@@ -69,7 +69,7 @@ feed:
 safe: False
 lsi: False
 username: Joel
-repo: https://github.com/LINARENA/LINARENA.github.io
+repo: LINARENA.github.io
 branch: master
 relative_source: ../
 destination: ../Lin-Posts/
