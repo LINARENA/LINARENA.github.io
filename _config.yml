@@ -1,37 +1,37 @@
 # Jekyll configuration
 markdown: kramdown
 highlighter: rouge
-paginate: 100 # it will paginate after this number
+paginate: 10 # it will paginate after this number
 language: 'ko-kr'
 
 # edit baseurl to simply '/' if using as your personal page (instead of a project page)
-baseurl: /LIN/
+baseurl: /
 
 # Website info
-title: LIN ARENA
-description: LIN ARENA Technology Blog
-cover: assets/images/lin_logo.png
-#logo: assets/images/blog-icon.png
-#logo_dark: assets/images/favicon.png
-#favicon: https://linarena.com/favicon.ico
-production_url: https://jekyller.github.io/jasper2/
-source_url: https://github.com/jekyller/jasper2/
+title: Ghost
+description: The professional publishing platform
+cover: assets/images/blog-cover.jpg
+logo: assets/images/blog-icon.png
+logo_dark: assets/images/favicon.png
+favicon: assets/images/favicon.png
+production_url: https://LINARENA.github.io/
+source_url: https://LINARENA.github.io/
 CNAME: #add cname for website to be created
-future: True
+
 # Social info
 navigation: True # show the navbar links
-subscribers: False # you need to connect an external service for this to work,
+subscribers: True # you need to connect an external service for this to work,
 # if 'True' the submit button is disabled for now, but you can change that
 # by editing `_includes/subscribe-form.html`
-#twitter: tryghost # replace by your username
-#facebook: ghost # replace by your username
+# twitter: tryghost # replace by your username
+facebook: teamlinarena # replace by your username
 
 # Disqus
-disqus: False
-disqus_shortname: Joel # replace with your disqus username
+disqus: True
+disqus_shortname: LINARENA # replace with your disqus username
 
 # Google Analytics
-google_analytics: UA-69281367-1 # replace with your GA tracking identifier
+# google_analytics: UA-69281367-1 # replace with your GA tracking identifier
 
 # Permalinks
 permalink: /:title
@@ -68,13 +68,13 @@ feed:
 # or "master" otherwise
 safe: False
 lsi: False
-username: Joel
-repo: jasper2
+username: LINARENA
+repo: LINARENA.github.io
 branch: master
-relative_source: ../jasper2/
-destination: ../Lin-Posts/
-production_url:  https://jekyller.github.io/jasper2/
-source_url:  https://github.com/jekyller/jasper2/
+relative_source: /
+destination: /
+production_url:  https://LINARENA.github.io/
+source_url:  https://github.com/LINARENA/LINARENA.github.io/
 
 exclude:
   - assets/css
