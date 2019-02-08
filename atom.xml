@@ -1,40 +1,28 @@
+---
+layout: null
+---
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title> - Articles</title>
-    <description>LIN ARENA Technology Blog</description>
+    <title>{{ site.name | xml_escape }} - Articles</title>
+    <description>{% if site.description %}{{ site.description | xml_escape }}{% endif %}</description>
     <link>
-    http://0.0.0.0:4000</link>
-    
-      
+    {{ site.url }}</link>
+    {% for post in site.posts %}
+      {% unless post.link %}
       <item>
-        <title>windows-0x01</title>
-        
-          <description>&lt;h1 id=&quot;0x01-윈도우-메모리&quot;&gt;0x01 윈도우 메모리&lt;/h1&gt;
-
-</description>
-        
-        <pubDate>Thu, 07 Feb 2019 19:18:00 +0900</pubDate>
+        <title>{{ post.title | xml_escape }}</title>
+        {% if post.excerpt %}
+          <description>{{ post.excerpt | xml_escape }}</description>
+        {% else %}
+          <description>{{ post.content | xml_escape }}</description>
+        {% endif %}
+        <pubDate>{{ post.date | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
         <link>
-        http://0.0.0.0:4000/windows-0x01</link>
-        <guid isPermaLink="true">http://0.0.0.0:4000/windows-0x01</guid>
+        {{ site.url }}{{ post.url }}</link>
+        <guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid>
       </item>
-      
-    
-      
-      <item>
-        <title>windows-0x00</title>
-        
-          <description>&lt;p&gt;0x00. 서문&lt;/p&gt;
-
-</description>
-        
-        <pubDate>Wed, 06 Feb 2019 19:18:00 +0900</pubDate>
-        <link>
-        http://0.0.0.0:4000/windows-0x00</link>
-        <guid isPermaLink="true">http://0.0.0.0:4000/windows-0x00</guid>
-      </item>
-      
-    
+      {% endunless %}
+    {% endfor %}
   </channel>
 </rss>
