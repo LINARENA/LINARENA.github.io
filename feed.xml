@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="http://0.0.0.0:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://0.0.0.0:4000/" rel="alternate" type="text/html" /><updated>2019-02-08T17:44:48+09:00</updated><id>http://0.0.0.0:4000/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">windows-0x01</title><link href="http://0.0.0.0:4000/windows-0x01" rel="alternate" type="text/html" title="windows-0x01" /><published>2019-02-07T19:18:00+09:00</published><updated>2019-02-07T19:18:00+09:00</updated><id>http://0.0.0.0:4000/windows-0x01</id><content type="html" xml:base="http://0.0.0.0:4000/windows-0x01">&lt;h1 id=&quot;0x01-윈도우-메모리&quot;&gt;0x01 윈도우 메모리&lt;/h1&gt;
+
+&lt;h3 id=&quot;가상-메모리&quot;&gt;가상 메모리&lt;/h3&gt;
+
+&lt;h5 id=&quot;x86-메모리-구조&quot;&gt;x86 메모리 구조&lt;/h5&gt;
+&lt;p&gt;x86 윈도우의 경우 각 프로세스 별로 최대 4GB를 지원합니다. 이 중 상위 절반(0xFFFFFFFF~0x80000000)은 OS 메모리로 사용하고(커널영역), 나머지 하위 절반(0x7FFFFFFF~0x00000000)은 프로세스가 독립적으로 사용할 수 있도록 제공합니다.(유저영역)
+그림 1-1는 32비트 윈도우에 의해 지원되는 전형적인 가상 주소 공간 배치를 나타냅니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그림 1-1에서 확인하였듯이 커널 영역은 다른 프로세스와 공통으로 사용하는 구조로 되어 있습니다. 그리고 이 영역은 OS가 사용하는 아주 중요한 영역입니다. 그래서 윈도우에서는 유저 영역에서 운영체제의 데이터에 접근하거나 수정하는 것을 막기 위해 두 가지 접근 모드(커널모드, 유저모드)를 사용합니다. &lt;strong&gt;유저 모드&lt;/strong&gt;는 커널 영역에 대한 접근을 할 수가 없지만, &lt;strong&gt;커널 모드&lt;/strong&gt;는 모든 시스템 메모리와 모든 CPU 명령어 등에 대해 접근이 허가된 실행모드를 말합니다. 이렇게 함으로써, 윈도우는 운영체제 시스템 커널에 잘못된 사용자 어플리케이션이 오동작을 유발하여, 시스템 전체의 안정성을 해치지 않게 보장하고 있습니다. 표 1-1은 커널모드, 유저모드를 뜻하는 다양한 용어들에 대한 정리입니다.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;모드&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;용어&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;커널 모드&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;커널 모드, 링 0, 커널 레벨, 슈퍼 바이저 모드&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;유저 모드&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;유저 모드, 링 3, 유저 레벨, 어플리케이션 모드&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;center&gt;[표 1-1] 커널 모드, 유저모드 용어 정리&lt;/center&gt;
+
+&lt;p&gt;** 윈도우는 4가지의 특권 레벨을 정의하고 있습니다. 하지만, 단지 두 개의 레벨만을 사용하는 이유는 일부 하드웨어 구조(ARM이나 MIPS 등)에서 2가지의 특권 레벨만 구현했기 때문입니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;x86-유저-영역-주소-공간-배치&quot;&gt;x86 유저 영역 주소 공간 배치&lt;/h5&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그림 1-2는 우리가 중점적으로 알아볼 유저영역의 메모리 배치입니다. 위 그림에서 볼 수 있듯이, 유저 영역은 스택, 힙, 공유라이브러리, PE Image 등으로 구성되어 있습니다. 또한, 각 영역의 주소가 임의로 할당됨을 알 수 있습니다. 메모리 보호기법 중 하나인 ASLR이 적용되어 위 그림과 같이 각 영역의 주소가 임의로 할당되는 것이죠. 그럼 계산기 프로그램을 가지고 실제로 저렇게 할당되는지 살펴보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그림 1-3은 Sysinternals suites의 vmmap을 통해 살펴 본 계산기의 메모리 구조입니다. 계산기를 종료한 후 다시 실행해보면 위치 값이 이전과 다르다는 것도 확인할 수 있습니다. 또한, vmmap은 각 할당 유형에 따라 다음과 같은 요약된 형태로 보여줍니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Image&lt;/strong&gt; : 실행 파일과 동적 라이브러리 같은 의존물, PE Image 파일을 매핑하는 데 사용되는 메모리 할당&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Shareable&lt;/strong&gt; : 일반적으로 공유 메모리를 포함해 공유 속성으로 설정된 메모리 할당&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Heap&lt;/strong&gt; : 프로세스가 소유한 힙을 위해 할당된 메모리 영역&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Stack&lt;/strong&gt; : 프로세스 내의 각 스레드를 위한 스택 용도로 할당된 영역&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Private Data&lt;/strong&gt; : 스택이나 힙을 제외한 전용 데이터(내부 데이터 구조체 등)로 표시된 메모리 영역&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;지금까지 윈도우 시스템의 가상 메모리 할당에 대한 대략적인 부분을 알아봤습니다. 이 글의 도입부에서 제가 각 프로세스 별로 4GB를 지원한다고 했습니다. 그런데 일반적으로 여러분들이 사용하는 PC의 RAM은 4~16GB 정도인데, 어떻게 실행하는 모든 프로세스마다 4GB를 지원할 수 있을까요?&lt;/p&gt;
+
+&lt;h5 id=&quot;paging&quot;&gt;Paging&lt;/h5&gt;
+
+&lt;p&gt;대부분의 시스템이 프로세스 실행에 사용하는 가상 메모리의 총합보다 작은 물리 메모리를 가지고 있습니다. 그래서 윈도우의 메모리 관리자는 프로세스가 사용하는 메모리 내용의 일부를 디스크로 보냅니다. 데이터를 디스크에 전송하면서 물리 메모리의 공간을 비울 수 있고, 그 자리를 다른 프로세스가 사용할 수 있도록 지원합니다. 만약 디스크에 전송한 내용을 사용하기 위해 가상 주소를 접근할 경우, 동일한 과정을 거쳐 메모리로 정보를 다시 가져옵니다. 이런 방식으로 윈도우에서는 메모리를 관리하고 있고, 디스크로 또는 메모리로 매핑하는 데이터의 단위를 페이지라고 부르고 기본 크기는 4KB입니다. 그림 1-4은 방금 설명한 페이징을 나타냅니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h5 id=&quot;공유-메모리&quot;&gt;공유 메모리&lt;/h5&gt;
+
+&lt;p&gt;공유 메모리란, 프로세스와 운영체제 사이의 공통으로 사용하는 메모리를 이야기합니다. 각 프로세스는 개별 데이터를 저장하거나 실행하기 위해 자신만의 메모리 공간을 갖겠지만, 여러 프로세스에서 동일하게 사용하는 부분은 굳이 여러 번 메모리에 할당할 필요가 없습니다. 그래서 윈도우는 그림 1-5과 같이 동일한 dll이나 다른 자원을 물리 메모리로 한 번만 로딩시키고 공유해서 사용하도록 구성되어 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이런 구조를 사용함으로써 메모리를 좀 더 효율적으로 사용할 수가 있게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;윈도우 메모리 구조에 대해 중요한 기본 개념들을 살펴봤습니다.
+다음 연재에서는 본격적으로 Stack의 구조와 Stack에서 일어날 수 있는 취약점들에 대해서 알아보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x01 윈도우 메모리</summary></entry><entry><title type="html">windows-0x00</title><link href="http://0.0.0.0:4000/windows-0x00" rel="alternate" type="text/html" title="windows-0x00" /><published>2019-02-06T19:18:00+09:00</published><updated>2019-02-06T19:18:00+09:00</updated><id>http://0.0.0.0:4000/windows-0x00</id><content type="html" xml:base="http://0.0.0.0:4000/windows-0x00">&lt;p&gt;0x00. 서문&lt;/p&gt;
+
+&lt;p&gt;안녕하세요. Joel-Park입니다.&lt;/p&gt;
+
+&lt;p&gt;“Windows Exploit”이라는 주제로 연재를 시작하게 되었습니다. 
+본격적으로 시작하기 전에 왜 이 연재를 시작하게 되었는지, 어떤 주제들을 다룰 것인지를 먼저 소개하려고 합니다.&lt;/p&gt;
+
+&lt;p&gt;왜 이 연재를 시작하게 되었는가?&lt;/p&gt;
+
+&lt;p&gt;결론부터 이야기를 드리자면, 자료가 너무 부족하다고 느꼈기 때문입니다.
+리눅스 시스템 해킹의 경우는 워게임이나 강좌 등 자료가 많이 존재하지만 윈도우는 찾기가 너무나도 힘이 듭니다. 어렵게 찾은 자료도 영문이라 100% 이해한 건지 확신하기도 어렵죠. 
+제가 윈도우 시스템 해킹을 시작하면서 느꼈던 이런 어려움들을 조금은 해소할 수 있지 않을까라는 생각에 연재를 시작하게 되었습니다.&lt;/p&gt;
+
+&lt;p&gt;어떤 주제들을 다룰 것인가?&lt;/p&gt;
+
+&lt;p&gt;Window_7_x86을 대상으로 메모리 구조, 스택과 힙 Exploit의 전반적인 내용을 다룰 것입니다.
+그리고 기회가 된다면 Windows 10을 이어서 연재할 예정입니다.( 아직 한다고는 안했습니다. :) )&lt;/p&gt;
+
+&lt;p&gt;이 글이 저와 같은 고민을 하시는 분들에게 조금이나마 도움이 되길 바랍니다.&lt;/p&gt;
+
+&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x00. 서문</summary></entry></feed>
