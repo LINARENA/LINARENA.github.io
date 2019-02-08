@@ -71,10 +71,10 @@ lsi: False
 username: Joel
 repo: https://github.com/LINARENA/LINARENA.github.io
 branch: master
-relative_source: ../LINARENA/
+relative_source: ../
 destination: ../Lin-Posts/
-production_url:  https://jekyller.github.io/jasper2/
-source_url:  https://github.com/jekyller/jasper2/
+# production_url:  https://jekyller.github.io/jasper2/
+# source_url:  https://github.com/jekyller/jasper2/
 
 exclude:
   - assets/css
