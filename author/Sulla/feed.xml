@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-02-08T22:33:30+09:00</updated>
+  <updated>2019-02-08T22:36:42+09:00</updated>
   <id>/author/Sulla/feed.xml</id>
 
   
@@ -49,7 +49,7 @@
 
 &lt;h2 id=&quot;메모리-구조&quot;&gt;메모리 구조&lt;/h2&gt;
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01-1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
   &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
 
@@ -81,7 +81,7 @@
 &lt;p&gt;Stack의 역할은 위에서 언급했으니 패스하고 동작 장식에 대하여 알아 보도록 하겠습니다. Stack은 기본적으로 &lt;strong&gt;후입선출&lt;/strong&gt;(LIFO, Last in First out)의 방식으로 동작합니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01-2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
   &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
 &lt;p&gt;Stack의 동작은 위와 같습니다. 16byte의 Stack공간에 A(4byte) 데이터를 저장시 PUSH를 통하여 저장합니다. 밀어 넣는다는 거죠. 이 때 ESP -4 즉 스택 포인터의 값을 총값에서 -4값을 저장 해둡니다. 왜일까요?&lt;/p&gt;

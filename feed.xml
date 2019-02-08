@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-02-08T22:33:30+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x01</title><link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" /><published>2019-02-08T19:18:00+09:00</published><updated>2019-02-08T19:18:00+09:00</updated><id>/linux_0x01</id><content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;buffer-overflow-뭐임뭐임뭐임&quot;&gt;Buffer Overflow 뭐임?뭐임?뭐임?&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-02-08T22:36:42+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x01</title><link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" /><published>2019-02-08T19:18:00+09:00</published><updated>2019-02-08T19:18:00+09:00</updated><id>/linux_0x01</id><content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;buffer-overflow-뭐임뭐임뭐임&quot;&gt;Buffer Overflow 뭐임?뭐임?뭐임?&lt;/h2&gt;
 
 &lt;p&gt;BOF란 &lt;strong&gt;메모리&lt;/strong&gt;의 동작 과정중의 오류로 인한 잘못된 동작을 유도하는 취약점입니다. 프로세스가 데이터를 &lt;strong&gt;버퍼&lt;/strong&gt;에 저장 시 입력 값의 크기를 검증하지 않을 경우 주어진 버퍼를 넘어선 즉, 지정된 위치가 아닌 곳에 저장되며 인접한 메모리를 덮어 쓰게 됩니다. 인접 메모리에는 기존의 데이터가 저장되어 있으며 &lt;strong&gt;변수, 프로세스 흐름 제어&lt;/strong&gt; 등의 데이터가 포함됩니다. 따라서 메모리 접근 오류로 인한 이상 동작을 하게되며 결과적으로 취약점으로 동작하게 되는것입니다.&lt;/p&gt;
 
@@ -6,7 +6,7 @@
 
 &lt;h2 id=&quot;메모리-구조&quot;&gt;메모리 구조&lt;/h2&gt;
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01-1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
   &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
 
@@ -38,7 +38,7 @@
 &lt;p&gt;Stack의 역할은 위에서 언급했으니 패스하고 동작 장식에 대하여 알아 보도록 하겠습니다. Stack은 기본적으로 &lt;strong&gt;후입선출&lt;/strong&gt;(LIFO, Last in First out)의 방식으로 동작합니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01-2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
   &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
 &lt;p&gt;Stack의 동작은 위와 같습니다. 16byte의 Stack공간에 A(4byte) 데이터를 저장시 PUSH를 통하여 저장합니다. 밀어 넣는다는 거죠. 이 때 ESP -4 즉 스택 포인터의 값을 총값에서 -4값을 저장 해둡니다. 왜일까요?&lt;/p&gt;
