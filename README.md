@@ -11,7 +11,7 @@ jekyll을 실행하기 위해서는 반드시 Devkit이 필요하기 때문에 w
 
 
 #2. Jekyll & bundler 설치
-<img data-action="zoom" src='{{ "https://github.com/LINARENA/LINARENA.github.io/blob/source/assets/images/guide_3.png" | relative_url }}' alt='[그림 1-3]'>
+<img data-action="zoom" src='{{ "https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_1.png" | relative_url }}' alt='[그림 1-3]'>
 </figure>
 
 gem 명령어를 이용해서 jekyll과 bundler를 설치해줍니다.
