@@ -30,7 +30,7 @@ github source branch의 blog_tmp에는 지금까지 블로그에 사용된 소�
 &nbsp;
 ![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_6.png)
 &nbsp;
-##5. md 작성 시 필요한 사항들
+## 5. md 작성 시 필요한 사항들
 &nbsp;
 ### 1) _data/authors.yml 작성
 &nbsp;
