@@ -11,13 +11,13 @@ jekyll을 실행하기 위해서는 반드시 Devkit이 필요하기 때문에 w
 
 
 #2. Jekyll & bundler 설치
-<img data-action="zoom" src='{{ "/assets/images/guide_3.png" | relative_url }}' alt='[그림 1-3]'>
+<img data-action="zoom" src='{{ "./assets/images/guide_3.png" | relative_url }}' alt='[그림 1-3]'>
 </figure>
 
 gem 명령어를 이용해서 jekyll과 bundler를 설치해줍니다.
 #3. github branch clone
 github source branch의 blog_tmp에는 지금까지 블로그에 사용된 소스코드가 들어있습니다. clone하여 소스코드를 받아주세요.
-<img data-action="zoom" src='{{ "/assets/images/guide_4.png" | relative_url }}' alt='[그림 1-4]'>
+<img data-action="zoom" src='{{ "./assets/images/guide_4.png" | relative_url }}' alt='[그림 1-4]'>
 </figure>
 <img data-action="zoom" src='{{ "/assets/images/guide_5.png" | relative_url }}' alt='[그림 1-5]'>
 </figure>
