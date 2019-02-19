@@ -1,5 +1,5 @@
 ## 1. Ruby 설치
-https://rubyinstaller.org/downloads/에서 자신의 OS Bit에 맞는 Ruby+Devkit을 설치합니다.
+https://rubyinstaller.org/downloads/ 에서 자신의 OS Bit에 맞는 Ruby+Devkit을 설치합니다.
 ![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_1.png)
 &nbsp;
 jekyll을 실행하기 위해서는 반드시 Devkit이 필요하기 때문에 with로 하시는 게 좋습니다.
