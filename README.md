@@ -1,8 +1,10 @@
 #1. Ruby 설치
 https://rubyinstaller.org/downloads/에서 자신의 OS Bit에 맞는 Ruby+Devkit을 설치합니다.
+<figure>
 <img data-action="zoom" src='{{ "/assets/images/guide_1.png" | relative_url }}' alt='[그림 1-1]'>
 </figure>
 jekyll을 실행하기 위해서는 반드시 Devkit이 필요하기 때문에 with로 하시는 게 좋습니다.
+<figure>
 <img data-action="zoom" src='{{ "/assets/images/guide_2.png" | relative_url }}' alt='[그림 1-2]'>
 </figure>
 
@@ -11,8 +13,9 @@ jekyll을 실행하기 위해서는 반드시 Devkit이 필요하기 때문에 w
 
 
 #2. Jekyll & bundler 설치
-<img data-action="zoom" src='{{ "https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_1.png" | relative_url }}' alt='[그림 1-3]'>
-</figure>
+
+
+![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_3.png)
 
 gem 명령어를 이용해서 jekyll과 bundler를 설치해줍니다.
 #3. github branch clone
