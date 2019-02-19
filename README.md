@@ -79,13 +79,13 @@ _data/authors.yml 파일을 열어 다음과 같이 작성자 프로필 설정�
 
 ## 6. Jekyll 동작 확인	
 
-http://127.0.0.1:4000/으로 접근하여 로컬에서 홈페이지가 잘 동작하는지 확인합니다.	
 	
 	bundle exec jekyll serve
 	
-
+위 명령어로 jekyll을 동작시킵니다.
+http://127.0.0.1:4000/으로 접근하여 로컬에서 홈페이지가 잘 동작하는지 확인합니다.
 * 빌드만 할 경우는 bundle exec jekyll build 명령어를 사용하면 됩니다.	
-
+	
 ![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_10.png)	
 
 ## 7. 빌드된 파일들 github에 push	
