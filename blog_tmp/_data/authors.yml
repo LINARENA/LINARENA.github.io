@@ -1,0 +1,32 @@
+ghost:
+  username: ghost
+  name: Ghost
+  url_full: http://jekyller.github.io/jasper2/
+  url: jekyller.github.io/jasper2
+  bio: The professional publishing platform
+  picture: assets/images/ghost.png
+  facebook: ghost
+  twitter: tryghost
+  cover: False
+Joel:
+  username: Joel
+  name: Joel Park
+  location: Seoul, Republic of Korea
+  url_full: 
+  url: 
+  bio: Joel is a member of LIN ARENA's Consulting Team. Also, in Red Team.
+  picture: assets/images/CI_Logo.jpg
+  facebook: False
+  twitter: False
+  cover: assets/images/lin_logo.png
+Sulla:
+  username: Sulla
+  name: Sulla
+  location: Seoul, Republic of Korea
+  url_full: 
+  url: 
+  bio: Sulla is a member of LIN ARENA's Consulting Team. Also, in Red Team.
+  picture: assets/images/CI_Logo.jpg
+  facebook: False
+  twitter: False
+  cover: assets/images/lin_logo.png
