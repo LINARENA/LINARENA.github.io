@@ -19,7 +19,8 @@ gem 명령어를 이용해서 jekyll과 bundler를 설치해줍니다.
 &nbsp;
 ## 3. github branch clone
 &nbsp;
-github source branch의 blog_tmp에는 지금까지 블로그에 사용된 소스코드가 들어있습니다. clone하여 소스코드를 받아주세요.
+github source branch의 blog_tmp에는 지금까지 블로그에 사용된 소스코드가 들어있습니다. &nbsp;
+clone하여 소스코드를 받아주세요.
 &nbsp;
 ![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_4.png)
 ![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_5.png)
@@ -36,13 +37,38 @@ github source branch의 blog_tmp에는 지금까지 블로그에 사용된 소�
 &nbsp;
 _data/authors.yml 파일을 열어 다음과 같이 작성자 프로필 설정을 해주세요.
 &nbsp;
-![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_7.png)
+	
+    Joel:
+        username: Joel
+        name: Joel Park
+        location: Seoul, Republic of Korea
+        url_full: 
+        url: 
+        bio: Joel is a member of LIN ARENA's Consulting Team. Also, in Red Team.
+        picture: assets/images/CI_Logo.jpg
+        facebook: False
+        twitter: False
+        cover: assets/images/lin_logo.png
+  
+
 &nbsp;
 ### 2) md 설정 값 작성
 &nbsp;
 본인이 작성한 md 헤더에 다음과 같이 값을 넣어주세요.
 &nbsp;
-![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_8.png)
+
+	---
+    layout: post
+    current: post
+    cover: 'assets/images/waves.jpg'
+    navigation: True
+    title: windows-0x01
+    date: 2019-02-07 10:18:00
+    tags: Posts
+    class: post-template
+	subclass: 'post tag-windows'
+	author: Joel
+	---
 &nbsp;
 - cover : 블로그 포스팅 시, 글 도입부에 표시될 이미지
 - title : 글 제목
