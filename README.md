@@ -5,14 +5,17 @@ https://rubyinstaller.org/downloads/ 에서 자신의 OS Bit에 맞는 Ruby+Devk
 
 jekyll을 실행하기 위해서는 반드시 Devkit이 필요하기 때문에 with로 하시는 게 좋습니다.	
 
-![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_2.png)
-
+	
+	Ruby -v
+	
 
 설치 후 Ruby –v로 잘 설치 되었는지 확인하세요. 명령어가 동작하지 않을 시, 환경변수에 Ruby를 추가해주세요.	
 
 ## 2. Jekyll & bundler 설치	
 
-![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_3.png)	
+	
+	gem install jekyll bundler
+	
 
 gem 명령어를 이용해서 jekyll과 bundler를 설치해줍니다.	
 
@@ -22,7 +25,6 @@ github source branch의 blog_tmp에는 지금까지 블로그에 사용된 소�
 clone하여 소스코드를 받아주세요.	
 
 ![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_4.png)
-![home page](https://raw.githubusercontent.com/LINARENA/LINARENA.github.io/source/assets/images/guide_5.png)
 
 ## 4. md 및 이미지 추가	
 
