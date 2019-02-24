@@ -30,3 +30,14 @@ Sulla:
   facebook: False
   twitter: False
   cover: assets/images/lin_logo.png
+Hackyu:
+  username: hackyu
+  name: hackyu
+  location: Seoul, Republic of Korea
+  url_full: 
+  url: 
+  bio: hackyu is a member of LIN ARENA's Consulting Team. Also, in Red Team.
+  picture: assets/images/CI_Logo.jpg
+  facebook: False
+  twitter: False
+  cover: assets/images/lin_logo.png
