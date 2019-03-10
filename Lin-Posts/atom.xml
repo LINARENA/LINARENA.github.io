@@ -8,6 +8,36 @@
     
       
       <item>
+        <title>windows-0x05</title>
+        
+          <description>&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Sat, 09 Mar 2019 19:18:00 +0900</pubDate>
+        <link>
+        /windows-0x05</link>
+        <guid isPermaLink="true">/windows-0x05</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>windows-0x04</title>
+        
+          <description>&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Sun, 03 Mar 2019 19:18:00 +0900</pubDate>
+        <link>
+        /windows-0x04</link>
+        <guid isPermaLink="true">/windows-0x04</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>web-0x01</title>
         
           <description>&lt;h1 id=&quot;privilege-escalation--content-injection-on-wordpress-470--471&quot;&gt;Privilege Escalation / Content Injection On Wordpress 4.7.0 ~ 4.7.1&lt;/h1&gt;
