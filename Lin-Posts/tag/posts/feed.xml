@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-09T18:18:34+09:00</updated>
+  <updated>2019-03-10T20:32:18+09:00</updated>
   <id>/tag/posts/feed.xml</id>
 
   
@@ -36,6 +36,308 @@
   
   
 
+  
+    <entry>
+      <title type="html">web-0x02</title>
+      <link href="/web-0x02" rel="alternate" type="text/html" title="web-0x02" />
+      <published>2019-03-11T04:00:00+09:00</published>
+      <updated>2019-03-11T04:00:00+09:00</updated>
+      <id>/web-0x02</id>
+      <content type="html" xml:base="/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘은 CVE-2018-12613 PHPMyAdmin LFI to RCE 취약점에 대한 포스팅입니다.&lt;br /&gt;&lt;br /&gt; 
+해당 취약점은 PMA(PHP My Admin) 버전 4.8.0 ~ 4.8.1에서 발생하는 취약점이며, index.php 요청 시 사용되는 target 파라미터의 값이 조건을 만족하게되는 경우 include()를 통해 발생되는 LFI 취약점을 이용한 RCE 공격입니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;lfi--rce&quot;&gt;LFI / RCE?&lt;/h5&gt;
+
+&lt;p&gt;LFI와 RCE 취약점에 대해 간략하게 설명드리겠습니다.&lt;br /&gt;&lt;br /&gt;
+LFI(Local File Inclusion) 취약점이란 클라이언트에 의한 서버로의 요청 시 반환하는 응답의 결과 내에 서버 내 존재하는 파일이 포함되어 노출되는 취약점을 말합니다.&lt;br /&gt;&lt;br /&gt;
+RCE(Remote Command Execution) 취약점이란 말그대로 원격 명령 실행으로 공격자가 삽입하는 또는 전달하는 값으로 서버 측의 환경에서 시스템 명령어를 실행할 수 있는 취약점을 말합니다.&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;해당 취약점을 이해하기 위해서 세션에 대해서 간략하게 말씀드리자면, 서버가 클라이언트를 식별하는데 사용하는 일조의 별명이라고 생각하시면 될 것 같습니다. 또한, 일반적으로 세션은 서버 측에서 파일로 관리하게 됩니다.&lt;br /&gt;&lt;br /&gt;
+세션이 파일로 관리되는 부분에 대해서는 취약점 분석 시 간략히 확인하실 수 있으실 것 같습니다. 또한 해당 취약점은 관리자로의 접근 이후 단계에서의 단게로 생각하시면 될 것 같습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;환경구성&lt;/strong&gt;&lt;br /&gt;
+    &lt;ul&gt;
+      &lt;li&gt;Apache 2.4.18&lt;br /&gt;&lt;/li&gt;
+      &lt;li&gt;PHP 7.0.30&lt;br /&gt;&lt;/li&gt;
+      &lt;li&gt;PHPMyadmin 4.8.1&lt;br /&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_1.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - LFI to RCE Vulnerability Flow -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;다음은 취약점이 발생한 PHPMyAdmin 4.8.1 소스코드 부분입니다.&lt;br /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// phpmyadmin 4.8.1 index.php line 53 ~ 62
+&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// If we have a valid target, let's load that script instead 
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;                            &lt;span class=&quot;c1&quot;&gt;// Request 시 target 파라미터 값 empty 야부
+&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;is_string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;                       &lt;span class=&quot;c1&quot;&gt;// Request 요청 파라미터 target 값의 타입 문자열 여부
+&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;preg_match&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'/^index/'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;//Request 요청 파라미터 target값에 'index' 문자열 매칭 여부
+&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$target_blacklist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;// equest 요청 파라미터 target의 값이 blacklist에 속해 있는지 여부
+&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Core&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;checkPageValidity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;         &lt;span class=&quot;c1&quot;&gt;// Core 클래스의 checkPageValidity 함수의 인자로 호출 결과 여부
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;                            &lt;span class=&quot;c1&quot;&gt;// 위의 조건이 만족하는 경우 include
+&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;figure&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - PHPMyAdmin 4.8.1 index.php line 53 to 62 -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// whitelist of /phpmyadmin/libraries/Core.php
+&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$goto_whitelist&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_datadict.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_events.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;        
+    &lt;span class=&quot;s1&quot;&gt;'db_importdocsql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_multi_table_query.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_structure.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_operations.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_search.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'db_routines.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'index.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'pdf_pages.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'pdf_schema.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_binlog.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_collations.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_databases.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_engines.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_privileges.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_status.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_status_advisor.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_status_monitor.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_status_queries.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_status_variables.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'server_variables.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_addfield.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_change.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_create.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_indexes.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_operations.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_structure.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_relation.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_replace.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_row_action.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_select.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'tbl_zoom_select.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'transformation_overview.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'transformation_wrapper.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s1&quot;&gt;'user_password.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;figure&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - PHPMyAdmin 4.8.1 whitelist of phpmyadmin/libraries/Core.php -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// checkPageValidity of /phpmyadmin/libraries/Core.php
+&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;checkPageValidity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[])&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+       &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$goto_whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;isset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;is_string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+   &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;mb_substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+       &lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+       &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+       &lt;span class=&quot;nb&quot;&gt;mb_strpos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+   &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;urldecode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;// url decoding 
+&lt;/span&gt;   &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;mb_substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+       &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+       &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+       &lt;span class=&quot;nb&quot;&gt;mb_strpos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+   &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;figure&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - PHPMyAdmin 4.8.1 checkPageValidity of phpmyadmin/libraries/Core.php -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;위 코드들이 해당 취약점에 발생되는 부분이며 간략하게 바로 드러나는 부분에 대해서는 주석처리로 설명하였습니다.&lt;br /&gt;&lt;br /&gt; 
+사용자가 입력한 값에 대한 검증에 미흡한 검증 절차가 있으며, checkPageValidity()에서 whitelist에 존재하는 값을 이용하여 db_sql.php?와 같이 bypass하기에 include() 함수를 이용하여 LFI가 가능한 것을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;취약점-공격-테스트&quot;&gt;취약점 공격 테스트&lt;/h5&gt;
+&lt;p&gt;먼저 다음과 같이 현재 php 관련 정보를 확인할 수 있는 것을 알 수 있습니다. 또한, 이번 취약점을 분석하는데 있어 중요하게 봐야할 부분 중 하나인 기본 세션 저장 경로(session_save_path)를 확인할 수 있습니다.&lt;br /&gt;&lt;br /&gt;
+현재 테스트 경로는 기본적으로 /var/lib/php/sessions라는 경로로 생성된 세션 파일이 저장되는 것으로 볼 수 있습니다.
+&lt;?php phpinfo(); ?&gt;&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_2.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;
+   - phpinfo() 결과 -
+&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;phpmyadmin으로 로그인 한 이후, SQL문을 실행할 수 있는 부분에서 다음과 같이 입력 한 후 실행하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_3.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;
+   - SQL문 실행 시도 -
+&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;정상적으로 SQL문이 실행이 되고, 로그인 또는 페이지 접근 시 생성된 쿠키 정보 중 phpMyAdmin 세션 값을 확인할 수 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_4.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;
+   - SQL문 실행 결과 확인 및 쿠키, 세션정보 확인 -
+&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;위에서 봤던 것과 같이 해당 경로에 이전단계에서 확인한 세션값 앞에 ‘sess_‘이라는 문자열이 연결된 세션 파일이 생성되고, 존재하는 것을 확인할 수 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_5.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;
+   - 세션 파일 확인 -
+&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;해당 세션 파일의 내용을 확인해보면 앞서 실행하였던 SQL 쿼리문이 세션 파일 내용으로 포함된 것을 확인할 수 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_6.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;
+   - 세션 파일 내용 확인 -
+&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;다음 그림과 같이 화이트리스트에 존재하는 목록(db_sql.php) 이용한 index.php의 파라미터 target으로 사용하며, 추가적으로 파일다운로드 취약점을 이용한 공격 시 많이 알려지고 사용되는 상대경로 ex) ../../../ 를 이용하여 세션저장경로의 세션파일 연결하여 파라미터 값으로 요청한 결과입니다.&lt;br /&gt;&lt;br /&gt;
+본 그림에서 보이는 것과 같이 앞서 실행한 SQL문이 포함되어 phpinfo()가 정상적으로 동작된 결과가 LFI를 통해 확인할 수 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_7.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;
+   - LFI 시도 및 결과 -
+&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;지금까지 입력한 SQL문이 세션 파일 내 포함이 되며 정상적으로 실행된 결과를 LFI를 통해 확인할 수 있는 부분까지 진행하였습니다.&lt;br /&gt;&lt;br /&gt; 본격적인 RCE를 위해 다음과 같이 SQL문을 실행하여 세션파일 내 포함하도록 합니다. 본 SQL문에 포함되는 php구문에 시스템 명렁어를 실행하는 함수 중 system() 함수를 이용하였습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_8.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;
+   - 세션 파일 내용 확인 -
+&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;다음 그림으로 정상적으로 RCE가 가능한 것을 확인할 수 있습니다. 앞에서 수행했던 방식과 조금의 차이점은 파라미터를 포함하여 요청 하였습니다. 우리가 cmd라는 파라미터로 입력한 시스템 명령어가 정상적으로 실행되는 것을 확인할 수 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_9.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;
+   - RCE 시도 및 결과 (id 명령어) -
+&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_10.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;
+   - RCE 시도 및 결과 (cat /etc/passwd) -
+&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;취약점 분석한 결과를 요약하면 다음과 같습니다.&lt;br /&gt;&lt;br /&gt;
+사용자가 실행한 SQL문이 세션 파일 내 포함됨&lt;br /&gt;
+Whitelist 값을 이용한 index.php의 target 파라미터로 요청 시 LFI 취약점 확인&lt;br /&gt;
+LFI를 이용한 원활한 RCE 사용 가능&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;패치 및 대응방안&lt;/strong&gt;
+&lt;br /&gt;
+ https://www.phpmyadmin.net/files/4.8.2/ 를 통해 본 취약점과 타 취약점들에 대해서 패치가 된 버전인 4.8.2로 업데이트 된 것을 확인할 수 있습니다.&lt;br /&gt;&lt;br /&gt;
+ ./phpmyadmin/libraries/classes/Core.php의 checkPageValidity()와 index.php의 checkPageValidity 호출 시 사용되는 파라미터 부분이 변경된 것을 확인하였습니다.
+&lt;br /&gt;&lt;br /&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;References&lt;/strong&gt;
+&lt;br /&gt;
+https://blog.vulnspy.com/2018/06/21/phpMyAdmin-4-8-x-Authorited-CLI-to-RCE/&lt;br /&gt;
+https://www.vulnspy.com/phpmyadmin-4.8.1/&lt;br /&gt;
+https://medium.com/@happyholic1203/phpmyadmin-4-8-0-4-8-1-remote-code-execution-257bcc146f8e&lt;br /&gt;
+https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
+&lt;/ul&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>hackyu</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1</summary>
+      
+
+      
+      
+    </entry>
   
     <entry>
       <title type="html">windows-0x05</title>
@@ -996,110 +1298,123 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
     </entry>
   
     <entry>
-      <title type="html">linux_0x01</title>
-      <link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
+      <title type="html">windows-0x03</title>
+      <link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
       <published>2019-02-18T19:18:00+09:00</published>
       <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>/linux_0x01</id>
-      <content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
+      <id>/windows-0x03</id>
+      <content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
 
-&lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다. 오늘부터 본격적으로 &lt;strong&gt;BOF&lt;/strong&gt;에 알아보도록 하겠습니다.&lt;/p&gt;
+&lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
 
-&lt;p&gt;&lt;strong&gt;BOF&lt;/strong&gt;(Buffer Overflow)란 &lt;strong&gt;메모리&lt;/strong&gt;의 동작 과정중의 오류로 인한 잘못된 동작을 유도하는 취약점입니다. 프로세스가 데이터를 &lt;strong&gt;버퍼&lt;/strong&gt;에 저장 시 입력 값의 크기를 검증하지 않을 경우 주어진 버퍼를 넘어선 즉, 지정된 위치가 아닌 곳에 저장되며 인접한 메모리를 덮어 쓰게 됩니다. 인접 메모리에는 기존의 데이터가 저장되어 있으며 &lt;strong&gt;변수, 프로세스 흐름 제어&lt;/strong&gt; 등의 데이터가 포함됩니다. 따라서 메모리 접근 오류로 인한 이상 동작을 하게되며 결과적으로 취약점으로 동작하게 되는것입니다.&lt;/p&gt;
+&lt;p&gt;Buffer Overflow(이하 BOF)는 데이터의 저장 또는 보관을 위해 주어진 메모리 공간의 크기보다 더 많은 값을 입력해 인접 메모리의 값을 변조할 수 있는 공격 기법입니다. 공격자들이 BOF를 이용해서 주로 하는 일은 변수의 값을 변조하는 것과 RET를 변조해서 프로그램의 흐름을 조작하는 것입니다.&lt;/p&gt;
 
-&lt;p&gt;앞으로 이 BOF에 대해서 천천히 알아보고자 합니다. 먼저 BOF를 알기 위해서는 메모리, 레지스터 등의 구조 및 개념과 앞으로 사용될 gdb의 사용법 등 본격적인 시작에 앞 서 필요한 배경 지식에 대하여 짚고 넘어가도록 하겠습니다.&lt;/p&gt;
+&lt;p&gt;이 취약점은 왜 발생할까요?&lt;/p&gt;
 
-&lt;h2 id=&quot;메모리-구조&quot;&gt;메모리 구조&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;strcpy, gets 등의 입력 값 길이를 체크하지 않는 취약한 문자열 함수의 사용&lt;/li&gt;
+  &lt;li&gt;길이 값 검증을 하지 않은 취약한 프로그램 설계&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;BOF는 흔히 위의 두 가지 이유로 발생합니다. 그렇다면 이 취약점이 발생하지 않게 하려면 어떻게 하면 될까요?
+입력 값 길이를 체크하는 안전한 문자열 함수를 사용하면 되겠죠? 물론 이것도 중요하지만 안전한 함수의 사용만으로는 이 공격을 100% 막을 수는 없습니다. 안전한 함수로 문자열 길이 500만큼 받도록 해놓더라도 버퍼의 크기가 300이면 BOF가 일어날 수 있습니다. 그렇기 때문에 안전한 문자열 함수의 사용과 더불어 &lt;strong&gt;안전한 프로그램 설계&lt;/strong&gt;도 뒷받침되어야 합니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;direct-eip-overwrite&quot;&gt;Direct EIP Overwrite&lt;/h5&gt;
+
+&lt;p&gt;아래 소스코드를 가지고 가장 기초적인 BOF를 다루어보도록 하겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+
+#pragma warning (disable:4996)
+#define _CRT_SECURE_NO_WARNINGS
+
+int main(int argc, char* argv[]) {
+
+    char content_buffer[1000];
+    char display_buffer[300];
+    FILE *f = fopen(argv[1], &quot;rb&quot;);
+
+    fgets(content_buffer, 1000, f);
+    strcpy(display_buffer,content_buffer);
+
+    printf(&quot;%s\n&quot;, display_buffer);
+
+    fclose(f);
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;fgets로 길이 1000만큼 파일을 읽어와서 content_buffer에 값을 저장하고, 다시 content_buffer에서 display_buffer로 값을 복사한 후 출력해주는 프로그램입니다. 여기서 문제는 strcpy로 content_buffer에서 display_buffer로 값을 복사한다는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;본격적으로 공격을 시작해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Buffer 시작 주소에서 RET까지의 거리 알아내기&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Buffer 시작 위치에서 값을 얼마나 넣어야 RET를 변조할 수 있는지 알아야 공격이 가능하겠죠?&lt;/p&gt;
+
+&lt;p&gt;지금은 거리를 모르니 다음과 같이 간단하게 “A” 100개만 넣어서 분석을 해보겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
-&lt;p&gt;먼저 BOF를 알기 위해선 메모리를 알아야 합니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Kernel&lt;/strong&gt; : OS의 중요 코드들이 로드되며 일반 사용자는 접근 불가한 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;off-limit&lt;/strong&gt; : 사용자의 Kernel 접근을 막기 위해 설정한 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Stack&lt;/strong&gt; : 환경변수, 파라미터, 반환되는 주소 및 지역변수 등 임시적인 데이터를 저장하는 공간이며, 높은 메모리 주소에서 낮은 메모리 주소로 저장됨&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;libc&lt;/strong&gt; : 프로그램 내부에서 사용하는 라이브러리 함수들과 관련된 공유 라이버리 파일이 정장되는 공간&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Heap&lt;/strong&gt; : 엉덩…아니 필요에 의해 사용되는 동적 변수의 데이터가 저장되는 공간이며, 낮은 메모리 주소에서 높은 메모리 주소로 저장됨&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;BSS / Data&lt;/strong&gt; : 전역변수, 정적변수, 배열, 구조체 등이 저장되는 구조이며 차이는 아래와 같다
-    &lt;ul&gt;
-      &lt;li&gt;&lt;strong&gt;BSS&lt;/strong&gt; : 초기화 되지 않은, 0으로 초기화, Null로 초기화된 데이터의 경우 저장되는 공간&lt;/li&gt;
-      &lt;li&gt;&lt;strong&gt;Data&lt;/strong&gt; : 초기화 된 데이터가 저장 되는 공간&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Code&lt;/strong&gt; : 실제로 실행되는 hex, bin과 같은 파일내부에 실행되는 코드들이 저장되며 기계어 명령어, 어셈블리 코드가 실행되는 영역&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;메모리를 간단하게 정리한 내용입니다. 여기서 Stack과 Heap의 동작 방향이 다르다는 것이 특이한 모습을 보입니다. 왜 그럴까요?&lt;/p&gt;
-
-&lt;p&gt;바로 효율적인 메모리 관리와 Kernel영역의 보호를 위해 저런 모습으로 설계 되었습니다. Stack은 Kernel의 반대 방향으로 움직이고 Stack과 Heap 사이에 libc를 배치하여 메모리 관리의 효율성을 높인것이죠.&lt;/p&gt;
-
-&lt;p&gt;이제 메모리를 간단히 알아 보았으니 메모리 중 Stack에 관하여 간단히 짚고 넘어가도록 하겠습니다.&lt;/p&gt;
-
-&lt;h2 id=&quot;stack&quot;&gt;Stack?&lt;/h2&gt;
-
-&lt;p&gt;Stack의 역할은 위에서 언급했으니 패스하고 동작 장식에 대하여 알아 보도록 하겠습니다. Stack은 기본적으로 &lt;strong&gt;후입선출&lt;/strong&gt;(LIFO, Last in First out)의 방식으로 동작합니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;Stack의 동작은 위와 같습니다. 16byte의 Stack공간에 A(4byte) 데이터를 저장시 PUSH를 통하여 저장합니다. 밀어 넣는다는 거죠. 이 때 ESP -4 즉, 스택 포인터의 값을 총값에서 -4값을 저장 해둡니다. 왜일까요?&lt;/p&gt;
+&lt;p&gt;Buffer 시작 위치가 EBP-12C인 것을 확인할 수 있습니다.&lt;/p&gt;
 
-&lt;p&gt;Stack은 메모리의 높은 주소값에서 낮은 주소값으로 이동하기 떄문에 16byte 에서 4byte씩 줄이는 것이죠. 높은 곳에서 낮은 곳으로.&lt;/p&gt;
-
-&lt;p&gt;다음으로 B 데이터를 저장시 마찬가지로 PUSH를 통하여 A데이터 위에 밀어 넣게 됩니다. ESP 값 또한 -4의 값을 저장 합니다. C 데이터까지 같은 방식으로 데이터를 저장 합니다. 그런데 다시 A 데이터를 빼고 싶다면?&lt;/p&gt;
-
-&lt;p&gt;앞서 말했던 Stack의 동작 방식인 &lt;strong&gt;후입선출&lt;/strong&gt;에 의해 C 데이터를 POP을 통하여 뽑고 ESP의 값은 -4가 아닌 +4의 값을 저장합니다. 이어서 B데이터를 뽑은 후 A 데이터를 뽑을 수 있습니다. 이것이 Stack의 동작 방식인 후입선출입니다.&lt;/p&gt;
-
-&lt;p&gt;정리하자면, Stack은 &lt;strong&gt;메모리의 높은 주소값에서 낮은 주소값으로 데이터가 저장&lt;/strong&gt;되며 동작 방식은 &lt;strong&gt;후입선출&lt;/strong&gt;의 방식으로 동작 합니다. 위에서 나온 ESP의 경우 레지스터의 한 종류로서 레지스터는 포인터, 산술 연산, 인덱스, 세그먼트, 플래그 등이 있으며 필요한 몇가지의 레지스터만 간단하게 정리하자면 다음과 같습니다.&lt;/p&gt;
-
-&lt;p&gt;포인터 레지스터 : 포인터와 관련된 레지스터&lt;/p&gt;
+&lt;p&gt;SFP도 덮어줘야 하니까 거리는 304가 되겠네요.(12C = 300)&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;EIP&lt;/strong&gt; (Instruction Pointer) : CPU가 실행할 다음 명령어의 주소값을 나타냄&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;EBP&lt;/strong&gt; (Base Pointer) : 현재 스택의 최하단 주속값을 나타냄, EBP의 다음 주소는 Return값을 나타냄&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ESP&lt;/strong&gt; (Stack Pointer) : 현재 스택의 최상단 주소값을 나타냄&lt;/li&gt;
+  &lt;li&gt;Exploit 작성하기&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;산술 연산 레지스터 : 산술 논리 연산에 필요한 레지스터&lt;/p&gt;
+&lt;p&gt;메모리 보호기법이 적용되지 않은 프로그램이기 때문에 RET를 Shellcode가 있는 곳의 주소로 변조하기만 하면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 Payload는 아래 코드와 같이 Nop과 Shellcode를 합쳐서 304만큼 만들어주고, RET는 Shellcode 시작 전 Nop이 있는 위치로 지정하면 되겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;immunity debugger로 프로그램 흐름을 한 번 살펴보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Strcpy가 동작이 완료된 후, RET가 Buffer 시작 주소로 잘 변조되었네요.&lt;/p&gt;
+
+&lt;p&gt;Main 함수의 RET를 변조했기 때문에 실제로 Shellcode가 실행되는 시점은 Main 함수의 에필로그 과정이 진행된 다음입니다.&lt;/p&gt;
+
+&lt;p&gt;에필로그 과정의 마지막에서 변조된 RET 주소로 프로그램의 흐름이 바뀌면 다음과 같이 Shellcode를 만나러 갑니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;EAX&lt;/strong&gt; (Accumulator Register) : 산술 논리 연산에 필요한 상수 또는 변수값이 저장되며 함수의 리턴값 저장&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ECX&lt;/strong&gt; (Counter Register) : 반복문 동작시 반복문의 반복 횟수를 저장&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;EDX&lt;/strong&gt; (Data Register) : EAX 레지스터를 보조&lt;/li&gt;
+  &lt;li&gt;공격 결과 확인&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;인덱스 레지스터 : 작업에 필요한 데이터의 주소값 저장에 사용되는 레지스터&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-6]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;ESI&lt;/strong&gt; (Source Index) : 데이터 복사 및 조작할 때 사용하는 데이터 주소를 저장(ESI &amp;lt;&amp;gt; EDI)&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;EDI&lt;/strong&gt; (Destination Index) : 데이터 복사시 목적지의 주소 저장 (EDI &amp;lt;&amp;gt; ESI)&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;CMD가 정상적으로 잘 실행되네요^^&lt;/p&gt;
 
-&lt;p&gt;레지스터의 사용 이유는 CPU의 빠른 작업 처리를 위해 사용 됩니다. CPU내부에 위치하여 메모리에 접근하는 것보다 더욱 빠른 속도로 접근 가능합니다. 단, 별도의 데이터를 저장 하기엔 용량이 작기에 위에서 알아본 특수한 목적에 맞는 특정 데이터만 저장해두며 CPU의 빠른 동작을 지원 해줍니다.&lt;/p&gt;
-
-&lt;p&gt;레지스터의 종류는 위의 내용 외 더욱 다양한 레지스터가 존재 하지만 현재 필요한 레지스터 및 알아두면 좋을 레지스터를 알아 보았습니다. 급하게 외우기보단 반복적으로 사용하다 보면 필요한 레지그터의 값만 빠르게 살펴보고 자연스럽게 기억이 되실겁니다.&lt;/p&gt;
-
-&lt;p&gt;마지막으로 어셈블리어 명령어에 대하여 알아보도록 하겠습니다. 위에서 Stack의 후입선출의 동작 방식을 알아보는 과정 중 PUSH, POP 그리고 언급은 없었지만 NOP라는 단어가 보였습니다. 이 단어들이 어셈블리어의 명령어이며, 어셈블리어란 컴퓨터 프로그래밍의 저급 언어입니다. 쉽게 말해 컴퓨터가 알아먹기 쉽도록 구성된 언어입니다. 다양한 명령어가 있으며 여기서도 필요한 또는 알아두면 나중에 좋을만한 내용들만 알아보도록 하겠습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;PUSH&lt;/strong&gt; : 데이터를 스택에 쌓음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;POP&lt;/strong&gt; : 스택의 저장된 데이터를 뽑음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;NOP&lt;/strong&gt; : 아무 동작 안함&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;MOV&lt;/strong&gt; : 데이터 이동&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;CALL&lt;/strong&gt; : 특정 주소의 함수를 호출, JMP와 같이 실행의 흐름이 변경되지만 호출된 함수의 동작이 종료되면 돌아갈 리턴 주소를 Stack에 저장해 둔다는 차이점이 있음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;JMP&lt;/strong&gt; : 특정 주소의 함수로 이동하며 JMP 외의 다양한 조건 점프 명령어가 있음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ADD&lt;/strong&gt; : 덧셈 명령을 수행&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;SUB&lt;/strong&gt; : 뺄셈 명령을 수행&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;위의 리스트 외에도 곱셈, 나눗셈, AND, OR, XOR 연산 및 조건 분기 등 다양한 기능의 명령어들이 존재 합니다. 이 명령어들 또한 레지스터들과 함께 자연스럽게 익혀 나가시면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;다음 포스트에는 간단한 BOF 공격과 공격에 필요한 내용들을 추가적으로 정리해보도록 하겠습니다.&lt;/p&gt;
-
-&lt;p&gt;천천히 갑시다. 조바심 내지 말고 천천히 탄탄하게.&lt;/p&gt;</content>
+&lt;p&gt;지금까지 Direct EIP Overwrite에 대해서 알아봤습니다. 다음 연재에서는 메모리 보호 기법 중 하나인 ASLR의 개념과 우회 방법을 다루어보도록 하겠습니다.&lt;/p&gt;</content>
 
       
       
@@ -1108,7 +1423,7 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
       
 
       <author>
-          <name>Sulla</name>
+          <name>Joel Park</name>
         
         
       </author>
@@ -1120,7 +1435,7 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
       
 
       
-        <summary type="html">0x01 - Buffer Overflow 준비</summary>
+        <summary type="html">0x03 Basic Bof</summary>
       
 
       
@@ -1276,123 +1591,110 @@ Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성�
     </entry>
   
     <entry>
-      <title type="html">windows-0x03</title>
-      <link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
+      <title type="html">linux_0x01</title>
+      <link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
       <published>2019-02-18T19:18:00+09:00</published>
       <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>/windows-0x03</id>
-      <content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
+      <id>/linux_0x01</id>
+      <content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
 
-&lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
+&lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다. 오늘부터 본격적으로 &lt;strong&gt;BOF&lt;/strong&gt;에 알아보도록 하겠습니다.&lt;/p&gt;
 
-&lt;p&gt;Buffer Overflow(이하 BOF)는 데이터의 저장 또는 보관을 위해 주어진 메모리 공간의 크기보다 더 많은 값을 입력해 인접 메모리의 값을 변조할 수 있는 공격 기법입니다. 공격자들이 BOF를 이용해서 주로 하는 일은 변수의 값을 변조하는 것과 RET를 변조해서 프로그램의 흐름을 조작하는 것입니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;BOF&lt;/strong&gt;(Buffer Overflow)란 &lt;strong&gt;메모리&lt;/strong&gt;의 동작 과정중의 오류로 인한 잘못된 동작을 유도하는 취약점입니다. 프로세스가 데이터를 &lt;strong&gt;버퍼&lt;/strong&gt;에 저장 시 입력 값의 크기를 검증하지 않을 경우 주어진 버퍼를 넘어선 즉, 지정된 위치가 아닌 곳에 저장되며 인접한 메모리를 덮어 쓰게 됩니다. 인접 메모리에는 기존의 데이터가 저장되어 있으며 &lt;strong&gt;변수, 프로세스 흐름 제어&lt;/strong&gt; 등의 데이터가 포함됩니다. 따라서 메모리 접근 오류로 인한 이상 동작을 하게되며 결과적으로 취약점으로 동작하게 되는것입니다.&lt;/p&gt;
 
-&lt;p&gt;이 취약점은 왜 발생할까요?&lt;/p&gt;
+&lt;p&gt;앞으로 이 BOF에 대해서 천천히 알아보고자 합니다. 먼저 BOF를 알기 위해서는 메모리, 레지스터 등의 구조 및 개념과 앞으로 사용될 gdb의 사용법 등 본격적인 시작에 앞 서 필요한 배경 지식에 대하여 짚고 넘어가도록 하겠습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;메모리-구조&quot;&gt;메모리 구조&lt;/h2&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+&lt;p&gt;먼저 BOF를 알기 위해선 메모리를 알아야 합니다.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;strcpy, gets 등의 입력 값 길이를 체크하지 않는 취약한 문자열 함수의 사용&lt;/li&gt;
-  &lt;li&gt;길이 값 검증을 하지 않은 취약한 프로그램 설계&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Kernel&lt;/strong&gt; : OS의 중요 코드들이 로드되며 일반 사용자는 접근 불가한 영역&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;off-limit&lt;/strong&gt; : 사용자의 Kernel 접근을 막기 위해 설정한 영역&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Stack&lt;/strong&gt; : 환경변수, 파라미터, 반환되는 주소 및 지역변수 등 임시적인 데이터를 저장하는 공간이며, 높은 메모리 주소에서 낮은 메모리 주소로 저장됨&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;libc&lt;/strong&gt; : 프로그램 내부에서 사용하는 라이브러리 함수들과 관련된 공유 라이버리 파일이 정장되는 공간&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Heap&lt;/strong&gt; : 엉덩…아니 필요에 의해 사용되는 동적 변수의 데이터가 저장되는 공간이며, 낮은 메모리 주소에서 높은 메모리 주소로 저장됨&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;BSS / Data&lt;/strong&gt; : 전역변수, 정적변수, 배열, 구조체 등이 저장되는 구조이며 차이는 아래와 같다
+    &lt;ul&gt;
+      &lt;li&gt;&lt;strong&gt;BSS&lt;/strong&gt; : 초기화 되지 않은, 0으로 초기화, Null로 초기화된 데이터의 경우 저장되는 공간&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;Data&lt;/strong&gt; : 초기화 된 데이터가 저장 되는 공간&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Code&lt;/strong&gt; : 실제로 실행되는 hex, bin과 같은 파일내부에 실행되는 코드들이 저장되며 기계어 명령어, 어셈블리 코드가 실행되는 영역&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;BOF는 흔히 위의 두 가지 이유로 발생합니다. 그렇다면 이 취약점이 발생하지 않게 하려면 어떻게 하면 될까요?
-입력 값 길이를 체크하는 안전한 문자열 함수를 사용하면 되겠죠? 물론 이것도 중요하지만 안전한 함수의 사용만으로는 이 공격을 100% 막을 수는 없습니다. 안전한 함수로 문자열 길이 500만큼 받도록 해놓더라도 버퍼의 크기가 300이면 BOF가 일어날 수 있습니다. 그렇기 때문에 안전한 문자열 함수의 사용과 더불어 &lt;strong&gt;안전한 프로그램 설계&lt;/strong&gt;도 뒷받침되어야 합니다.&lt;/p&gt;
+&lt;p&gt;메모리를 간단하게 정리한 내용입니다. 여기서 Stack과 Heap의 동작 방향이 다르다는 것이 특이한 모습을 보입니다. 왜 그럴까요?&lt;/p&gt;
 
-&lt;h5 id=&quot;direct-eip-overwrite&quot;&gt;Direct EIP Overwrite&lt;/h5&gt;
+&lt;p&gt;바로 효율적인 메모리 관리와 Kernel영역의 보호를 위해 저런 모습으로 설계 되었습니다. Stack은 Kernel의 반대 방향으로 움직이고 Stack과 Heap 사이에 libc를 배치하여 메모리 관리의 효율성을 높인것이죠.&lt;/p&gt;
 
-&lt;p&gt;아래 소스코드를 가지고 가장 기초적인 BOF를 다루어보도록 하겠습니다.&lt;/p&gt;
+&lt;p&gt;이제 메모리를 간단히 알아 보았으니 메모리 중 Stack에 관하여 간단히 짚고 넘어가도록 하겠습니다.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
-#include &amp;lt;stdlib.h&amp;gt;
-#include &amp;lt;string.h&amp;gt;
+&lt;h2 id=&quot;stack&quot;&gt;Stack?&lt;/h2&gt;
 
-#pragma warning (disable:4996)
-#define _CRT_SECURE_NO_WARNINGS
+&lt;p&gt;Stack의 역할은 위에서 언급했으니 패스하고 동작 장식에 대하여 알아 보도록 하겠습니다. Stack은 기본적으로 &lt;strong&gt;후입선출&lt;/strong&gt;(LIFO, Last in First out)의 방식으로 동작합니다.&lt;/p&gt;
 
-int main(int argc, char* argv[]) {
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
 
-    char content_buffer[1000];
-    char display_buffer[300];
-    FILE *f = fopen(argv[1], &quot;rb&quot;);
+&lt;p&gt;Stack의 동작은 위와 같습니다. 16byte의 Stack공간에 A(4byte) 데이터를 저장시 PUSH를 통하여 저장합니다. 밀어 넣는다는 거죠. 이 때 ESP -4 즉, 스택 포인터의 값을 총값에서 -4값을 저장 해둡니다. 왜일까요?&lt;/p&gt;
 
-    fgets(content_buffer, 1000, f);
-    strcpy(display_buffer,content_buffer);
+&lt;p&gt;Stack은 메모리의 높은 주소값에서 낮은 주소값으로 이동하기 떄문에 16byte 에서 4byte씩 줄이는 것이죠. 높은 곳에서 낮은 곳으로.&lt;/p&gt;
 
-    printf(&quot;%s\n&quot;, display_buffer);
+&lt;p&gt;다음으로 B 데이터를 저장시 마찬가지로 PUSH를 통하여 A데이터 위에 밀어 넣게 됩니다. ESP 값 또한 -4의 값을 저장 합니다. C 데이터까지 같은 방식으로 데이터를 저장 합니다. 그런데 다시 A 데이터를 빼고 싶다면?&lt;/p&gt;
 
-    fclose(f);
-    return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;앞서 말했던 Stack의 동작 방식인 &lt;strong&gt;후입선출&lt;/strong&gt;에 의해 C 데이터를 POP을 통하여 뽑고 ESP의 값은 -4가 아닌 +4의 값을 저장합니다. 이어서 B데이터를 뽑은 후 A 데이터를 뽑을 수 있습니다. 이것이 Stack의 동작 방식인 후입선출입니다.&lt;/p&gt;
 
-&lt;p&gt;fgets로 길이 1000만큼 파일을 읽어와서 content_buffer에 값을 저장하고, 다시 content_buffer에서 display_buffer로 값을 복사한 후 출력해주는 프로그램입니다. 여기서 문제는 strcpy로 content_buffer에서 display_buffer로 값을 복사한다는 것이죠.&lt;/p&gt;
+&lt;p&gt;정리하자면, Stack은 &lt;strong&gt;메모리의 높은 주소값에서 낮은 주소값으로 데이터가 저장&lt;/strong&gt;되며 동작 방식은 &lt;strong&gt;후입선출&lt;/strong&gt;의 방식으로 동작 합니다. 위에서 나온 ESP의 경우 레지스터의 한 종류로서 레지스터는 포인터, 산술 연산, 인덱스, 세그먼트, 플래그 등이 있으며 필요한 몇가지의 레지스터만 간단하게 정리하자면 다음과 같습니다.&lt;/p&gt;
 
-&lt;p&gt;본격적으로 공격을 시작해보도록 하겠습니다.&lt;/p&gt;
+&lt;p&gt;포인터 레지스터 : 포인터와 관련된 레지스터&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Buffer 시작 주소에서 RET까지의 거리 알아내기&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;EIP&lt;/strong&gt; (Instruction Pointer) : CPU가 실행할 다음 명령어의 주소값을 나타냄&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;EBP&lt;/strong&gt; (Base Pointer) : 현재 스택의 최하단 주속값을 나타냄, EBP의 다음 주소는 Return값을 나타냄&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;ESP&lt;/strong&gt; (Stack Pointer) : 현재 스택의 최상단 주소값을 나타냄&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Buffer 시작 위치에서 값을 얼마나 넣어야 RET를 변조할 수 있는지 알아야 공격이 가능하겠죠?&lt;/p&gt;
-
-&lt;p&gt;지금은 거리를 모르니 다음과 같이 간단하게 “A” 100개만 넣어서 분석을 해보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Buffer 시작 위치가 EBP-12C인 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;SFP도 덮어줘야 하니까 거리는 304가 되겠네요.(12C = 300)&lt;/p&gt;
+&lt;p&gt;산술 연산 레지스터 : 산술 논리 연산에 필요한 레지스터&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Exploit 작성하기&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;EAX&lt;/strong&gt; (Accumulator Register) : 산술 논리 연산에 필요한 상수 또는 변수값이 저장되며 함수의 리턴값 저장&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;ECX&lt;/strong&gt; (Counter Register) : 반복문 동작시 반복문의 반복 횟수를 저장&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;EDX&lt;/strong&gt; (Data Register) : EAX 레지스터를 보조&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;메모리 보호기법이 적용되지 않은 프로그램이기 때문에 RET를 Shellcode가 있는 곳의 주소로 변조하기만 하면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;그럼 Payload는 아래 코드와 같이 Nop과 Shellcode를 합쳐서 304만큼 만들어주고, RET는 Shellcode 시작 전 Nop이 있는 위치로 지정하면 되겠네요.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;immunity debugger로 프로그램 흐름을 한 번 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Strcpy가 동작이 완료된 후, RET가 Buffer 시작 주소로 잘 변조되었네요.&lt;/p&gt;
-
-&lt;p&gt;Main 함수의 RET를 변조했기 때문에 실제로 Shellcode가 실행되는 시점은 Main 함수의 에필로그 과정이 진행된 다음입니다.&lt;/p&gt;
-
-&lt;p&gt;에필로그 과정의 마지막에서 변조된 RET 주소로 프로그램의 흐름이 바뀌면 다음과 같이 Shellcode를 만나러 갑니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
+&lt;p&gt;인덱스 레지스터 : 작업에 필요한 데이터의 주소값 저장에 사용되는 레지스터&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;공격 결과 확인&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;ESI&lt;/strong&gt; (Source Index) : 데이터 복사 및 조작할 때 사용하는 데이터 주소를 저장(ESI &amp;lt;&amp;gt; EDI)&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;EDI&lt;/strong&gt; (Destination Index) : 데이터 복사시 목적지의 주소 저장 (EDI &amp;lt;&amp;gt; ESI)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-6]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
+&lt;p&gt;레지스터의 사용 이유는 CPU의 빠른 작업 처리를 위해 사용 됩니다. CPU내부에 위치하여 메모리에 접근하는 것보다 더욱 빠른 속도로 접근 가능합니다. 단, 별도의 데이터를 저장 하기엔 용량이 작기에 위에서 알아본 특수한 목적에 맞는 특정 데이터만 저장해두며 CPU의 빠른 동작을 지원 해줍니다.&lt;/p&gt;
 
-&lt;p&gt;CMD가 정상적으로 잘 실행되네요^^&lt;/p&gt;
+&lt;p&gt;레지스터의 종류는 위의 내용 외 더욱 다양한 레지스터가 존재 하지만 현재 필요한 레지스터 및 알아두면 좋을 레지스터를 알아 보았습니다. 급하게 외우기보단 반복적으로 사용하다 보면 필요한 레지그터의 값만 빠르게 살펴보고 자연스럽게 기억이 되실겁니다.&lt;/p&gt;
 
-&lt;p&gt;지금까지 Direct EIP Overwrite에 대해서 알아봤습니다. 다음 연재에서는 메모리 보호 기법 중 하나인 ASLR의 개념과 우회 방법을 다루어보도록 하겠습니다.&lt;/p&gt;</content>
+&lt;p&gt;마지막으로 어셈블리어 명령어에 대하여 알아보도록 하겠습니다. 위에서 Stack의 후입선출의 동작 방식을 알아보는 과정 중 PUSH, POP 그리고 언급은 없었지만 NOP라는 단어가 보였습니다. 이 단어들이 어셈블리어의 명령어이며, 어셈블리어란 컴퓨터 프로그래밍의 저급 언어입니다. 쉽게 말해 컴퓨터가 알아먹기 쉽도록 구성된 언어입니다. 다양한 명령어가 있으며 여기서도 필요한 또는 알아두면 나중에 좋을만한 내용들만 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;PUSH&lt;/strong&gt; : 데이터를 스택에 쌓음&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;POP&lt;/strong&gt; : 스택의 저장된 데이터를 뽑음&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;NOP&lt;/strong&gt; : 아무 동작 안함&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;MOV&lt;/strong&gt; : 데이터 이동&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;CALL&lt;/strong&gt; : 특정 주소의 함수를 호출, JMP와 같이 실행의 흐름이 변경되지만 호출된 함수의 동작이 종료되면 돌아갈 리턴 주소를 Stack에 저장해 둔다는 차이점이 있음&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;JMP&lt;/strong&gt; : 특정 주소의 함수로 이동하며 JMP 외의 다양한 조건 점프 명령어가 있음&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;ADD&lt;/strong&gt; : 덧셈 명령을 수행&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;SUB&lt;/strong&gt; : 뺄셈 명령을 수행&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;위의 리스트 외에도 곱셈, 나눗셈, AND, OR, XOR 연산 및 조건 분기 등 다양한 기능의 명령어들이 존재 합니다. 이 명령어들 또한 레지스터들과 함께 자연스럽게 익혀 나가시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;다음 포스트에는 간단한 BOF 공격과 공격에 필요한 내용들을 추가적으로 정리해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;천천히 갑시다. 조바심 내지 말고 천천히 탄탄하게.&lt;/p&gt;</content>
 
       
       
@@ -1401,7 +1703,7 @@ int main(int argc, char* argv[]) {
       
 
       <author>
-          <name>Joel Park</name>
+          <name>Sulla</name>
         
         
       </author>
@@ -1413,7 +1715,7 @@ int main(int argc, char* argv[]) {
       
 
       
-        <summary type="html">0x03 Basic Bof</summary>
+        <summary type="html">0x01 - Buffer Overflow 준비</summary>
       
 
       
@@ -1466,124 +1768,6 @@ int main(int argc, char* argv[]) {
 
       
         <summary type="html">##0x00 - 시작에 앞서</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">windows-0x01</title>
-      <link href="/windows-0x01" rel="alternate" type="text/html" title="windows-0x01" />
-      <published>2019-02-07T19:18:00+09:00</published>
-      <updated>2019-02-07T19:18:00+09:00</updated>
-      <id>/windows-0x01</id>
-      <content type="html" xml:base="/windows-0x01">&lt;h1 id=&quot;0x01-윈도우-메모리&quot;&gt;0x01 윈도우 메모리&lt;/h1&gt;
-
-&lt;h3 id=&quot;가상-메모리&quot;&gt;가상 메모리&lt;/h3&gt;
-
-&lt;h5 id=&quot;x86-메모리-구조&quot;&gt;x86 메모리 구조&lt;/h5&gt;
-&lt;p&gt;x86 윈도우의 경우 각 프로세스 별로 최대 4GB를 지원합니다. 이 중 상위 절반(0xFFFFFFFF~0x80000000)은 OS 메모리로 사용하고(커널영역), 나머지 하위 절반(0x7FFFFFFF~0x00000000)은 프로세스가 독립적으로 사용할 수 있도록 제공합니다.(유저영역)
-그림 1-1는 32비트 윈도우에 의해 지원되는 전형적인 가상 주소 공간 배치를 나타냅니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;그림 1-1에서 확인하였듯이 커널 영역은 다른 프로세스와 공통으로 사용하는 구조로 되어 있습니다. 그리고 이 영역은 OS가 사용하는 아주 중요한 영역입니다. 그래서 윈도우에서는 유저 영역에서 운영체제의 데이터에 접근하거나 수정하는 것을 막기 위해 두 가지 접근 모드(커널모드, 유저모드)를 사용합니다. &lt;strong&gt;유저 모드&lt;/strong&gt;는 커널 영역에 대한 접근을 할 수가 없지만, &lt;strong&gt;커널 모드&lt;/strong&gt;는 모든 시스템 메모리와 모든 CPU 명령어 등에 대해 접근이 허가된 실행모드를 말합니다. 이렇게 함으로써, 윈도우는 운영체제 시스템 커널에 잘못된 사용자 어플리케이션이 오동작을 유발하여, 시스템 전체의 안정성을 해치지 않게 보장하고 있습니다. 표 1-1은 커널모드, 유저모드를 뜻하는 다양한 용어들에 대한 정리입니다.&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;모드&lt;/th&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;용어&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;커널 모드&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;커널 모드, 링 0, 커널 레벨, 슈퍼 바이저 모드&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;유저 모드&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;유저 모드, 링 3, 유저 레벨, 어플리케이션 모드&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;center&gt;[표 1-1] 커널 모드, 유저모드 용어 정리&lt;/center&gt;
-
-&lt;p&gt;** 윈도우는 4가지의 특권 레벨을 정의하고 있습니다. 하지만, 단지 두 개의 레벨만을 사용하는 이유는 일부 하드웨어 구조(ARM이나 MIPS 등)에서 2가지의 특권 레벨만 구현했기 때문입니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;x86-유저-영역-주소-공간-배치&quot;&gt;x86 유저 영역 주소 공간 배치&lt;/h5&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;그림 1-2는 우리가 중점적으로 알아볼 유저영역의 메모리 배치입니다. 위 그림에서 볼 수 있듯이, 유저 영역은 스택, 힙, 공유라이브러리, PE Image 등으로 구성되어 있습니다. 또한, 각 영역의 주소가 임의로 할당됨을 알 수 있습니다. 메모리 보호기법 중 하나인 ASLR이 적용되어 위 그림과 같이 각 영역의 주소가 임의로 할당되는 것이죠. 그럼 계산기 프로그램을 가지고 실제로 저렇게 할당되는지 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;그림 1-3은 Sysinternals suites의 vmmap을 통해 살펴 본 계산기의 메모리 구조입니다. 계산기를 종료한 후 다시 실행해보면 위치 값이 이전과 다르다는 것도 확인할 수 있습니다. 또한, vmmap은 각 할당 유형에 따라 다음과 같은 요약된 형태로 보여줍니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Image&lt;/strong&gt; : 실행 파일과 동적 라이브러리 같은 의존물, PE Image 파일을 매핑하는 데 사용되는 메모리 할당&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Shareable&lt;/strong&gt; : 일반적으로 공유 메모리를 포함해 공유 속성으로 설정된 메모리 할당&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Heap&lt;/strong&gt; : 프로세스가 소유한 힙을 위해 할당된 메모리 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Stack&lt;/strong&gt; : 프로세스 내의 각 스레드를 위한 스택 용도로 할당된 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Private Data&lt;/strong&gt; : 스택이나 힙을 제외한 전용 데이터(내부 데이터 구조체 등)로 표시된 메모리 영역&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;지금까지 윈도우 시스템의 가상 메모리 할당에 대한 대략적인 부분을 알아봤습니다. 이 글의 도입부에서 제가 각 프로세스 별로 4GB를 지원한다고 했습니다. 그런데 일반적으로 여러분들이 사용하는 PC의 RAM은 4~16GB 정도인데, 어떻게 실행하는 모든 프로세스마다 4GB를 지원할 수 있을까요?&lt;/p&gt;
-
-&lt;h5 id=&quot;paging&quot;&gt;Paging&lt;/h5&gt;
-
-&lt;p&gt;대부분의 시스템이 프로세스 실행에 사용하는 가상 메모리의 총합보다 작은 물리 메모리를 가지고 있습니다. 그래서 윈도우의 메모리 관리자는 프로세스가 사용하는 메모리 내용의 일부를 디스크로 보냅니다. 데이터를 디스크에 전송하면서 물리 메모리의 공간을 비울 수 있고, 그 자리를 다른 프로세스가 사용할 수 있도록 지원합니다. 만약 디스크에 전송한 내용을 사용하기 위해 가상 주소를 접근할 경우, 동일한 과정을 거쳐 메모리로 정보를 다시 가져옵니다. 이런 방식으로 윈도우에서는 메모리를 관리하고 있고, 디스크로 또는 메모리로 매핑하는 데이터의 단위를 페이지라고 부르고 기본 크기는 4KB입니다. 그림 1-4은 방금 설명한 페이징을 나타냅니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;h5 id=&quot;공유-메모리&quot;&gt;공유 메모리&lt;/h5&gt;
-
-&lt;p&gt;공유 메모리란, 프로세스와 운영체제 사이의 공통으로 사용하는 메모리를 이야기합니다. 각 프로세스는 개별 데이터를 저장하거나 실행하기 위해 자신만의 메모리 공간을 갖겠지만, 여러 프로세스에서 동일하게 사용하는 부분은 굳이 여러 번 메모리에 할당할 필요가 없습니다. 그래서 윈도우는 그림 1-5과 같이 동일한 dll이나 다른 자원을 물리 메모리로 한 번만 로딩시키고 공유해서 사용하도록 구성되어 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;이런 구조를 사용함으로써 메모리를 좀 더 효율적으로 사용할 수가 있게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;윈도우 메모리 구조에 대해 중요한 기본 개념들을 살펴봤습니다.
-다음 연재에서는 본격적으로 Stack의 구조와 Stack에서 일어날 수 있는 취약점들에 대해서 알아보도록 하겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x01 윈도우 메모리</summary>
       
 
       
