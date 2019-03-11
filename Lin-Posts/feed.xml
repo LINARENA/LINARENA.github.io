@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-11T22:38:52+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x03</title><link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>/linux_0x03</id><content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-12T00:40:42+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x03</title><link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>/linux_0x03</id><content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
 
@@ -143,8 +143,8 @@
 LFI(Local File Inclusion) 취약점이란 클라이언트에 의한 서버로의 요청 시 반환하는 응답의 결과 내에 서버 내 존재하는 파일이 포함되어 노출되는 취약점을 말합니다.&lt;br /&gt;&lt;br /&gt;
 RCE(Remote Command Execution) 취약점이란 말그대로 원격 명령 실행으로 공격자가 삽입하는 또는 전달하는 값으로 서버 측의 환경에서 시스템 명령어를 실행할 수 있는 취약점을 말합니다.&lt;br /&gt;&lt;/p&gt;
 
-&lt;p&gt;해당 취약점을 이해하기 위해서 세션에 대해서 간략하게 말씀드리자면, 서버가 클라이언트를 식별하는데 사용하는 일조의 별명이라고 생각하시면 될 것 같습니다. 또한, 일반적으로 세션은 서버 측에서 파일로 관리하게 됩니다.&lt;br /&gt;&lt;br /&gt;
-세션이 파일로 관리되는 부분에 대해서는 취약점 분석 시 간략히 확인하실 수 있으실 것 같습니다. 또한 해당 취약점은 관리자로의 접근 이후 단계에서의 단게로 생각하시면 될 것 같습니다.&lt;/p&gt;
+&lt;p&gt;해당 취약점을 이해하기 위해서 세션에 대해서 간략하게 말씀드리자면, 서버가 클라이언트를 식별하는데 사용하는 일종의 별명이라고 생각하시면 될 것 같습니다. 또한, 일반적으로 세션은 서버 측에서 파일로 관리하게 됩니다.&lt;br /&gt;&lt;br /&gt;
+세션이 파일로 관리되는 부분에 대해서는 본 포스팅의 뒷부분 취약점 분석 부분에서 간략히 확인하실 수 있으실 것 같습니다. 더불어 해당 취약점은 관리자로의 접근 이후 단계에서의 진행되는 것으로 생각하시면 될 것 같습니다.&lt;/p&gt;
 
 &lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
 &lt;ul&gt;
@@ -364,11 +364,11 @@ RCE(Remote Command Execution) 취약점이란 말그대로 원격 명령 실행�
 &lt;/figure&gt;
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;p&gt;다음 그림으로 정상적으로 RCE가 가능한 것을 확인할 수 있습니다. 앞에서 수행했던 방식과 조금의 차이점은 파라미터를 포함하여 요청 하였습니다. 우리가 cmd라는 파라미터로 입력한 시스템 명령어가 정상적으로 실행되는 것을 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;다음 그림으로 정상적으로 RCE가 가능한 것을 확인할 수 있습니다. 앞에서 수행했던 방식과 조금의 차이점은 파라미터를 포함하여 요청 하였습니다. cmd라는 파라미터로 입력한 시스템 명령어가 정상적으로 실행되는 것을 확인할 수 있습니다.&lt;/p&gt;
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_9.png&quot; /&gt;
   &lt;figcaption&gt;&lt;center&gt;
-   - RCE 시도 및 결과 (id 명령어) -
+   - RCE 시도 및 결과 (id) -
 &lt;/center&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
