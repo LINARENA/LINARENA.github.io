@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-11T21:51:34+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x03</title><link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>/linux_0x03</id><content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-11T22:27:48+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x03</title><link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>/linux_0x03</id><content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
 
@@ -26,7 +26,7 @@
 
 &lt;p&gt;붉은 박스에서 보여지듯 ESP의 메모리 주소는 계속 바뀝니다.(사실 잘 보시면 완전 랜덤화는 아닙니다….끝에만 바뀌고 있죠…) 즉, 프로그램이 시작 될 때마다 할당받는 메모리의 주소값이 바뀌는 것이죠. 그럼 어찌 해야 할까요?? 가장 간단한 방법은 메모리의 주소가 안바뀐다면?? 메모리의 주소가 항상 고정된 주소를 사용하는 뭔가가 있지 않을까??라는 생각을 하게됩니다. 그런게 뭐가 있을까요?? 고정된 메모리 주소값을 가지며  쉽게 다룰 수 있는???&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;황경변수&lt;/strong&gt;는 &lt;em&gt;**&lt;/em&gt;항상 고정된 메모리 주소값을 가집니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;황경변수&lt;/strong&gt;는 항상 고정된 메모리 주소값을 가집니다.&lt;/p&gt;
 
 &lt;h1 id=&quot;환경변수&quot;&gt;환경변수&lt;/h1&gt;
 
