@@ -1,4 +1,136 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-10T20:32:18+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">web-0x02</title><link href="/web-0x02" rel="alternate" type="text/html" title="web-0x02" /><published>2019-03-11T04:00:00+09:00</published><updated>2019-03-11T04:00:00+09:00</updated><id>/web-0x02</id><content type="html" xml:base="/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-11T21:51:34+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x03</title><link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>/linux_0x03</id><content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+
+&lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
+
+&lt;p&gt;이번에는 저번 시간에 이어서 &lt;strong&gt;Basic BOF&lt;/strong&gt; 또는 &lt;strong&gt;Direct EIP overwrite&lt;/strong&gt; 라고 불리는 기본적인 BOF와 메모리 보호 기법에 대해서 알아 보겠습니다.&lt;/p&gt;
+
+&lt;h1 id=&quot;basic-bof-준비&quot;&gt;Basic BOF 준비&lt;/h1&gt;
+
+&lt;p&gt;지난 시간에 &lt;strong&gt;RET&lt;/strong&gt;구역 즉, EIP 값이 저장되는 구역에 “&lt;strong&gt;HACK&lt;/strong&gt; “ 저장됨을 확인했습니다. 이 말은 공격자가 RET 구역에 원래 있어야 할 값을 임의의 값으로 변경이 가능 하다는 말이죠.  초기에 레지스터의 역할을 간략히 설명 드릴때 &lt;strong&gt;EIP&lt;/strong&gt; 레지스터의 역할은 “&lt;strong&gt;다음 명령의 주소를 가리킨다”&lt;/strong&gt;라고 했었죠. 이것을 노려서 공격자는 &lt;strong&gt;EIP&lt;/strong&gt;에 원하는 주소값을 저장해 공격을 이어갑니다. 명령어가 종료 된 후 &lt;strong&gt;EIP&lt;/strong&gt; 주소를 참조해 공격자가 미리 지정한 주소로 이동하여 명령을 이어가죠. 이 때 공격자는 shell을 따 내는것이 최종 목표입니다. 물론 굳이 shell 아니더라도 원하는 행위만 미리 구현해 둔다면 실행이 될 것 입니다.&lt;/p&gt;
+
+&lt;p&gt;말이 주절주절 길어졌는데 간략한 그림으로 표현 해보죠.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-1.png&quot; alt=&quot;[그림 3-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;지난 포스팅에서 다룬 내용과 비슷합니다. &lt;strong&gt;함수 프롤로그&lt;/strong&gt; 과정이 지난 후에 버퍼 크기만큼 공간을 확보 후 함수가 진행되고 함수 종료후 &lt;strong&gt;ret&lt;/strong&gt; 구역에 저장되있는 주소를 참조하여 이동 합니다. 위 그림과 같이 &lt;strong&gt;Shellcode&lt;/strong&gt;가 저장되있는 임의의 주소가 될 것이며 해당 주소 이동 후 &lt;strong&gt;Shellcode&lt;/strong&gt;가 실행 되어 공격자가 원하는 행위를 하게 되는 것이죠!!&lt;/p&gt;
+
+&lt;p&gt;그런데, Shellcode, Shellcode, 쉘코드 하는데 이게 뭐하는 놈일까요? 명칭의 기원은 모르나 역할만은 분명합니다. 이름 그대로 shell을 따내는 code이죠. 위에서도 계속 말했듯이 공격자가 원하는 행위를 수행하도록 하는게 목표라고 했죠. 파일을 생성하든, 삭제하든 passwd, shadow 및 각종 config 파일 과 같은 중요 파일을 대상으로 뭔가를 행위를 하도록 하면 됩니다. 단지 이 모든걸 한방에 할 수 있는건 shell을 따냄으로서 해결됩니다. 물론 권한 문제가 필요하기에 root권한이 필요할겁니다. 쉽게 표현 하자면 감기약, 두통약, 치통약, 변비약 등등 이것저것 챙겨 먹을 필요없이 만병통치약 하나 먹으면 된다는 것이죠. &lt;strong&gt;shellcode&lt;/strong&gt;는 이미 인터넷에 다양하게 생성되있습니다. 해당 코드를 따와서 사용해도 되고, 직접 만들어서 사용해도 됩니다. &lt;strong&gt;shellcode&lt;/strong&gt; 작성 방법에 대해서는 나중에 따로 다뤄보도록 하곘습니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 &lt;strong&gt;Shellcode&lt;/strong&gt;가 뭔지는 알았으니 이놈을 써서 직접 BOF를 해봐야 하는데 문제가 하나 있습니다. 지금까지 설명한 내용처럼 사용자가 메모리의 주소를 알고 있는 상태 즉, 메모리의 주소값이 고정값이라면 공격이 쉬워 지기에 이를 방어하기 위해서 메모리의 주소값을 랜덤으로 부여 합니다.(&lt;strong&gt;ASLR&lt;/strong&gt;) 다음 사진을 보시죠.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-2.png&quot; alt=&quot;[그림 3-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;붉은 박스에서 보여지듯 ESP의 메모리 주소는 계속 바뀝니다.(사실 잘 보시면 완전 랜덤화는 아닙니다….끝에만 바뀌고 있죠…) 즉, 프로그램이 시작 될 때마다 할당받는 메모리의 주소값이 바뀌는 것이죠. 그럼 어찌 해야 할까요?? 가장 간단한 방법은 메모리의 주소가 안바뀐다면?? 메모리의 주소가 항상 고정된 주소를 사용하는 뭔가가 있지 않을까??라는 생각을 하게됩니다. 그런게 뭐가 있을까요?? 고정된 메모리 주소값을 가지며  쉽게 다룰 수 있는???&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;황경변수&lt;/strong&gt;는 &lt;em&gt;**&lt;/em&gt;항상 고정된 메모리 주소값을 가집니다.&lt;/p&gt;
+
+&lt;h1 id=&quot;환경변수&quot;&gt;환경변수&lt;/h1&gt;
+
+&lt;p&gt;환경변수의 역할은 OS가 필요한 정보들을 미리 메모리에 등록해서 필요할떄 바로바로 해당 내용들을 참조합니다. python, java 또는 서버 구축 후에 환경변수를 등록해서 쉽게 구동시키는 작업을 생각한다면 이해가 되실겁니다.(실행경로를 환경 변수 등록하는 과정….JAVA_HOME이 대표적이죠.)&lt;/p&gt;
+
+&lt;p&gt;미리 등록해서 번거롭게 설치된 위치로 이동해서 실행한는 것이 아니라 간편하게 바로바로 실행할 수 있도록 경로를 환경변수로 등록 하는것이죠. 자연스럽게 아셨겠지만 이 환경변수는 사용자가 직접 등록해서 사용할 수 있다는것도 아실겁니다. 미리 운영체제에 필요한 내용들이 등록되있고 사용자의 필요로 인한 내용을 등록해서 사용도 가능하죠.&lt;/p&gt;
+
+&lt;p&gt;그렇다면 환경변수의 주소를 어떻게 알 수 있을까요? 다음과 같은 코드를 작성해서 우리가 원하는 환경변수의 주소값을 출력 가능합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-3.png&quot; alt=&quot;[그림 3-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;코드는 간단합니다. argv[]로 입력받은 값을 addr에 저장 합니다. 이떄 addr은 char형트로 포인터가 붙어있어서 주소값 형태로 저장 됩니다.
+위 코드를 작성 하고 해당 프로그램을 실행하면 다음과 입력한 환경변수의 주소값을 출력해줍니다. 또한 환경변수의 주소값이 변하지 않는다는것 또한 확인 가능합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-4.png&quot; alt=&quot;[그림 3-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;거의 다 되갑니다…. 이제 공격의 환경을 만들어 볼까 합니다. 우리는 shell을 따내는것이 목표이지만 더 정확히 말하자면 &lt;strong&gt;root 권한&lt;/strong&gt;을 얻는것이 목표입니다. shell을 따도 &lt;strong&gt;root 권한&lt;/strong&gt;이 없을경우 제한적인 권한을 가지게 되죠. 그런데 &lt;strong&gt;setuid&lt;/strong&gt;가 설정 되어있는 경우 이런 문제가 해결 됩니다. 이유는 &lt;strong&gt;setuid&lt;/strong&gt;가 설정된 파일을 실행하는 동안은 해당 파일의 소유권자와 동일한 권한을 부여 받습니다. root 계정이 a파일을 &lt;strong&gt;setuid&lt;/strong&gt; 권한으로 설정헀다면 일반 계정이 해당 파일을 실행하는 동안은 &lt;strong&gt;root 권한&lt;/strong&gt;을 부여 받는것이죠. 실제로 root권한을 부여 받는지 확인을 위해 일반 계정으로 변경 해줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-5.png&quot; alt=&quot;[그림 3-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;추가로 언어팩도 아래와 같이 변경해 줍니다. 이떄 계정은 일반 계정으로 변경하고 진행 해줍니다. 기본 셋팅은 UTF-8로 설정되어 있는데 영어의 경우 한 글자 당 1바이트를 사용합니다. 추후에 쉘코드 입력시 값이 1바이트를 넘는다면 의도된 값으로 입력되지 않기 때문에 2바이트를 사용하는 한글로 변경 해야하죠. (ASCII (7bit 인식)와 UNICODE(8bit 인식)의 인식 차이입니다.)&lt;/p&gt;
+
+&lt;p&gt;쉽게 말해 공격수행에 문제가 생기기 때문에 바꿔주는 것입니다. 환경변수를 바꾸는 방법은 &lt;strong&gt;export&lt;/strong&gt; 명령어를 사용하며 아래와 같이 진행됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-6.png&quot; alt=&quot;[그림 3-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;지금부터는 일반계정(sulla)으로 변경하여 진행 합니다. 환경은 준비가 끝났고 이제 본격적으로 일반계정으로 BOF를 시도하여 root 권한의 shell을 따보도록 합시다.&lt;/p&gt;
+
+&lt;h1 id=&quot;basic-bof-진짜-시작&quot;&gt;Basic BOF 진짜 시작&lt;/h1&gt;
+
+&lt;p&gt;시작 전에 정리하자면 아래와 같습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;고정된 메모리 주소를 사용하는 환경변수를 이용해 &lt;strong&gt;shellcode&lt;/strong&gt;를 환경변수에 저장하고 해당 황경변수의 주소를 알아냅니다.&lt;/li&gt;
+  &lt;li&gt;쉘코드가 저장된 환경변수의 메모리 주소를 취약한 bof1 파일에 삽입합니다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;즉, 공격 페이로드는 이런 모습으로 구성될 것 입니다 [&lt;strong&gt;44byte 잉여값&lt;/strong&gt;] + [&lt;strong&gt;4byte 환경변수 주소&lt;/strong&gt;]&lt;/p&gt;
+
+&lt;p&gt;그럼 1번 과정 부터 먼저 해보도록 합시다.&lt;/p&gt;
+
+&lt;p&gt;환경변수를 설정해야 하니 &lt;strong&gt;export&lt;/strong&gt; 명령어를 사용해서 환경변수 명과 내용을 채워보도록 하죠. 공격용 쉘코드는 다음과 같습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;\x31\xc0\x89\xc3\xb0\x17\xcd\x80\xeb\x0f\x5e\x31\xc0\x50\x89\xe2\x56\x89\xe1\x89\xf3\xb0\x0b\xcd\x80\xe8\xec\xff\xff\xff\x2f\x62\x69\x6e\x2f\x73\x68
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이 길다란 코드를 아래와 같이 환경변수로 저장하고 주소까지 확인해줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-7.png&quot; alt=&quot;[그림 3-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;bof라는 이름으로 환경변수를 만들었습니다. 환경변수 내용은 /bin/sh 를 실행하는 내용이며 해당 환경변수의 주소를 확인하니 &lt;strong&gt;0xbffffee9&lt;/strong&gt;의 주소값을 가지고 있습니다. 이로써 1번 과정을 끝났습니다. 이제 2번 과정을 진행해 봅시다. 그림으로 표현하자면 아래와 같이 보여지겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-8.png&quot; alt=&quot;[그림 3-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;공격 페이로드는 저번 시간에서 작성했던 방식과 동일합니다.&lt;/p&gt;
+
+&lt;p&gt;단, 지난 시간에서는 버퍼 영역에 “&lt;strong&gt;A&lt;/strong&gt;” 40byte와 sfp 영역에 “&lt;strong&gt;B&lt;/strong&gt;” 4byte  마지막으로 ret 영역에 “&lt;strong&gt;HACK&lt;/strong&gt;“를 저장 헀습니다. 즉, 잉여 데이터 44byte를 입력했고 ret에 원하는 4byte를 입력하는 과정이었습니다.&lt;/p&gt;
+
+&lt;p&gt;지금부터는 “&lt;strong&gt;HACK&lt;/strong&gt;“이 아닌 위에서 알아낸 &lt;strong&gt;환경변수의 주소값&lt;/strong&gt;을 입력 할것입니다. 물론 sfp 영역의 “B” 또한 잉여 데이터기에 “A”로 통일해서 입력 합니다.(그동안은 각 영역을 구분하기 위해 A B HACK 로 나눠서 입력했습니다…..) 주의점은 환경변수의 주소값은 &lt;strong&gt;리틀엔디안&lt;/strong&gt; 형식으로 입력해 줍니다. 그럼 아래와 같이 공격 페이로드가 완성 됩니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./bof1 `python -c 'print &quot;A&quot;*11 + &quot;\xe9\xfe\xff\xbf&quot;'`
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;작성된 페이로드를 입력 하게 되면 아래와 같이 shell이 떨어지며 가장 중요한 점은 shell의 &lt;strong&gt;uid&lt;/strong&gt;권한이 &lt;strong&gt;root&lt;/strong&gt;권한임을 확인할 수 있습니다!!!!&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-9.png&quot; alt=&quot;[그림 3-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이렇게해서 드디어 root권한의 shell을 따내는데 성공 헀습니다. 앞에서 설정헀던 &lt;strong&gt;setuid&lt;/strong&gt;를 해체한 상태로 진행하면 &lt;strong&gt;uid&lt;/strong&gt;가 &lt;strong&gt;root&lt;/strong&gt;가 아닌 일반 계정(sulla)으로 설정 됨을 확인하실 수 있습니다.&lt;/p&gt;
+
+&lt;h1 id=&quot;메모리-보호-기법&quot;&gt;메모리 보호 기법&lt;/h1&gt;
+
+&lt;p&gt;위에서 말헀던 메모리의 주소를 랜덤화 하는 메모리 보호기법을 &lt;strong&gt;ASLR(Address Space Layout Randomization)&lt;/strong&gt; 이라고 부릅니다. &lt;strong&gt;ASLR&lt;/strong&gt; 외의 다양한 보호 기법이 있는데 알아보도록 하죠.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;ASLR :&lt;/strong&gt; 프로세스가 실행될 떄마다 메모리의 주소를 랜덤화 합니다.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;DEP/NX bit :&lt;/strong&gt; Stack/Heap등 메모리 영역에 실행 권한을 없애 코드 실행을 막습니다.( 쉽게 말해 Stack/heap 영역에 저장된 Shellcode의 실행을 막는다는 겁니다.)&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;CANARY :&lt;/strong&gt; 메모리에 무결성 확인을 위해 버퍼 영역과 SFP 영역 사이에 특정한 값을 설정 합니다. (네트워크의 패킷 무결성을 위한 패리티 비트와 비슷한 역할이라 생각하면 편합니다.)&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;ASCII-Armor :&lt;/strong&gt; 공유 라이브러리 영역 상위에 NULL값을 삽입하여 호출을 막습니다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;이외에도 더 있습니다. 이러한 메모리 보호 기법이 하나, 둘 적용 되면서 우회기법이 생기고 묻히고 생기고 묻히길 반복합니다. 다들 아시겠지만 많이 보이던 패턴이죠. 
+(취약점 &amp;gt; 대응 &amp;gt; 우회 &amp;gt; 대응 &amp;gt;우회 &amp;gt; 대응 &amp;gt; 우회 &amp;gt; 대응 &amp;gt; 우회 &amp;gt; 대응) * 무한 반복&lt;/p&gt;
+
+&lt;p&gt;앞으로는 Basic BOF를 중심으로 어떤 보호기법이 생겼고 그 우회 방법은 어떤것이 있는지 또 그 우회 방법의 어떤 대응법이 있고 또 다시 대응법의 새로운 우회ㅂ…..후……&lt;/p&gt;
+
+&lt;p&gt;천천히 오늘 했던 방식처럼 하나 하나씩 알아보도록 하겠습니다.
+고생하셨습니다. 다음 포스팅까지 차근차근 준비해서 다시 뵙겠습니다.&lt;/p&gt;
+
+&lt;p&gt;감사합니다!
+&lt;strong&gt;뿅&lt;/strong&gt;!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x03 - Basic BOF &amp;amp; 메모리 보호 기법</summary></entry><entry><title type="html">web-0x02</title><link href="/web-0x02" rel="alternate" type="text/html" title="web-0x02" /><published>2019-03-11T04:00:00+09:00</published><updated>2019-03-11T04:00:00+09:00</updated><id>/web-0x02</id><content type="html" xml:base="/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -848,13 +980,13 @@ https://blog.sucuri.net/2017/02/content-injection-vulnerability-wordpress-rest-a
 &lt;p&gt;흔히들 기존에 발견되어진 취약점이 아닌 새롭게 발견된 취약점을 0Day(Zero Day)취약점이라고 불리우는데, 해당 취약점에 대한 패치가 된 취약점을 1Day 취약점이라고 생각하시면 될 것 같습니다.
 CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요. 간략하게 흔히들 Wordpress, Gnuboard, Drupal과 같은 Framework 입니다.&lt;/p&gt;
 
-&lt;p&gt;처음 CMS 1Day Test 포스팅의 서문은 여기서 마치고, 앞으로 열심히하여 쉽고, 잘 정리가 된 1Day Test 내용을 포스팅 하도록 하겠습니다.&lt;/p&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">0x00. 서문</summary></entry><entry><title type="html">linux_0x02</title><link href="/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" /><published>2019-02-22T19:18:00+09:00</published><updated>2019-02-22T19:18:00+09:00</updated><id>/linux_0x02</id><content type="html" xml:base="/linux_0x02">&lt;p&gt;##0x02 - Buffer Overflow 맛보기&lt;/p&gt;
+&lt;p&gt;처음 CMS 1Day Test 포스팅의 서문은 여기서 마치고, 앞으로 열심히하여 쉽고, 잘 정리가 된 1Day Test 내용을 포스팅 하도록 하겠습니다.&lt;/p&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">0x00. 서문</summary></entry><entry><title type="html">linux_0x02</title><link href="/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" /><published>2019-02-22T19:18:00+09:00</published><updated>2019-02-22T19:18:00+09:00</updated><id>/linux_0x02</id><content type="html" xml:base="/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;임돠.&lt;/p&gt;
 
 &lt;p&gt;오늘은 저번 시간에 다룬 내용에 이어서 기본적인 BOF 와 추가적으로 알아야 할 내용을 다루도록 하겠습니다.&lt;/p&gt;
 
-&lt;p&gt;먼저 이번 시간부터는 직접 &lt;strong&gt;gdb&lt;/strong&gt;를 이용해서 여기저기 들쑤실 계획인데 그럴려면 &lt;strong&gt;gdb&lt;/strong&gt; 조작법을 먼저 알아야 겠죠. 마찬가지로 필요한 명령어만 알아 보도록 하겠습니다. (개취)&lt;/p&gt;
+&lt;p&gt;먼저 이번 시간부터는 직접 &lt;strong&gt;gdb&lt;/strong&gt;를 이용해서 여기저기 들쑤실 계획인데 그럴려면 &lt;strong&gt;gdb&lt;/strong&gt; 조작법을 먼저 알아야 겠죠. 마찬가지로 필요한 명령어들 먼저 알아 보도록 하겠습니다. (개취)&lt;/p&gt;
 
 &lt;h1 id=&quot;gdb&quot;&gt;gdb&lt;/h1&gt;
 
@@ -880,19 +1012,19 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-3.png&quot; alt=&quot;[그림 2-3]&quot; /&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;보시는 것처럼 &lt;strong&gt;빅엔디언&lt;/strong&gt;의 경우는 우리가 평소 글을 쓰는 방향과 동일하게 저장됩니다.
-반면 &lt;strong&gt;리틀엔디언&lt;/strong&gt;의 경우 이상한 모습이죠. 빅엔디안과는 다르게 데이터가 역순으로 저장 됩니다.&lt;/p&gt;
+&lt;p&gt;보시는 것처럼 &lt;strong&gt;빅엔디안&lt;/strong&gt;의 경우는 우리가 평소 글을 쓰는 방향과 동일하게 저장됩니다.
+반면 &lt;strong&gt;리틀엔디안&lt;/strong&gt;의 경우 이상한 모습이죠. 빅엔디안과는 다르게 데이터가 역순으로 저장 됩니다.&lt;/p&gt;
 
 &lt;p&gt;왜 컴퓨터는 이런 짓 거리를 할까요? CPU에는 &lt;strong&gt;ALU&lt;/strong&gt;라는 산술/연산을 담당하는 친구가 껴있습니다. 이 친구는 메모리를 읽을 때 &lt;strong&gt;낮은 주소&lt;/strong&gt;에서 &lt;strong&gt;높은 주소&lt;/strong&gt;로 읽어들이고 그래야 작업 속도가 빠른 친구입니다. 쉽게 말해 작업 처리를 더 효율적으로 하기위해 설계된 방식입니다.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;빅엔디언&lt;/strong&gt;의 경우 주로 네트워크 상에서 사용된다 생각하시면 되겠습니다.
-우리 주변에 있는 대부분의 데스크톱은 &lt;strong&gt;리틀엔디언&lt;/strong&gt;을 사용하며 Intel 계열의 프로세서인 리눅스, 윈도우가 이에 해당 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;빅엔디안&lt;/strong&gt;의 경우 주로 네트워크 상에서 사용된다 생각하시면 되겠습니다.
+우리 주변에 있는 대부분의 데스크톱은 &lt;strong&gt;리틀엔디안&lt;/strong&gt;을 사용하며 Intel 계열의 프로세서인 리눅스, 윈도우가 이에 해당 됩니다. 앞으로 &lt;strong&gt;리틀엔디안&lt;/strong&gt;을 자주 보게 될겁니다.&lt;/p&gt;
 
 &lt;p&gt;추가적로 ARM 프로세서들은 빅엔디안과 리틀엔디안을 선택하여 사용 가능합니다.&lt;/p&gt;
 
 &lt;h1 id=&quot;함수-프롤로그에필로그&quot;&gt;함수 프롤로그/에필로그&lt;/h1&gt;
 
-&lt;p&gt;코드를 몇 번 분석하다 보면 공통적인 모습을 찾을 수 있습니다. (못 보셨을수도 있습니다.)바로 함수의 시작과 끝이 같은 모습을 취하고 있다는 것이죠. 왜일까요?&lt;/p&gt;
+&lt;p&gt;코드를 몇 번 분석하다 보면 공통적인 모습을 찾을 수 있습니다. (못 보셨을수도 있습니다.)바로 함수의 시작과 끝이 비슷한 모습을 취하고 있다는 것이죠. 왜일까요?&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;함수 호출&lt;/strong&gt; 시 동작 방식은 다음과 같이 요약해 봤습니다.&lt;/p&gt;
 
@@ -905,7 +1037,7 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
   &lt;li&gt;호출한 지점의 다음 라인으로 점프 또는 스택에 저장 된 eip값으로 복귀(다음 함수 수행)&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;즉, 함수를 수행하기 위한 준비 과정을 &lt;strong&gt;프롤로그&lt;/strong&gt;라 하며 함수 수행을 마무리하는 과정을 &lt;strong&gt;에필로그&lt;/strong&gt;라 이해하면 되겠습니다.&lt;/p&gt;
+&lt;p&gt;즉, 함수를 수행하기 위한 준비 과정을 &lt;strong&gt;프롤로그&lt;/strong&gt;라 하며 함수 수행을 마무리하는 과정을 &lt;strong&gt;에필로그&lt;/strong&gt;라 이해하면 되겠습니다. 그사이에 실제 코드가 동작 하게는 명령어들이 자리 잡게 됩니다.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1   #include &amp;lt;stdio.h&amp;gt;
 2
@@ -915,7 +1047,7 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
 6     int num2=3;
 7
 8     sum(num1,num2); /*sum() 종료후 복귀할 주소를 ret에 저장 
-											및 인자값을 스택에 저장 후 sum()으로 점프*/ 
+					및 인자값을 스택에 저장 후 sum()으로 점프*/
 9          
 10     return 0;
 11   //에필로그
@@ -947,15 +1079,17 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
 6  jmp     eip         # 함수 종료 후 다음 명령으로 이동
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;main() 함수 시작 시 프롤로그인 1~2라인이 먼저 수행 됩니다. 그 다음 작성된 코드가 수행 되고 return 값 반환 후에 에필로그 3~6라인이 수행됩니다. 이 때 3~4 라인은 leave, 5~6라인은 ret라고 표현하기도 합니다.&lt;/p&gt;
+&lt;p&gt;main() 함수 시작 시 프롤로그인 1~2라인이 먼저 수행 됩니다. 그 다음 작성된 코드가 수행 되고 return 값 반환 후에 에필로그 3~6라인이 수행됩니다.&lt;/p&gt;
 
-&lt;p&gt;간단히 정리 하자면, 함수의 시작점은 프롤로그, 끝점은 에필로그라 생각하시면 됩니다. 그 과정에서 길을 잃지 않기 위해서 위의 과정들을 거치는 것이죠.&lt;/p&gt;
+&lt;p&gt;이 때 3~4 라인은 &lt;strong&gt;leave&lt;/strong&gt;, 5~6라인은 &lt;strong&gt;ret&lt;/strong&gt;라고 표현하기도 합니다.&lt;/p&gt;
+
+&lt;p&gt;간단히 정리 하자면, 함수의 시작점은 프롤로그, 끝점은 에필로그라 생각하시면 됩니다. 그 과정에서 길을 잃지 않기 위해서 위와 같이 ebp와 esp의 조작 과정들을 거치는 것이죠.&lt;/p&gt;
 
 &lt;p&gt;그럼 sfp는 무엇이고, ret는 무엇일까요?&lt;/p&gt;
 
 &lt;h1 id=&quot;bof-맛보기&quot;&gt;BOF 맛보기&lt;/h1&gt;
 
-&lt;p&gt;&lt;strong&gt;sfp&lt;/strong&gt;와 &lt;strong&gt;ret&lt;/strong&gt;는 &lt;strong&gt;BOF 맛보기&lt;/strong&gt;와 한 번에 알아보도록 하겠습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;sfp&lt;/strong&gt;와 &lt;strong&gt;ret&lt;/strong&gt;는 &lt;strong&gt;BOF 맛보기&lt;/strong&gt;와 함께 알아보도록 하겠습니다.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bof1.c
 1   #include &amp;lt;stdio.h&amp;gt;
@@ -978,9 +1112,11 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-4.png&quot; alt=&quot;[그림 2-4]&quot; /&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;&lt;strong&gt;sfp&lt;/strong&gt;(save frame pointer)는 ebp를 바로 전에 호출한 ebp 주소를 저장해두고 나중에 함수 리턴전에 이 값을 참조하여 ebp를 복구합니다. &lt;strong&gt;ret&lt;/strong&gt;에서는 함수 종료 후 복귀할 주소가 저장됩니다. 제일 뒤에 있는 파라미터는 필요한 변수의 값들이 들어서게 됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;sfp&lt;/strong&gt;(save frame pointer)는 ebp를 바로 전에 호출한 ebp 주소를 저장해두고 나중에 함수 리턴전에 이 값을 참조하여 ebp를 복구합니다.&lt;/p&gt;
 
-&lt;p&gt;여기서 코드 실행 시 일반적으로 사용자가 입력한 값은 버퍼20 영역에 들어가도록 설계가 되었습니다. 하지만 취약한 함수인 &lt;strong&gt;scanf&lt;/strong&gt;, &lt;strong&gt;strcpy&lt;/strong&gt; 등을 사용하며, 사용자로부터 &lt;strong&gt;입력받은 값의 길이를 검증하지 않는 경우&lt;/strong&gt; 버퍼를 넘어서 sfp, ret의 영역에 까지 입력값이 저장 됩니다. 이 때 ret영역 공격 쉘코드로 덮어버리면 공격자의 코드까지 동작되는 것이죠. 예를 들어 “AAAA”*64를 해서 A를 256개를 입력 받았다면 이런 모습일 겁니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ret&lt;/strong&gt;에서는 함수 종료 후 복귀할 주소가 저장됩니다. 제일 뒤에 있는 파라미터는 필요한 변수의 값들이 들어서게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;여기서 코드 실행 시 일반적으로 사용자가 입력한 값은 버퍼20 영역에 들어가도록 설계가 되었습니다. 하지만 취약한 함수인 &lt;strong&gt;scanf&lt;/strong&gt;, &lt;strong&gt;strcpy&lt;/strong&gt; 등(str…..)을 사용하며, 사용자로부터 &lt;strong&gt;입력받은 값의 길이를 검증하지 않는 경우&lt;/strong&gt; 버퍼를 넘어서 sfp, ret의 영역에 까지 입력값이 저장 됩니다. 이 때 ret영역에 공격 쉘코드로 덮어버리면 공격자의 코드까지 동작되는 것이죠. 예를 들어 “AAAA”*64를 입력 해서 A를 256개를 입력 받았다면 다음과 같이 할당 받은 20byte의 버퍼 공간을 넘어서 저장될 것입니다.&lt;/p&gt;
 
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-5.png&quot; alt=&quot;[그림 2-5]&quot; /&gt;
@@ -993,17 +1129,17 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-6.png&quot; alt=&quot;[그림 2-6]&quot; /&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;이제부터는 앞에서 봤던 bof 코드를 대상으로 &lt;strong&gt;BOF&lt;/strong&gt; 시도해 봅시다. 우리 목표는 위의 그림과 마찬가지로 ret 영역에 HACK를 넣는겁니다. 주의 할 점은 코드내에서 버퍼를 20byte를 주었다 해도 실제 메모리상에서는 그 이상을 할당할 수도 있습니다. 반드시 gdb를 통해서 확인해야 합니다.&lt;/p&gt;
+&lt;p&gt;이제부터는 앞에서 봤던 코드를 대상으로 &lt;strong&gt;BOF&lt;/strong&gt; 시도해 봅시다. 우리 목표는 위의 그림과 마찬가지로 ret 영역에 HACK를 넣는겁니다. 주의 할 점은 코드내에서 버퍼를 20byte를 주었다 해도 실제 메모리상에서는 그 이상을 할당할 수도 있습니다. 반드시 gdb를 통해서 실제 할당 공간을 확인해야 합니다.&lt;/p&gt;
 
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-7.png&quot; alt=&quot;[그림 2-7]&quot; /&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;위와 같이 해당 코드를 작성 후 컴파일 해야 합니다. 컴파일된 바이너리 파일을 실행하여 정상적으로 동작이 되는지까지 확인 합시다. 동작은 아래와 같습니다.&lt;/p&gt;
+&lt;p&gt;위에서 봤던 bof.c 코드를 작성 후 컴파일 해야 합니다. 컴파일된 바이너리 파일을 실행하여 정상적으로 동작이 되는지까지 확인 합시다. 동작은 아래와 같습니다.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;7번 라인에서 입력 받은 argv의 값을 &lt;strong&gt;strcpy&lt;/strong&gt; 함수를 통하여 buf에 복사&lt;/li&gt;
-  &lt;li&gt;8번 라인에서 buf에 복사된 입력값을 &lt;strong&gt;printf&lt;/strong&gt; 함수를 통하여 출력&lt;/li&gt;
+  &lt;li&gt;bof.c의 7번 라인에서 입력 받은 argv의 값을 &lt;strong&gt;strcpy&lt;/strong&gt; 함수를 통하여 buf에 복사&lt;/li&gt;
+  &lt;li&gt;bof.c의 8번 라인에서 buf에 복사된 입력값을 &lt;strong&gt;printf&lt;/strong&gt; 함수를 통하여 출력&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;정상적으로 동작되는 것을 확인 했습니다. 이제 gdb를 사용해서 바이너리 파일 bof1을 뜯어 보도록 합시다.&lt;/p&gt;
@@ -1017,12 +1153,18 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-9.png&quot; alt=&quot;[그림 2-9]&quot; /&gt;
 &lt;/figure&gt;
-&lt;p&gt;보기 편한 형태로 보시면 됩니다. 참고로 다시 at&amp;amp;t 형식으로 바꾸는 방법은 &lt;strong&gt;set disassembly-flavor att&lt;/strong&gt; 입니다.계속 진행 해보겠습니다. 위에서 짚고 넘어갔던 프롤로그/에필로그와 전 편에서 다뤘던 어셈블리 명령어, 레지스터 등이 보입니다. 여기서 중요시 봐야할 라인은 버퍼의 크기를 정하는 main+3 라인입니다. 플로그 후에 필요한 버퍼 크기만큼 할당하여 esp를 쭉 밀어 넣는다고 생각하시면 됩니다. 하지만 앞서 말했듯이 우린 20byte를 지정 했지만 실제로는 0x28 즉, 40byte를 할당 받았습니다. 이 유는 컴파일러마다의 차이라고 합니다. 그러니 꼭 항상 확인 하셔야 합니다.&lt;/p&gt;
+
+&lt;p&gt;보기 편한 형태로 보시면 됩니다. 참고로 다시 at&amp;amp;t 형식으로 바꾸는 방법은 &lt;strong&gt;set disassembly-flavor att&lt;/strong&gt; 입니다. 계속 진행 해보겠습니다. 위에서 짚고 넘어갔던 프롤로그/에필로그와 전 편에서 다뤘던 어셈블리 명령어, 레지스터 등이 보입니다.&lt;/p&gt;
+
+&lt;p&gt;여기서 중요시 봐야할 라인은 버퍼의 크기를 정하는 &lt;strong&gt;main+3&lt;/strong&gt; 라인입니다. 프롤로그 후에 필요한 버퍼 크기만큼 할당하여 esp를 쭉 밀어 넣는다고 생각하시면 됩니다. 하지만 앞서 말했듯이 우린 20byte를 지정 했지만 실제로는 0x28 즉, 40byte를 할당 받았습니다. 이 유는 컴파일러마다의 차이라고 하시면 되겠습니다. 중요한 것은 할당받은 버퍼공간을 꼭 항상 확인해야 한다는 겁니다.&lt;/p&gt;
 
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-10.png&quot; alt=&quot;[그림 2-10]&quot; /&gt;
 &lt;/figure&gt;
-&lt;p&gt;지금까지 확인 된 내용은 위의 그림과 같습니다. 40byte의 버퍼와 sfp, ret 각 4byte 입니다. 그럼 이제 버퍼에 값이 정말 들어가는지 봐야겠습니다. main+31 라인은 strcpy 함수를 호출하는 라인입니다.  우리가 입력값이 저장되어있는 argv의 값을 buf에 복사하기 전입니다. 그 다음 라인 36,39 라인은 esp를 정리하는 라인이며 42라인에서 ebp를 eax에 저장하는 과정을 확인 가능합니다. 버퍼에 입력한 값들이 들어 가는지 확인해 봅시다. 잊지 말아야 하는 점은 버퍼 다음 sfp 다음 ret 영역이 자리 잡는 다는 겁니다.&lt;/p&gt;
+
+&lt;p&gt;지금까지 확인 된 내용은 위의 그림과 같습니다. 40byte의 버퍼와 sfp, ret 각 4byte 입니다. 그럼 이제 버퍼에 값이 정말 들어가는지 봐야겠습니다. main+31 라인은 strcpy 함수를 호출하는 라인입니다.  우리가 입력값이 저장되어있는 argv의 값을 buf에 복사하기 전입니다. 그 다음 라인 36,39 라인은 esp를 정리하는 라인이며 42라인에서 ebp를 eax에 저장하는 과정을 확인 가능합니다. 버퍼에 입력한 값들이 들어 가는지 확인해 봅시다.&lt;/p&gt;
+
+&lt;p&gt;잊지 말아야 하는 점은 버퍼 다음 sfp 다음 ret 영역이 자리 잡는 다는 겁니다.&lt;/p&gt;
 
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-11.png&quot; alt=&quot;[그림 2-11]&quot; /&gt;
@@ -1034,7 +1176,7 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-12.png&quot; alt=&quot;[그림 2-12]&quot; /&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;검정색으로 덮혀있는 40byte가 버퍼 구역임을 확인할 수 있습니다. 버퍼 다음엔 sfp 구역이며 이어서 ret 구역이 자리잡는다 알려 드렸습니다. 다음과 ebp의 위치를 확인 하여 붉은 박스가 sfp 영역인지 확인할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;검정색으로 덮혀있는 40byte가 버퍼 구역임을 확인할 수 있습니다. 버퍼 다음엔 sfp 구역이며 이어서 ret 구역이 자리잡는다고 알려 드렸습니다. 다음의 사진을 통해 ebp의 위치를 확인 하여 붉은 박스가 sfp 영역인지 확인할 수 있습니다.&lt;/p&gt;
 
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-13.png&quot; alt=&quot;[그림 2-13]&quot; /&gt;
@@ -1046,15 +1188,16 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-14.png&quot; alt=&quot;[그림 2-14]&quot; /&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;sfp 위치에 BBBB의 아스키 값이 저장 되있고, 우리의 타겟이었던 ret 구역에 HACK 아스키 값이 잘 저장 되어있네요. 이로써 ret 구역에 값이 저장 되며 이를 악용해 쉡코드를 저 위치에 저장 하면 됩니다. 즉, 40byte + 4byte의 잉여 데이터를 채우고 ret에 공격 쉘코드를 읽을수 있는 주소값으로 바꾸면 함수 종료 후 ret에 저장된 주소값을 참조하며 쉘코드가 실행 됩니다.&lt;/p&gt;
+&lt;p&gt;sfp 위치에 BBBB의 아스키 값이 저장 되있고, 우리의 타겟이었던 ret 구역(초록 박스)에 “HACK” 문자의 아스키 값이 잘 저장 되어있네요. 이로써 ret 구역에 값이 저장 되며 이를 악용해 쉘코드를 저 위치에 저장 하면 됩니다.&lt;/p&gt;
 
-&lt;p&gt;지금 까지는 맛보기 BOF였습니다. 이것 저것 한 번에 알려 드려야 할게 많아서 양이 많아졌네요. 공부 하면서 중구 난방으로 보던 생각에 무리해서라고 꽉꽉 채웠습니다.&lt;/p&gt;
+&lt;p&gt;즉, 40byte(buffer) + 4byte(sfp)의 잉여 데이터를 채우고 ret에 공격 쉘코드를 읽을수 있는 주소값으로 바꾸면 함수 종료 후 ret에 저장된 주소값을 참조하며 쉘코드가 실행 됩니다.&lt;/p&gt;
 
-&lt;p&gt;다음 시간에는 직접 쉘코드를 활용해서 실제 쉘을 따보겠습니다.&lt;/p&gt;
+&lt;p&gt;지금 까지는 맛보기 BOF였습니다. 이것 저것 한 번에 알려 드려서 양이 많아졌네요. 공부 하면서 중구난방으로 있던 내용들을 무리해서라고 꽉꽉 채웠습니다. 최대한 간단하게…&lt;/p&gt;
 
-&lt;p&gt;갈 길이 멉니다….천천히 탄탄히 갑시다.&lt;/p&gt;
+&lt;p&gt;다음 시간에는 직접 쉘코드를 활용해서 실제 쉘을 따보겠습니다.
+갈 길이 멉니다….천천히 탄탄히 갑시다.&lt;/p&gt;
 
-&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">##0x02 - Buffer Overflow 맛보기</summary></entry><entry><title type="html">windows-0x03</title><link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" /><published>2019-02-18T19:18:00+09:00</published><updated>2019-02-18T19:18:00+09:00</updated><id>/windows-0x03</id><content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
+&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x02 - Buffer Overflow 맛보기</summary></entry><entry><title type="html">windows-0x03</title><link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" /><published>2019-02-18T19:18:00+09:00</published><updated>2019-02-18T19:18:00+09:00</updated><id>/windows-0x03</id><content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
 
@@ -1292,6 +1435,7 @@ Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성�
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
 &lt;/figure&gt;
+
 &lt;p&gt;먼저 BOF를 알기 위해선 메모리를 알아야 합니다.&lt;/p&gt;
 
 &lt;ul&gt;
@@ -1377,22 +1521,4 @@ Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성�
 
 &lt;p&gt;다음 포스트에는 간단한 BOF 공격과 공격에 필요한 내용들을 추가적으로 정리해보도록 하겠습니다.&lt;/p&gt;
 
-&lt;p&gt;천천히 갑시다. 조바심 내지 말고 천천히 탄탄하게.&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x01 - Buffer Overflow 준비</summary></entry><entry><title type="html">linux_0x00</title><link href="/linux_0x00" rel="alternate" type="text/html" title="linux_0x00" /><published>2019-02-08T19:18:00+09:00</published><updated>2019-02-08T19:18:00+09:00</updated><id>/linux_0x00</id><content type="html" xml:base="/linux_0x00">&lt;p&gt;##0x00 - 시작에 앞서&lt;/p&gt;
-
-&lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다.&lt;/p&gt;
-
-&lt;p&gt;팀장님(Joel-Park)께서 Windows Exploit 주제로 연재를 시작하시면서 저는 Linux 파트를 맡게 되었습니다…… :(&lt;/p&gt;
-
-&lt;h1 id=&quot;왜-하나요&quot;&gt;왜 하나요?&lt;/h1&gt;
-
-&lt;p&gt;앞으로 &lt;strong&gt;linux bof&lt;/strong&gt; 관련 공부 내용을 정리 할 겸 저처럼 해당 내용을 공부하시는 분들에게 좋은 참고 내용이 되기 위해서 최대한 쉽게 하지만, 탄탄하게 정리해서 연제 하겠습니다.&lt;/p&gt;
-
-&lt;h1 id=&quot;뭐-하나요&quot;&gt;뭐 하나요?&lt;/h1&gt;
-
-&lt;p&gt;Window와 마찬가지로 주 내용은 &lt;strong&gt;Stack&lt;/strong&gt;, &lt;strong&gt;Heap&lt;/strong&gt; &lt;strong&gt;BOF&lt;/strong&gt;이며 관련한 추가적인 내용들도 함께 다뤄볼까 합니다. 일단은 정해진 일정에 맞춰서 진행 하고 일정 완료 후에도 지속적으로 내용을 업데이트 할 생각입니다.&lt;/p&gt;
-
-&lt;h1 id=&quot;마치며&quot;&gt;마치며…&lt;/h1&gt;
-
-&lt;p&gt;많은 분들에게 좋은 자료로 쓰이면 좋겠습니다. 많이들 봐주시고 지적도 많이 해주세요. 화이팅!&lt;/p&gt;
-
-&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">##0x00 - 시작에 앞서</summary></entry></feed>
+&lt;p&gt;천천히 갑시다. 조바심 내지 말고 천천히 탄탄하게.&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x01 - Buffer Overflow 준비</summary></entry></feed>
