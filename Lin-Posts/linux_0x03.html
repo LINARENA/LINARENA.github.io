@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- Document Settings -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Base Meta -->
+    <!-- dynamically fixing the title for tag/author pages -->
+
+
+
+    <title>linux_0x03</title>
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="shortcut icon" type="image/x-icon" href="https://linarena.com/favicon.ico" >
+    <!-- Styles'n'Scripts -->
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.edited.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/built/syntax.css" />
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+    <style>.hljs { background: none; }</style>
+
+    <!--[if IE]>
+        <style>
+            p, ol, ul{
+                width: 100%;
+            }
+            blockquote{
+                width: 100%;
+            }
+        </style>
+    <![endif]-->
+    
+    <!-- This tag outputs SEO meta+structured data and other important settings -->
+    <meta name="description" content="LIN ARENA Technology Blog" />
+    <link rel="shortcut icon" href="/" type="image/png" />
+    <link rel="canonical" href="/linux_0x03" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+
+     <!--title below is coming from _includes/dynamic_title-->
+    <meta property="og:site_name" content="LIN ARENA" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="linux_0x03" />
+    <meta property="og:description" content="0x03 - Basic BOF &amp; 메모리 보호 기법 안녕하세요! Sulla임돠…. 이번에는 저번 시간에 이어서 Basic BOF 또는 Direct EIP overwrite 라고 불리는 기본적인 BOF와 메모리 보호 기법에 대해서 알아 보겠습니다. Basic BOF 준비 지난 시간에 RET구역 즉, EIP 값이 저장되는 구역에 “HACK “ 저장됨을 확인했습니다. 이 말은 공격자가 RET 구역에" />
+    <meta property="og:url" content="/linux_0x03" />
+    <meta property="og:image" content="/assets/images/sky.jpg" />
+    <meta property="article:publisher" content="https://www.facebook.com/" />
+    <meta property="article:author" content="https://www.facebook.com/" />
+    <meta property="article:published_time" content="2019-03-11T19:18:00+09:00" />
+    <meta property="article:modified_time" content="2019-03-11T19:18:00+09:00" />
+    <meta property="article:tag" content="Posts" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="linux_0x03" />
+    <meta name="twitter:description" content="0x03 - Basic BOF &amp; 메모리 보호 기법 안녕하세요! Sulla임돠…. 이번에는 저번 시간에 이어서 Basic BOF 또는 Direct EIP overwrite 라고 불리는 기본적인 BOF와 메모리 보호 기법에 대해서 알아 보겠습니다. Basic BOF 준비 지난 시간에 RET구역 즉, EIP 값이 저장되는 구역에 “HACK “ 저장됨을 확인했습니다. 이 말은 공격자가 RET 구역에" />
+    <meta name="twitter:url" content="/" />
+    <meta name="twitter:image" content="/assets/images/sky.jpg" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="LIN ARENA" />
+    <meta name="twitter:label2" content="Filed under" />
+    <meta name="twitter:data2" content="Posts" />
+    <meta name="twitter:site" content="@" />
+    <meta name="twitter:creator" content="@" />
+    <meta property="og:image:width" content="1400" />
+    <meta property="og:image:height" content="933" />
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Website",
+    "publisher": {
+        "@type": "Organization",
+        "name": "LIN ARENA",
+        "logo": "/"
+    },
+    "url": "/linux_0x03",
+    "image": {
+        "@type": "ImageObject",
+        "url": "/assets/images/sky.jpg",
+        "width": 2000,
+        "height": 666
+    },
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "/linux_0x03"
+    },
+    "description": "0x03 - Basic BOF &amp; 메모리 보호 기법 안녕하세요! Sulla임돠…. 이번에는 저번 시간에 이어서 Basic BOF 또는 Direct EIP overwrite 라고 불리는 기본적인 BOF와 메모리 보호 기법에 대해서 알아 보겠습니다. Basic BOF 준비 지난 시간에 RET구역 즉, EIP 값이 저장되는 구역에 “HACK “ 저장됨을 확인했습니다. 이 말은 공격자가 RET 구역에"
+}
+    </script>
+
+    <!-- <script type="text/javascript" src="https://demo.ghost.io/public/ghost-sdk.min.js?v=724281a32e"></script>
+    <script type="text/javascript">
+    ghost.init({
+    	clientId: "ghost-frontend",
+    	clientSecret: "f84a07a72b17"
+    });
+    </script> -->
+
+    <meta name="generator" content="Jekyll 3.6.2" />
+    <link rel="alternate" type="application/rss+xml" title="linux_0x03" href="/feed.xml" />
+
+
+</head>
+<body class="post-template">
+
+    <div class="site-wrapper">
+        <!-- All the main content gets inserted here, index.hbs, post.hbs, etc -->
+        <!-- default -->
+
+<!-- The tag above means: insert everything in this file
+into the {body} of the default.hbs template -->
+
+<header class="site-header outer">
+    <div class="inner">
+        <nav class="site-nav">
+    <div class="site-nav-left">
+        
+            
+                <a class="site-nav-logo" href="https://linarena.github.io/">LIN ARENA</a>
+            
+        
+        
+            <ul class="nav" role="menu">
+    <li class="nav-home" role="menuitem"><a href="/">Home</a></li>
+    <li class="nav-about" role="menuitem"><a href="/about/">About</a></li>
+    <li class="nav-Posts" role="menuitem"><a href="/tag/posts/">Posts</a></li>
+    <!--<li class="nav-try-ghost" role="menuitem"><a href="https://ghost.org">Try Ghost</a></li>-->
+</ul>
+
+        
+    </div>
+    <div class="site-nav-right">
+        <div class="social-links">
+            
+            
+        </div>
+        
+    </div>
+</nav>
+
+    </div>
+</header>
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<main id="site-main" class="site-main outer" role="main">
+    <div class="inner">
+
+        <article class="post-full post tag-linux ">
+
+            <header class="post-full-header">
+                <section class="post-full-meta">
+                    <time class="post-full-meta-date" datetime="11 March 2019">11 March 2019</time>
+                    
+                        <span class="date-divider">/</span>
+                        
+                            
+                               <a href='/tag/posts/'>POSTS</a>
+                            
+                        
+                    
+                </section>
+                <h1 class="post-full-title">linux_0x03</h1>
+            </header>
+
+            
+            <figure class="post-full-image" style="background-image: url(/assets/images/sky.jpg)">
+            </figure>
+            
+
+            <section class="post-full-content">
+                <div class="kg-card-markdown">
+                    <h2 id="0x03---basic-bof--메모리-보호-기법">0x03 - Basic BOF &amp; 메모리 보호 기법</h2>
+
+<p>안녕하세요! <strong>Sulla</strong>임돠….</p>
+
+<p>이번에는 저번 시간에 이어서 <strong>Basic BOF</strong> 또는 <strong>Direct EIP overwrite</strong> 라고 불리는 기본적인 BOF와 메모리 보호 기법에 대해서 알아 보겠습니다.</p>
+
+<h1 id="basic-bof-준비">Basic BOF 준비</h1>
+
+<p>지난 시간에 <strong>RET</strong>구역 즉, EIP 값이 저장되는 구역에 “<strong>HACK</strong> “ 저장됨을 확인했습니다. 이 말은 공격자가 RET 구역에 원래 있어야 할 값을 임의의 값으로 변경이 가능 하다는 말이죠.  초기에 레지스터의 역할을 간략히 설명 드릴때 <strong>EIP</strong> 레지스터의 역할은 “<strong>다음 명령의 주소를 가리킨다”</strong>라고 했었죠. 이것을 노려서 공격자는 <strong>EIP</strong>에 원하는 주소값을 저장해 공격을 이어갑니다. 명령어가 종료 된 후 <strong>EIP</strong> 주소를 참조해 공격자가 미리 지정한 주소로 이동하여 명령을 이어가죠. 이 때 공격자는 shell을 따 내는것이 최종 목표입니다. 물론 굳이 shell 아니더라도 원하는 행위만 미리 구현해 둔다면 실행이 될 것 입니다.</p>
+
+<p>말이 주절주절 길어졌는데 간략한 그림으로 표현 해보죠.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/linux/0x03/0x03-1.png" alt="[그림 3-1]" />
+</figure>
+
+<p>지난 포스팅에서 다룬 내용과 비슷합니다. <strong>함수 프롤로그</strong> 과정이 지난 후에 버퍼 크기만큼 공간을 확보 후 함수가 진행되고 함수 종료후 <strong>ret</strong> 구역에 저장되있는 주소를 참조하여 이동 합니다. 위 그림과 같이 <strong>Shellcode</strong>가 저장되있는 임의의 주소가 될 것이며 해당 주소 이동 후 <strong>Shellcode</strong>가 실행 되어 공격자가 원하는 행위를 하게 되는 것이죠!!</p>
+
+<p>그런데, Shellcode, Shellcode, 쉘코드 하는데 이게 뭐하는 놈일까요? 명칭의 기원은 모르나 역할만은 분명합니다. 이름 그대로 shell을 따내는 code이죠. 위에서도 계속 말했듯이 공격자가 원하는 행위를 수행하도록 하는게 목표라고 했죠. 파일을 생성하든, 삭제하든 passwd, shadow 및 각종 config 파일 과 같은 중요 파일을 대상으로 뭔가를 행위를 하도록 하면 됩니다. 단지 이 모든걸 한방에 할 수 있는건 shell을 따냄으로서 해결됩니다. 물론 권한 문제가 필요하기에 root권한이 필요할겁니다. 쉽게 표현 하자면 감기약, 두통약, 치통약, 변비약 등등 이것저것 챙겨 먹을 필요없이 만병통치약 하나 먹으면 된다는 것이죠. <strong>shellcode</strong>는 이미 인터넷에 다양하게 생성되있습니다. 해당 코드를 따와서 사용해도 되고, 직접 만들어서 사용해도 됩니다. <strong>shellcode</strong> 작성 방법에 대해서는 나중에 따로 다뤄보도록 하곘습니다.</p>
+
+<p>그럼 <strong>Shellcode</strong>가 뭔지는 알았으니 이놈을 써서 직접 BOF를 해봐야 하는데 문제가 하나 있습니다. 지금까지 설명한 내용처럼 사용자가 메모리의 주소를 알고 있는 상태 즉, 메모리의 주소값이 고정값이라면 공격이 쉬워 지기에 이를 방어하기 위해서 메모리의 주소값을 랜덤으로 부여 합니다.(<strong>ASLR</strong>) 다음 사진을 보시죠.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/linux/0x03/0x03-2.png" alt="[그림 3-2]" />
+</figure>
+
+<p>붉은 박스에서 보여지듯 ESP의 메모리 주소는 계속 바뀝니다.(사실 잘 보시면 완전 랜덤화는 아닙니다….끝에만 바뀌고 있죠…) 즉, 프로그램이 시작 될 때마다 할당받는 메모리의 주소값이 바뀌는 것이죠. 그럼 어찌 해야 할까요?? 가장 간단한 방법은 메모리의 주소가 안바뀐다면?? 메모리의 주소가 항상 고정된 주소를 사용하는 뭔가가 있지 않을까??라는 생각을 하게됩니다. 그런게 뭐가 있을까요?? 고정된 메모리 주소값을 가지며  쉽게 다룰 수 있는???</p>
+
+<p><strong>황경변수</strong>는 <em>**</em>항상 고정된 메모리 주소값을 가집니다.</p>
+
+<h1 id="환경변수">환경변수</h1>
+
+<p>환경변수의 역할은 OS가 필요한 정보들을 미리 메모리에 등록해서 필요할떄 바로바로 해당 내용들을 참조합니다. python, java 또는 서버 구축 후에 환경변수를 등록해서 쉽게 구동시키는 작업을 생각한다면 이해가 되실겁니다.(실행경로를 환경 변수 등록하는 과정….JAVA_HOME이 대표적이죠.)</p>
+
+<p>미리 등록해서 번거롭게 설치된 위치로 이동해서 실행한는 것이 아니라 간편하게 바로바로 실행할 수 있도록 경로를 환경변수로 등록 하는것이죠. 자연스럽게 아셨겠지만 이 환경변수는 사용자가 직접 등록해서 사용할 수 있다는것도 아실겁니다. 미리 운영체제에 필요한 내용들이 등록되있고 사용자의 필요로 인한 내용을 등록해서 사용도 가능하죠.</p>
+
+<p>그렇다면 환경변수의 주소를 어떻게 알 수 있을까요? 다음과 같은 코드를 작성해서 우리가 원하는 환경변수의 주소값을 출력 가능합니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/linux/0x03/0x03-3.png" alt="[그림 3-3]" />
+</figure>
+
+<p>코드는 간단합니다. argv[]로 입력받은 값을 addr에 저장 합니다. 이떄 addr은 char형트로 포인터가 붙어있어서 주소값 형태로 저장 됩니다.
+위 코드를 작성 하고 해당 프로그램을 실행하면 다음과 입력한 환경변수의 주소값을 출력해줍니다. 또한 환경변수의 주소값이 변하지 않는다는것 또한 확인 가능합니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/linux/0x03/0x03-4.png" alt="[그림 3-4]" />
+</figure>
+
+<p>거의 다 되갑니다…. 이제 공격의 환경을 만들어 볼까 합니다. 우리는 shell을 따내는것이 목표이지만 더 정확히 말하자면 <strong>root 권한</strong>을 얻는것이 목표입니다. shell을 따도 <strong>root 권한</strong>이 없을경우 제한적인 권한을 가지게 되죠. 그런데 <strong>setuid</strong>가 설정 되어있는 경우 이런 문제가 해결 됩니다. 이유는 <strong>setuid</strong>가 설정된 파일을 실행하는 동안은 해당 파일의 소유권자와 동일한 권한을 부여 받습니다. root 계정이 a파일을 <strong>setuid</strong> 권한으로 설정헀다면 일반 계정이 해당 파일을 실행하는 동안은 <strong>root 권한</strong>을 부여 받는것이죠. 실제로 root권한을 부여 받는지 확인을 위해 일반 계정으로 변경 해줍니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/linux/0x03/0x03-5.png" alt="[그림 3-5]" />
+</figure>
+
+<p>추가로 언어팩도 아래와 같이 변경해 줍니다. 이떄 계정은 일반 계정으로 변경하고 진행 해줍니다. 기본 셋팅은 UTF-8로 설정되어 있는데 영어의 경우 한 글자 당 1바이트를 사용합니다. 추후에 쉘코드 입력시 값이 1바이트를 넘는다면 의도된 값으로 입력되지 않기 때문에 2바이트를 사용하는 한글로 변경 해야하죠. (ASCII (7bit 인식)와 UNICODE(8bit 인식)의 인식 차이입니다.)</p>
+
+<p>쉽게 말해 공격수행에 문제가 생기기 때문에 바꿔주는 것입니다. 환경변수를 바꾸는 방법은 <strong>export</strong> 명령어를 사용하며 아래와 같이 진행됩니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/linux/0x03/0x03-6.png" alt="[그림 3-6]" />
+</figure>
+
+<p>지금부터는 일반계정(sulla)으로 변경하여 진행 합니다. 환경은 준비가 끝났고 이제 본격적으로 일반계정으로 BOF를 시도하여 root 권한의 shell을 따보도록 합시다.</p>
+
+<h1 id="basic-bof-진짜-시작">Basic BOF 진짜 시작</h1>
+
+<p>시작 전에 정리하자면 아래와 같습니다.</p>
+
+<ol>
+  <li>고정된 메모리 주소를 사용하는 환경변수를 이용해 <strong>shellcode</strong>를 환경변수에 저장하고 해당 황경변수의 주소를 알아냅니다.</li>
+  <li>쉘코드가 저장된 환경변수의 메모리 주소를 취약한 bof1 파일에 삽입합니다.</li>
+</ol>
+
+<p>즉, 공격 페이로드는 이런 모습으로 구성될 것 입니다 [<strong>44byte 잉여값</strong>] + [<strong>4byte 환경변수 주소</strong>]</p>
+
+<p>그럼 1번 과정 부터 먼저 해보도록 합시다.</p>
+
+<p>환경변수를 설정해야 하니 <strong>export</strong> 명령어를 사용해서 환경변수 명과 내용을 채워보도록 하죠. 공격용 쉘코드는 다음과 같습니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>\x31\xc0\x89\xc3\xb0\x17\xcd\x80\xeb\x0f\x5e\x31\xc0\x50\x89\xe2\x56\x89\xe1\x89\xf3\xb0\x0b\xcd\x80\xe8\xec\xff\xff\xff\x2f\x62\x69\x6e\x2f\x73\x68
+</code></pre></div></div>
+
+<p>이 길다란 코드를 아래와 같이 환경변수로 저장하고 주소까지 확인해줍니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/linux/0x03/0x03-7.png" alt="[그림 3-7]" />
+</figure>
+
+<p>bof라는 이름으로 환경변수를 만들었습니다. 환경변수 내용은 /bin/sh 를 실행하는 내용이며 해당 환경변수의 주소를 확인하니 <strong>0xbffffee9</strong>의 주소값을 가지고 있습니다. 이로써 1번 과정을 끝났습니다. 이제 2번 과정을 진행해 봅시다. 그림으로 표현하자면 아래와 같이 보여지겠네요.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/linux/0x03/0x03-8.png" alt="[그림 3-8]" />
+</figure>
+
+<p>공격 페이로드는 저번 시간에서 작성했던 방식과 동일합니다.</p>
+
+<p>단, 지난 시간에서는 버퍼 영역에 “<strong>A</strong>” 40byte와 sfp 영역에 “<strong>B</strong>” 4byte  마지막으로 ret 영역에 “<strong>HACK</strong>“를 저장 헀습니다. 즉, 잉여 데이터 44byte를 입력했고 ret에 원하는 4byte를 입력하는 과정이었습니다.</p>
+
+<p>지금부터는 “<strong>HACK</strong>“이 아닌 위에서 알아낸 <strong>환경변수의 주소값</strong>을 입력 할것입니다. 물론 sfp 영역의 “B” 또한 잉여 데이터기에 “A”로 통일해서 입력 합니다.(그동안은 각 영역을 구분하기 위해 A B HACK 로 나눠서 입력했습니다…..) 주의점은 환경변수의 주소값은 <strong>리틀엔디안</strong> 형식으로 입력해 줍니다. 그럼 아래와 같이 공격 페이로드가 완성 됩니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./bof1 `python -c 'print "A"*11 + "\xe9\xfe\xff\xbf"'`
+</code></pre></div></div>
+
+<p>작성된 페이로드를 입력 하게 되면 아래와 같이 shell이 떨어지며 가장 중요한 점은 shell의 <strong>uid</strong>권한이 <strong>root</strong>권한임을 확인할 수 있습니다!!!!</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/linux/0x03/0x03-9.png" alt="[그림 3-9]" />
+</figure>
+
+<p>이렇게해서 드디어 root권한의 shell을 따내는데 성공 헀습니다. 앞에서 설정헀던 <strong>setuid</strong>를 해체한 상태로 진행하면 <strong>uid</strong>가 <strong>root</strong>가 아닌 일반 계정(sulla)으로 설정 됨을 확인하실 수 있습니다.</p>
+
+<h1 id="메모리-보호-기법">메모리 보호 기법</h1>
+
+<p>위에서 말헀던 메모리의 주소를 랜덤화 하는 메모리 보호기법을 <strong>ASLR(Address Space Layout Randomization)</strong> 이라고 부릅니다. <strong>ASLR</strong> 외의 다양한 보호 기법이 있는데 알아보도록 하죠.</p>
+
+<ul>
+  <li><strong>ASLR :</strong> 프로세스가 실행될 떄마다 메모리의 주소를 랜덤화 합니다.</li>
+  <li><strong>DEP/NX bit :</strong> Stack/Heap등 메모리 영역에 실행 권한을 없애 코드 실행을 막습니다.( 쉽게 말해 Stack/heap 영역에 저장된 Shellcode의 실행을 막는다는 겁니다.)</li>
+  <li><strong>CANARY :</strong> 메모리에 무결성 확인을 위해 버퍼 영역과 SFP 영역 사이에 특정한 값을 설정 합니다. (네트워크의 패킷 무결성을 위한 패리티 비트와 비슷한 역할이라 생각하면 편합니다.)</li>
+  <li><strong>ASCII-Armor :</strong> 공유 라이브러리 영역 상위에 NULL값을 삽입하여 호출을 막습니다.</li>
+</ul>
+
+<p>이외에도 더 있습니다. 이러한 메모리 보호 기법이 하나, 둘 적용 되면서 우회기법이 생기고 묻히고 생기고 묻히길 반복합니다. 다들 아시겠지만 많이 보이던 패턴이죠. 
+(취약점 &gt; 대응 &gt; 우회 &gt; 대응 &gt;우회 &gt; 대응 &gt; 우회 &gt; 대응 &gt; 우회 &gt; 대응) * 무한 반복</p>
+
+<p>앞으로는 Basic BOF를 중심으로 어떤 보호기법이 생겼고 그 우회 방법은 어떤것이 있는지 또 그 우회 방법의 어떤 대응법이 있고 또 다시 대응법의 새로운 우회ㅂ…..후……</p>
+
+<p>천천히 오늘 했던 방식처럼 하나 하나씩 알아보도록 하겠습니다.
+고생하셨습니다. 다음 포스팅까지 차근차근 준비해서 다시 뵙겠습니다.</p>
+
+<p>감사합니다!
+<strong>뿅</strong>!</p>
+
+                </div>
+            </section>
+
+            <!-- Email subscribe form at the bottom of the page -->
+            
+
+            <footer class="post-full-footer">
+                <!-- Everything inside the #author tags pulls data from the author -->
+                <!-- #author-->
+                
+                    
+                
+                    
+                
+                    
+                        <section class="author-card">
+                            
+                                <img class="author-profile-image" src="/assets/images/CI_Logo.jpg" alt="Sulla" />
+                            
+                            <section class="author-card-content">
+                                <h4 class="author-card-name"><a href="/author/Sulla">Sulla</a></h4>
+                                
+                                    <p>Sulla is a member of LIN ARENA's Consulting Team. Also, in Red Team.</p>
+                                
+                            </section>
+                        </section>
+                        <div class="post-full-footer-right">
+                            <a class="author-card-button" href="/author/Sulla">Read More</a>
+                        </div>
+                    
+                
+                    
+                
+                <!-- /author  -->
+            </footer>
+
+            <!-- If you use Disqus comments, just uncomment this block.
+            The only thing you need to change is "test-apkdzgmqhj" - which
+            should be replaced with your own Disqus site-id. -->
+            
+
+        </article>
+
+    </div>
+</main>
+
+<!-- Links to Previous/Next posts -->
+<aside class="read-next outer">
+    <div class="inner">
+        <div class="read-next-feed">
+            
+                
+                
+                
+                
+                    <article class="read-next-card"
+                        
+                            style="background-image: url(/assets/images/lin_logo.png)"
+                        
+                    >
+                        <header class="read-next-card-header">
+                            <small class="read-next-card-header-sitetitle">&mdash; LIN ARENA &mdash;</small>
+                            
+                                <h3 class="read-next-card-header-title"><a href="/tag/posts/">Posts</a></h3>
+                            
+                        </header>
+                        <div class="read-next-divider"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 14.5s2 3 5 3 5.5-2.463 5.5-5.5S21 6.5 18 6.5c-5 0-7 11-12 11C2.962 17.5.5 15.037.5 12S3 6.5 6 6.5s4.5 3.5 4.5 3.5"/></svg>
+</div>
+                        <div class="read-next-card-content">
+                            <ul>
+                                
+                                
+                                  
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                            <li><a href="/web-0x02">web-0x02</a></li>
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                            <li><a href="/windows-0x05">windows-0x05</a></li>
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                            <li><a href="/windows-0x04">windows-0x04</a></li>
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                            </ul>
+                        </div>
+                        <footer class="read-next-card-footer">
+                            <a href="/tag/posts/">
+                                
+                                    See all 12 posts  →
+                                
+                            </a>
+                        </footer>
+                    </article>
+                
+            
+
+            <!-- If there's a next post, display it using the same markup included from - partials/post-card.hbs -->
+            
+
+            <!-- If there's a previous post, display it using the same markup included from - partials/post-card.hbs -->
+            
+                
+    <article class="post-card post-template">
+        
+            <a class="post-card-image-link" href="/web-0x02">
+                <div class="post-card-image" style="background-image: url(/assets/images/web/sky.jpg)"></div>
+            </a>
+        
+        <div class="post-card-content">
+            <a class="post-card-content-link" href="/web-0x02">
+                <header class="post-card-header">
+                    
+                        
+                            
+                                <span class="post-card-tags">Posts</span>
+                            
+                        
+                    
+
+                    <h2 class="post-card-title">web-0x02</h2>
+                </header>
+                <section class="post-card-excerpt">
+                    
+                        <p></p>
+                    
+                </section>
+            </a>
+            <footer class="post-card-meta">
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                        
+                        <img class="author-profile-image" src="/assets/images/CI_Logo.jpg" alt="hackyu" />
+                        
+                        <span class="post-card-author">
+                            <a href="/author/hackyu/">hackyu</a>
+                        </span>
+                    
+                
+            </footer>
+        </div>
+    </article>
+
+            
+
+        </div>
+    </div>
+</aside>
+
+<!-- Floating header which appears on-scroll, included from includes/floating-header.hbs -->
+<div class="floating-header">
+    <div class="floating-header-logo">
+        <a href="/">
+            
+            <span>LIN ARENA</span>
+        </a>
+    </div>
+    <span class="floating-header-divider">&mdash;</span>
+    <div class="floating-header-title">linux_0x03</div>
+    <div class="floating-header-share">
+        <div class="floating-header-share-label">Share this <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M7.5 15.5V4a1.5 1.5 0 1 1 3 0v4.5h2a1 1 0 0 1 1 1h2a1 1 0 0 1 1 1H18a1.5 1.5 0 0 1 1.5 1.5v3.099c0 .929-.13 1.854-.385 2.748L17.5 23.5h-9c-1.5-2-5.417-8.673-5.417-8.673a1.2 1.2 0 0 1 1.76-1.605L7.5 15.5zm6-6v2m-3-3.5v3.5m6-1v2"/>
+</svg>
+</div>
+        <a class="floating-header-share-tw" href="https://twitter.com/share?text=linux_0x03&amp;url=https://jekyller.github.io/jasper2/linux_0x03"
+            onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+
+        </a>
+        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=https://jekyller.github.io/jasper2/linux_0x03"
+            onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
+
+        </a>
+    </div>
+    <progress class="progress" value="0">
+        <div class="progress-container">
+            <span class="progress-bar"></span>
+        </div>
+    </progress>
+</div>
+
+
+<!-- /post -->
+
+<!-- The #contentFor helper here will send everything inside it up to the matching #block helper found in default.hbs -->
+
+
+        <!-- Previous/next page links - displayed on every page -->
+        
+
+        <!-- The footer at the very bottom of the screen -->
+        <footer class="site-footer outer">
+            <div class="site-footer-content inner">
+                <section class="copyright"><a href="/">LIN ARENA</a> &copy; 2019</section>
+                <section class="poweredby">All rights reserved. Powered by GitHub Pages.</section>
+                <nav class="site-footer-nav">
+                    <a href="/">[Latest Posts]</a>
+                    <a href="https://linarena.com/" target="_blank" rel="noopener">[LIN ARENA HOMEPAGE]</a>
+                </nav>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- The big email subscribe modal content -->
+    
+
+    <!-- highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.10.0/components/prism-abap.min.js"></script>
+    <script>$(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });</script>
+
+    <!-- jQuery + Fitvids, which makes all video embeds responsive -->
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="https://demo.ghost.io/assets/js/jquery.fitvids.js?v=724281a32e"></script>
+
+
+    <!-- Paginator increased to "infinit" in _config.yml -->
+    <!-- if paginator.posts  -->
+    <!-- <script>
+        var maxPages = parseInt('');
+    </script>
+    <script src="/assets/js/infinitescroll.js"></script> -->
+    <!-- /endif -->
+
+    
+
+
+    <!-- Add Google Analytics  -->
+    <!-- Google Analytics Tracking code -->
+ <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69281367-1', 'auto');
+  ga('send', 'pageview');
+
+ </script>
+
+
+    <!-- The #block helper will pull in data from the #contentFor other template files. In this case, there's some JavaScript which we only want to use in post.hbs, but it needs to be included down here, after jQuery has already loaded. -->
+    
+        <script>
+
+// NOTE: Scroll performance is poor in Safari
+// - this appears to be due to the events firing much more slowly in Safari.
+//   Dropping the scroll event and using only a raf loop results in smoother
+//   scrolling but continuous processing even when not scrolling
+$(document).ready(function () {
+    // Start fitVids
+    var $postContent = $(".post-full-content");
+    $postContent.fitVids();
+    // End fitVids
+
+    var progressBar = document.querySelector('progress');
+    var header = document.querySelector('.floating-header');
+    var title = document.querySelector('.post-full-title');
+
+    var lastScrollY = window.scrollY;
+    var lastWindowHeight = window.innerHeight;
+    var lastDocumentHeight = $(document).height();
+    var ticking = false;
+
+    function onScroll() {
+        lastScrollY = window.scrollY;
+        requestTick();
+    }
+
+    function onResize() {
+        lastWindowHeight = window.innerHeight;
+        lastDocumentHeight = $(document).height();
+        requestTick();
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(update);
+        }
+        ticking = true;
+    }
+
+    function update() {
+        var trigger = title.getBoundingClientRect().top + window.scrollY;
+        var triggerOffset = title.offsetHeight + 35;
+        var progressMax = lastDocumentHeight - lastWindowHeight;
+
+        // show/hide floating header
+        if (lastScrollY >= trigger + triggerOffset) {
+            header.classList.add('floating-active');
+        } else {
+            header.classList.remove('floating-active');
+        }
+
+        progressBar.setAttribute('max', progressMax);
+        progressBar.setAttribute('value', lastScrollY);
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onResize, false);
+
+    update();
+});
+</script>
+
+    
+
+    <!-- Ghost outputs important scripts and data with this tag - it should always be the very last thing before the closing body tag -->
+    <!-- ghost_foot -->
+
+</body>
+</html>
