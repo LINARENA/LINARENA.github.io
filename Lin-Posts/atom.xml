@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>linux_0x03</title>
+        
+          <description>&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Mon, 11 Mar 2019 19:18:00 +0900</pubDate>
+        <link>
+        /linux_0x03</link>
+        <guid isPermaLink="true">/linux_0x03</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>web-0x02</title>
         
           <description>&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
@@ -85,7 +100,7 @@
       <item>
         <title>linux_0x02</title>
         
-          <description>&lt;p&gt;##0x02 - Buffer Overflow 맛보기&lt;/p&gt;
+          <description>&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
 
 </description>
         
@@ -145,7 +160,7 @@
       <item>
         <title>linux_0x00</title>
         
-          <description>&lt;p&gt;##0x00 - 시작에 앞서&lt;/p&gt;
+          <description>&lt;h2 id=&quot;0x00---시작에-앞서&quot;&gt;0x00 - 시작에 앞서&lt;/h2&gt;
 
 </description>
         
