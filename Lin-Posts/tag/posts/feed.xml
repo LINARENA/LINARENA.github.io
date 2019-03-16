@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-12T00:40:42+09:00</updated>
+  <updated>2019-03-16T15:19:37+09:00</updated>
   <id>/tag/posts/feed.xml</id>
 
   
@@ -36,6 +36,147 @@
   
   
 
+  
+    <entry>
+      <title type="html">mobile-0x00</title>
+      <link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
+      <published>2019-03-16T06:00:00+09:00</published>
+      <updated>2019-03-16T06:00:00+09:00</updated>
+      <id>/android-0x00</id>
+      <content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
+
+&lt;p&gt;Mobile Android 해킹을 주제로 포스팅을 시작하려고 합니다.
+우선 Mobile OWASP Top 10에 등록된  주요 취약점을 간단히 리뷰하고 이후 해당 취약점들을 이용한 Android 해킹과 관련된 내용으로 포스팅을 진행하도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;mobile-owasp-top-10&quot;&gt;Mobile OWASP Top 10&lt;/h5&gt;
+&lt;p&gt;OWASP(The Open Web Application Security Project)란 국제 웹 보안 표준기군이며, 웹에 관한 주요 보안 취약점들을 연구하며, 4년 마다 취약점 Top 10 을 발표하고 있습니다. 
+OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어플리케이션을 안전하게 구축하고 유지, 관리하는데 필요한 리소스를 제공하며 앞으로 일어날 수 있는 영향도와 위험성을 줄이기 위해 진행되고 있습니다. 2년 마다 취약점 Top 10을 발표하고 있으며, 현재 가장 최신 자료는 2016년 release된 자료입니다.(아래 그림 참조)
+그럼 Mobile OWASP Top 10의 각 취약점에 대해 리뷰해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/Mobile%20OWASP%20Top10.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m1---improper-platform-usage&quot;&gt;M1 - Improper Platform Usage&lt;/h4&gt;
+&lt;p&gt;첫번째 M1은 부적절한 플랫폼 사용에 관한 취약점입니다. 
+이 취약점은 플랫폼 기능의 오용이나 보안 설정이 잘못될 경우 발생하는 문제에 대해 다루고 있습니다.
+주로 개발자들의 실수로 인해 발생하며, 문제는 공격 가능성은 쉬우나 그에 따른 영향도가 심각하다는 점입니다.
+대응방안으로는 시큐어 코딩과 보안 설정을 서버 단에서 진행하는 것입니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M1.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m2---insecure-data-storage&quot;&gt;M2 - Insecure Data Storage&lt;/h4&gt;
+&lt;p&gt;M2는 취약한 데이터 저장소에 관한 취약점입니다. 
+이 취약점은 안전하지 않은 데이터 저장소로 인해 의도하지 않은 데이터 유출로 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며 신분 도용, 개인 정보 침해 등의 위험을 초래합니다.
+대응방안은 아래와 같은 기능을 통해 중요 정보를 내부 저장소에 저장하지 않아야 합니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;URL caching (both request and response)&lt;/li&gt;
+  &lt;li&gt;Keyboard press caching&lt;/li&gt;
+  &lt;li&gt;Copy/Paste buffer caching&lt;/li&gt;
+  &lt;li&gt;Application backgrounding&lt;/li&gt;
+  &lt;li&gt;Intermediate data&lt;/li&gt;
+  &lt;li&gt;Logging&lt;/li&gt;
+  &lt;li&gt;HTML5 data storage&lt;/li&gt;
+  &lt;li&gt;Browser cookie objects&lt;/li&gt;
+  &lt;li&gt;Analytics data sent to 3rd parties&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m3---insecure-communication&quot;&gt;M3 - Insecure Communication&lt;/h4&gt;
+&lt;p&gt;M3는 취약한 통신에 관한 취약점입니다. 이 취약점은 악의적인 handshaking, 잘못된 SSL 버전, 약한 협상, 민감 정보의 평문 통신으로 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 피싱 및 MITM 공격에 의해 중요 정보가 노출될 수 있습니다.
+대응방안은 SSL/TLS 적용, 강한 cipher suites 사용, 인증서 확인 등이 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M2.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m4---insecure-authentication&quot;&gt;M4 - Insecure Authentication&lt;/h4&gt;
+&lt;p&gt;M4는 취약한 인증에 관한 취약점입니다. 이 취약점은 사용자 인증 또는 잘못된 세션 관리로 인해 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 약한 인증 패턴을 피하고, 인증을 강화하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M4.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m5---insufficient-cryptography&quot;&gt;M5 - Insufficient Cryptography&lt;/h4&gt;
+&lt;p&gt;M5는 취약한 암호화에 관한 취약점입니다. 이 취약점은 키관리 문제, 커스텀 암호화 생성, 취약한 암호화 알고리즘 사용 시 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 모바일 기기에 중요한 정보를 저장하지 말아야 하며, 검증된 암호화 표준을 적용하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M5.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m6---insecure-authorization&quot;&gt;M6 - Insecure Authorization&lt;/h4&gt;
+&lt;p&gt;M6는 취약한 권한에 관한 취약점입니다. 이 취약점은 안전하지 않은 권한을 부여하여 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 서버 단에서 사용자의 역할 및 권한을 확인해야 하며, 어플리케이션의 필요한 퍼미션만 설정하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M6.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m7---client-code-quality&quot;&gt;M7 - Client Code Quality&lt;/h4&gt;
+&lt;p&gt;M7는 클라이언트 코드 품질에 관한 취약점입니다. 이 취약점은 잘못된 코드 구현으로 인해 클라이언트에서 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 어렵고 영향도는 보통이며 버퍼오버플로우, XSS등의 취약점으로 이어질 수 있습니다.
+대응방안은 버퍼 사용 시 입력 버퍼의 길이를 확인하는 등 안전한 구문을 사용하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M7.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m8---code-tampering&quot;&gt;M8 - Code Tampering&lt;/h4&gt;
+&lt;p&gt;M8는 코드 변조에 관한 취약점입니다. 이 취약점은 바이너리 패치, 로컬 리소스 수정, 메소드 후킹 및 변경, 동적 메모리 수정등 코드 변조 시 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 무결성 체크, 루팅 탐지등의 방법이 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M8.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m9---reverse-engineering&quot;&gt;M9 - Reverse Engineering&lt;/h4&gt;
+&lt;p&gt;M9는 역공학에 관한 취약점입니다. 이 취약점은 라이브러리, 알고리즘, 핵심 바이너리 등의 분석을 통해 중요 로직을 파악하여 발생되는 문제 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 보통이며,
+대응방안은 바이너리 암호화와, 코드 난독화를 적용하여 리버싱을 방지하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M9.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m10---extraneous-functionality&quot;&gt;M10 - Extraneous Functionality&lt;/h4&gt;
+&lt;p&gt;마지막으로 M10는 불필요한 기능에 관한 취약점입니다. 이 취약점은 개발자가 숨겨놓은 기능이나 운영 환경에 적용하지 않는 개발 환경 기능을 악용하여 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 테스트 코드가 포함되어 있는지 확인하고, 모든 로그를 검사하여 과도한 설명이 포함되어 있는지 확인하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M10.png&quot; alt=&quot;[그림 1-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Mobile OWASP Top 10에 대해 간략히 리뷰해봤고, 자세한 내용은 원문에서 확인하실 수 있습니다.
+다음 포스트에서는 IDA를 이용해 정적 분석하는 방법을 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;감사합니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Chaem</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x00. Introduction</summary>
+      
+
+      
+      
+    </entry>
   
     <entry>
       <title type="html">linux_0x03</title>
@@ -1475,6 +1616,151 @@ CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요
     </entry>
   
     <entry>
+      <title type="html">windows-0x03</title>
+      <link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
+      <published>2019-02-18T19:18:00+09:00</published>
+      <updated>2019-02-18T19:18:00+09:00</updated>
+      <id>/windows-0x03</id>
+      <content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
+
+&lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
+
+&lt;p&gt;Buffer Overflow(이하 BOF)는 데이터의 저장 또는 보관을 위해 주어진 메모리 공간의 크기보다 더 많은 값을 입력해 인접 메모리의 값을 변조할 수 있는 공격 기법입니다. 공격자들이 BOF를 이용해서 주로 하는 일은 변수의 값을 변조하는 것과 RET를 변조해서 프로그램의 흐름을 조작하는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;이 취약점은 왜 발생할까요?&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;strcpy, gets 등의 입력 값 길이를 체크하지 않는 취약한 문자열 함수의 사용&lt;/li&gt;
+  &lt;li&gt;길이 값 검증을 하지 않은 취약한 프로그램 설계&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;BOF는 흔히 위의 두 가지 이유로 발생합니다. 그렇다면 이 취약점이 발생하지 않게 하려면 어떻게 하면 될까요?
+입력 값 길이를 체크하는 안전한 문자열 함수를 사용하면 되겠죠? 물론 이것도 중요하지만 안전한 함수의 사용만으로는 이 공격을 100% 막을 수는 없습니다. 안전한 함수로 문자열 길이 500만큼 받도록 해놓더라도 버퍼의 크기가 300이면 BOF가 일어날 수 있습니다. 그렇기 때문에 안전한 문자열 함수의 사용과 더불어 &lt;strong&gt;안전한 프로그램 설계&lt;/strong&gt;도 뒷받침되어야 합니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;direct-eip-overwrite&quot;&gt;Direct EIP Overwrite&lt;/h5&gt;
+
+&lt;p&gt;아래 소스코드를 가지고 가장 기초적인 BOF를 다루어보도록 하겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+
+#pragma warning (disable:4996)
+#define _CRT_SECURE_NO_WARNINGS
+
+int main(int argc, char* argv[]) {
+
+    char content_buffer[1000];
+    char display_buffer[300];
+    FILE *f = fopen(argv[1], &quot;rb&quot;);
+
+    fgets(content_buffer, 1000, f);
+    strcpy(display_buffer,content_buffer);
+
+    printf(&quot;%s\n&quot;, display_buffer);
+
+    fclose(f);
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;fgets로 길이 1000만큼 파일을 읽어와서 content_buffer에 값을 저장하고, 다시 content_buffer에서 display_buffer로 값을 복사한 후 출력해주는 프로그램입니다. 여기서 문제는 strcpy로 content_buffer에서 display_buffer로 값을 복사한다는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;본격적으로 공격을 시작해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Buffer 시작 주소에서 RET까지의 거리 알아내기&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Buffer 시작 위치에서 값을 얼마나 넣어야 RET를 변조할 수 있는지 알아야 공격이 가능하겠죠?&lt;/p&gt;
+
+&lt;p&gt;지금은 거리를 모르니 다음과 같이 간단하게 “A” 100개만 넣어서 분석을 해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Buffer 시작 위치가 EBP-12C인 것을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;SFP도 덮어줘야 하니까 거리는 304가 되겠네요.(12C = 300)&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Exploit 작성하기&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;메모리 보호기법이 적용되지 않은 프로그램이기 때문에 RET를 Shellcode가 있는 곳의 주소로 변조하기만 하면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 Payload는 아래 코드와 같이 Nop과 Shellcode를 합쳐서 304만큼 만들어주고, RET는 Shellcode 시작 전 Nop이 있는 위치로 지정하면 되겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;immunity debugger로 프로그램 흐름을 한 번 살펴보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Strcpy가 동작이 완료된 후, RET가 Buffer 시작 주소로 잘 변조되었네요.&lt;/p&gt;
+
+&lt;p&gt;Main 함수의 RET를 변조했기 때문에 실제로 Shellcode가 실행되는 시점은 Main 함수의 에필로그 과정이 진행된 다음입니다.&lt;/p&gt;
+
+&lt;p&gt;에필로그 과정의 마지막에서 변조된 RET 주소로 프로그램의 흐름이 바뀌면 다음과 같이 Shellcode를 만나러 갑니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;공격 결과 확인&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-6]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;CMD가 정상적으로 잘 실행되네요^^&lt;/p&gt;
+
+&lt;p&gt;지금까지 Direct EIP Overwrite에 대해서 알아봤습니다. 다음 연재에서는 메모리 보호 기법 중 하나인 ASLR의 개념과 우회 방법을 다루어보도록 하겠습니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x03 Basic Bof</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
       <title type="html">windows-0x02</title>
       <link href="/windows-0x02" rel="alternate" type="text/html" title="windows-0x02" />
       <published>2019-02-18T19:18:00+09:00</published>
@@ -1616,284 +1902,6 @@ Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성�
 
       
         <summary type="html">0x02 STACK</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">linux_0x01</title>
-      <link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
-      <published>2019-02-18T19:18:00+09:00</published>
-      <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>/linux_0x01</id>
-      <content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
-
-&lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다. 오늘부터 본격적으로 &lt;strong&gt;BOF&lt;/strong&gt;에 알아보도록 하겠습니다.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;BOF&lt;/strong&gt;(Buffer Overflow)란 &lt;strong&gt;메모리&lt;/strong&gt;의 동작 과정중의 오류로 인한 잘못된 동작을 유도하는 취약점입니다. 프로세스가 데이터를 &lt;strong&gt;버퍼&lt;/strong&gt;에 저장 시 입력 값의 크기를 검증하지 않을 경우 주어진 버퍼를 넘어선 즉, 지정된 위치가 아닌 곳에 저장되며 인접한 메모리를 덮어 쓰게 됩니다. 인접 메모리에는 기존의 데이터가 저장되어 있으며 &lt;strong&gt;변수, 프로세스 흐름 제어&lt;/strong&gt; 등의 데이터가 포함됩니다. 따라서 메모리 접근 오류로 인한 이상 동작을 하게되며 결과적으로 취약점으로 동작하게 되는것입니다.&lt;/p&gt;
-
-&lt;p&gt;앞으로 이 BOF에 대해서 천천히 알아보고자 합니다. 먼저 BOF를 알기 위해서는 메모리, 레지스터 등의 구조 및 개념과 앞으로 사용될 gdb의 사용법 등 본격적인 시작에 앞 서 필요한 배경 지식에 대하여 짚고 넘어가도록 하겠습니다.&lt;/p&gt;
-
-&lt;h2 id=&quot;메모리-구조&quot;&gt;메모리 구조&lt;/h2&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;먼저 BOF를 알기 위해선 메모리를 알아야 합니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Kernel&lt;/strong&gt; : OS의 중요 코드들이 로드되며 일반 사용자는 접근 불가한 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;off-limit&lt;/strong&gt; : 사용자의 Kernel 접근을 막기 위해 설정한 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Stack&lt;/strong&gt; : 환경변수, 파라미터, 반환되는 주소 및 지역변수 등 임시적인 데이터를 저장하는 공간이며, 높은 메모리 주소에서 낮은 메모리 주소로 저장됨&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;libc&lt;/strong&gt; : 프로그램 내부에서 사용하는 라이브러리 함수들과 관련된 공유 라이버리 파일이 정장되는 공간&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Heap&lt;/strong&gt; : 엉덩…아니 필요에 의해 사용되는 동적 변수의 데이터가 저장되는 공간이며, 낮은 메모리 주소에서 높은 메모리 주소로 저장됨&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;BSS / Data&lt;/strong&gt; : 전역변수, 정적변수, 배열, 구조체 등이 저장되는 구조이며 차이는 아래와 같다
-    &lt;ul&gt;
-      &lt;li&gt;&lt;strong&gt;BSS&lt;/strong&gt; : 초기화 되지 않은, 0으로 초기화, Null로 초기화된 데이터의 경우 저장되는 공간&lt;/li&gt;
-      &lt;li&gt;&lt;strong&gt;Data&lt;/strong&gt; : 초기화 된 데이터가 저장 되는 공간&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Code&lt;/strong&gt; : 실제로 실행되는 hex, bin과 같은 파일내부에 실행되는 코드들이 저장되며 기계어 명령어, 어셈블리 코드가 실행되는 영역&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;메모리를 간단하게 정리한 내용입니다. 여기서 Stack과 Heap의 동작 방향이 다르다는 것이 특이한 모습을 보입니다. 왜 그럴까요?&lt;/p&gt;
-
-&lt;p&gt;바로 효율적인 메모리 관리와 Kernel영역의 보호를 위해 저런 모습으로 설계 되었습니다. Stack은 Kernel의 반대 방향으로 움직이고 Stack과 Heap 사이에 libc를 배치하여 메모리 관리의 효율성을 높인것이죠.&lt;/p&gt;
-
-&lt;p&gt;이제 메모리를 간단히 알아 보았으니 메모리 중 Stack에 관하여 간단히 짚고 넘어가도록 하겠습니다.&lt;/p&gt;
-
-&lt;h2 id=&quot;stack&quot;&gt;Stack?&lt;/h2&gt;
-
-&lt;p&gt;Stack의 역할은 위에서 언급했으니 패스하고 동작 장식에 대하여 알아 보도록 하겠습니다. Stack은 기본적으로 &lt;strong&gt;후입선출&lt;/strong&gt;(LIFO, Last in First out)의 방식으로 동작합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Stack의 동작은 위와 같습니다. 16byte의 Stack공간에 A(4byte) 데이터를 저장시 PUSH를 통하여 저장합니다. 밀어 넣는다는 거죠. 이 때 ESP -4 즉, 스택 포인터의 값을 총값에서 -4값을 저장 해둡니다. 왜일까요?&lt;/p&gt;
-
-&lt;p&gt;Stack은 메모리의 높은 주소값에서 낮은 주소값으로 이동하기 떄문에 16byte 에서 4byte씩 줄이는 것이죠. 높은 곳에서 낮은 곳으로.&lt;/p&gt;
-
-&lt;p&gt;다음으로 B 데이터를 저장시 마찬가지로 PUSH를 통하여 A데이터 위에 밀어 넣게 됩니다. ESP 값 또한 -4의 값을 저장 합니다. C 데이터까지 같은 방식으로 데이터를 저장 합니다. 그런데 다시 A 데이터를 빼고 싶다면?&lt;/p&gt;
-
-&lt;p&gt;앞서 말했던 Stack의 동작 방식인 &lt;strong&gt;후입선출&lt;/strong&gt;에 의해 C 데이터를 POP을 통하여 뽑고 ESP의 값은 -4가 아닌 +4의 값을 저장합니다. 이어서 B데이터를 뽑은 후 A 데이터를 뽑을 수 있습니다. 이것이 Stack의 동작 방식인 후입선출입니다.&lt;/p&gt;
-
-&lt;p&gt;정리하자면, Stack은 &lt;strong&gt;메모리의 높은 주소값에서 낮은 주소값으로 데이터가 저장&lt;/strong&gt;되며 동작 방식은 &lt;strong&gt;후입선출&lt;/strong&gt;의 방식으로 동작 합니다. 위에서 나온 ESP의 경우 레지스터의 한 종류로서 레지스터는 포인터, 산술 연산, 인덱스, 세그먼트, 플래그 등이 있으며 필요한 몇가지의 레지스터만 간단하게 정리하자면 다음과 같습니다.&lt;/p&gt;
-
-&lt;p&gt;포인터 레지스터 : 포인터와 관련된 레지스터&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;EIP&lt;/strong&gt; (Instruction Pointer) : CPU가 실행할 다음 명령어의 주소값을 나타냄&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;EBP&lt;/strong&gt; (Base Pointer) : 현재 스택의 최하단 주속값을 나타냄, EBP의 다음 주소는 Return값을 나타냄&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ESP&lt;/strong&gt; (Stack Pointer) : 현재 스택의 최상단 주소값을 나타냄&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;산술 연산 레지스터 : 산술 논리 연산에 필요한 레지스터&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;EAX&lt;/strong&gt; (Accumulator Register) : 산술 논리 연산에 필요한 상수 또는 변수값이 저장되며 함수의 리턴값 저장&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ECX&lt;/strong&gt; (Counter Register) : 반복문 동작시 반복문의 반복 횟수를 저장&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;EDX&lt;/strong&gt; (Data Register) : EAX 레지스터를 보조&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;인덱스 레지스터 : 작업에 필요한 데이터의 주소값 저장에 사용되는 레지스터&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;ESI&lt;/strong&gt; (Source Index) : 데이터 복사 및 조작할 때 사용하는 데이터 주소를 저장(ESI &amp;lt;&amp;gt; EDI)&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;EDI&lt;/strong&gt; (Destination Index) : 데이터 복사시 목적지의 주소 저장 (EDI &amp;lt;&amp;gt; ESI)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;레지스터의 사용 이유는 CPU의 빠른 작업 처리를 위해 사용 됩니다. CPU내부에 위치하여 메모리에 접근하는 것보다 더욱 빠른 속도로 접근 가능합니다. 단, 별도의 데이터를 저장 하기엔 용량이 작기에 위에서 알아본 특수한 목적에 맞는 특정 데이터만 저장해두며 CPU의 빠른 동작을 지원 해줍니다.&lt;/p&gt;
-
-&lt;p&gt;레지스터의 종류는 위의 내용 외 더욱 다양한 레지스터가 존재 하지만 현재 필요한 레지스터 및 알아두면 좋을 레지스터를 알아 보았습니다. 급하게 외우기보단 반복적으로 사용하다 보면 필요한 레지그터의 값만 빠르게 살펴보고 자연스럽게 기억이 되실겁니다.&lt;/p&gt;
-
-&lt;p&gt;마지막으로 어셈블리어 명령어에 대하여 알아보도록 하겠습니다. 위에서 Stack의 후입선출의 동작 방식을 알아보는 과정 중 PUSH, POP 그리고 언급은 없었지만 NOP라는 단어가 보였습니다. 이 단어들이 어셈블리어의 명령어이며, 어셈블리어란 컴퓨터 프로그래밍의 저급 언어입니다. 쉽게 말해 컴퓨터가 알아먹기 쉽도록 구성된 언어입니다. 다양한 명령어가 있으며 여기서도 필요한 또는 알아두면 나중에 좋을만한 내용들만 알아보도록 하겠습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;PUSH&lt;/strong&gt; : 데이터를 스택에 쌓음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;POP&lt;/strong&gt; : 스택의 저장된 데이터를 뽑음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;NOP&lt;/strong&gt; : 아무 동작 안함&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;MOV&lt;/strong&gt; : 데이터 이동&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;CALL&lt;/strong&gt; : 특정 주소의 함수를 호출, JMP와 같이 실행의 흐름이 변경되지만 호출된 함수의 동작이 종료되면 돌아갈 리턴 주소를 Stack에 저장해 둔다는 차이점이 있음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;JMP&lt;/strong&gt; : 특정 주소의 함수로 이동하며 JMP 외의 다양한 조건 점프 명령어가 있음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ADD&lt;/strong&gt; : 덧셈 명령을 수행&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;SUB&lt;/strong&gt; : 뺄셈 명령을 수행&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;위의 리스트 외에도 곱셈, 나눗셈, AND, OR, XOR 연산 및 조건 분기 등 다양한 기능의 명령어들이 존재 합니다. 이 명령어들 또한 레지스터들과 함께 자연스럽게 익혀 나가시면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;다음 포스트에는 간단한 BOF 공격과 공격에 필요한 내용들을 추가적으로 정리해보도록 하겠습니다.&lt;/p&gt;
-
-&lt;p&gt;천천히 갑시다. 조바심 내지 말고 천천히 탄탄하게.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Sulla</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x01 - Buffer Overflow 준비</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">windows-0x03</title>
-      <link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
-      <published>2019-02-18T19:18:00+09:00</published>
-      <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>/windows-0x03</id>
-      <content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
-
-&lt;p&gt;Buffer Overflow(이하 BOF)는 데이터의 저장 또는 보관을 위해 주어진 메모리 공간의 크기보다 더 많은 값을 입력해 인접 메모리의 값을 변조할 수 있는 공격 기법입니다. 공격자들이 BOF를 이용해서 주로 하는 일은 변수의 값을 변조하는 것과 RET를 변조해서 프로그램의 흐름을 조작하는 것입니다.&lt;/p&gt;
-
-&lt;p&gt;이 취약점은 왜 발생할까요?&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;strcpy, gets 등의 입력 값 길이를 체크하지 않는 취약한 문자열 함수의 사용&lt;/li&gt;
-  &lt;li&gt;길이 값 검증을 하지 않은 취약한 프로그램 설계&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;BOF는 흔히 위의 두 가지 이유로 발생합니다. 그렇다면 이 취약점이 발생하지 않게 하려면 어떻게 하면 될까요?
-입력 값 길이를 체크하는 안전한 문자열 함수를 사용하면 되겠죠? 물론 이것도 중요하지만 안전한 함수의 사용만으로는 이 공격을 100% 막을 수는 없습니다. 안전한 함수로 문자열 길이 500만큼 받도록 해놓더라도 버퍼의 크기가 300이면 BOF가 일어날 수 있습니다. 그렇기 때문에 안전한 문자열 함수의 사용과 더불어 &lt;strong&gt;안전한 프로그램 설계&lt;/strong&gt;도 뒷받침되어야 합니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;direct-eip-overwrite&quot;&gt;Direct EIP Overwrite&lt;/h5&gt;
-
-&lt;p&gt;아래 소스코드를 가지고 가장 기초적인 BOF를 다루어보도록 하겠습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
-#include &amp;lt;stdlib.h&amp;gt;
-#include &amp;lt;string.h&amp;gt;
-
-#pragma warning (disable:4996)
-#define _CRT_SECURE_NO_WARNINGS
-
-int main(int argc, char* argv[]) {
-
-    char content_buffer[1000];
-    char display_buffer[300];
-    FILE *f = fopen(argv[1], &quot;rb&quot;);
-
-    fgets(content_buffer, 1000, f);
-    strcpy(display_buffer,content_buffer);
-
-    printf(&quot;%s\n&quot;, display_buffer);
-
-    fclose(f);
-    return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;fgets로 길이 1000만큼 파일을 읽어와서 content_buffer에 값을 저장하고, 다시 content_buffer에서 display_buffer로 값을 복사한 후 출력해주는 프로그램입니다. 여기서 문제는 strcpy로 content_buffer에서 display_buffer로 값을 복사한다는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;본격적으로 공격을 시작해보도록 하겠습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Buffer 시작 주소에서 RET까지의 거리 알아내기&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Buffer 시작 위치에서 값을 얼마나 넣어야 RET를 변조할 수 있는지 알아야 공격이 가능하겠죠?&lt;/p&gt;
-
-&lt;p&gt;지금은 거리를 모르니 다음과 같이 간단하게 “A” 100개만 넣어서 분석을 해보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Buffer 시작 위치가 EBP-12C인 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;SFP도 덮어줘야 하니까 거리는 304가 되겠네요.(12C = 300)&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Exploit 작성하기&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;메모리 보호기법이 적용되지 않은 프로그램이기 때문에 RET를 Shellcode가 있는 곳의 주소로 변조하기만 하면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;그럼 Payload는 아래 코드와 같이 Nop과 Shellcode를 합쳐서 304만큼 만들어주고, RET는 Shellcode 시작 전 Nop이 있는 위치로 지정하면 되겠네요.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;immunity debugger로 프로그램 흐름을 한 번 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Strcpy가 동작이 완료된 후, RET가 Buffer 시작 주소로 잘 변조되었네요.&lt;/p&gt;
-
-&lt;p&gt;Main 함수의 RET를 변조했기 때문에 실제로 Shellcode가 실행되는 시점은 Main 함수의 에필로그 과정이 진행된 다음입니다.&lt;/p&gt;
-
-&lt;p&gt;에필로그 과정의 마지막에서 변조된 RET 주소로 프로그램의 흐름이 바뀌면 다음과 같이 Shellcode를 만나러 갑니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;공격 결과 확인&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-6]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;CMD가 정상적으로 잘 실행되네요^^&lt;/p&gt;
-
-&lt;p&gt;지금까지 Direct EIP Overwrite에 대해서 알아봤습니다. 다음 연재에서는 메모리 보호 기법 중 하나인 ASLR의 개념과 우회 방법을 다루어보도록 하겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x03 Basic Bof</summary>
       
 
       
