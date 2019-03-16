@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom" >
+  <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
+  <link href="/author/Chaem/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-03-16T16:11:19+09:00</updated>
+  <id>/author/Chaem/feed.xml</id>
+
+  
+  
+  
+
+  
+    <title type="html">LIN ARENA | </title>
+  
+
+  
+    <subtitle>LIN ARENA Technology Blog</subtitle>
+  
+
+  
+
+  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+  
+  
+
+  
+    <entry>
+      <title type="html">mobile-0x00</title>
+      <link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
+      <published>2019-03-16T06:00:00+09:00</published>
+      <updated>2019-03-16T06:00:00+09:00</updated>
+      <id>/android-0x00</id>
+      <content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
+
+&lt;p&gt;Mobile Android 해킹을 주제로 포스팅을 시작하려고 합니다.
+우선 Mobile OWASP Top 10에 등록된  주요 취약점을 간단히 리뷰하고 이후 해당 취약점들을 이용한 Android 해킹과 관련된 내용으로 포스팅을 진행하도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;mobile-owasp-top-10&quot;&gt;Mobile OWASP Top 10&lt;/h5&gt;
+&lt;p&gt;OWASP(The Open Web Application Security Project)란 국제 웹 보안 표준기군이며, 웹에 관한 주요 보안 취약점들을 연구하며, 4년 마다 취약점 Top 10 을 발표하고 있습니다. 
+OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어플리케이션을 안전하게 구축하고 유지, 관리하는데 필요한 리소스를 제공하며 앞으로 일어날 수 있는 영향도와 위험성을 줄이기 위해 진행되고 있습니다. 2년 마다 취약점 Top 10을 발표하고 있으며, 현재 가장 최신 자료는 2016년 release된 자료입니다.(아래 그림 참조)
+그럼 Mobile OWASP Top 10의 각 취약점에 대해 리뷰해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/Mobile%20OWASP%20TOP10.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m1---improper-platform-usage&quot;&gt;M1 - Improper Platform Usage&lt;/h4&gt;
+&lt;p&gt;첫번째 M1은 부적절한 플랫폼 사용에 관한 취약점입니다. 
+이 취약점은 플랫폼 기능의 오용이나 보안 설정이 잘못될 경우 발생하는 문제에 대해 다루고 있습니다.
+주로 개발자들의 실수로 인해 발생하며, 문제는 공격 가능성은 쉬우나 그에 따른 영향도가 심각하다는 점입니다.
+대응방안으로는 시큐어 코딩과 보안 설정을 서버 단에서 진행하는 것입니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M1.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m2---insecure-data-storage&quot;&gt;M2 - Insecure Data Storage&lt;/h4&gt;
+&lt;p&gt;M2는 취약한 데이터 저장소에 관한 취약점입니다. 
+이 취약점은 안전하지 않은 데이터 저장소로 인해 의도하지 않은 데이터 유출로 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며 신분 도용, 개인 정보 침해 등의 위험을 초래합니다.
+대응방안은 아래와 같은 기능을 통해 중요 정보를 내부 저장소에 저장하지 않아야 합니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;URL caching (both request and response)&lt;/li&gt;
+  &lt;li&gt;Keyboard press caching&lt;/li&gt;
+  &lt;li&gt;Copy/Paste buffer caching&lt;/li&gt;
+  &lt;li&gt;Application backgrounding&lt;/li&gt;
+  &lt;li&gt;Intermediate data&lt;/li&gt;
+  &lt;li&gt;Logging&lt;/li&gt;
+  &lt;li&gt;HTML5 data storage&lt;/li&gt;
+  &lt;li&gt;Browser cookie objects&lt;/li&gt;
+  &lt;li&gt;Analytics data sent to 3rd parties&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m3---insecure-communication&quot;&gt;M3 - Insecure Communication&lt;/h4&gt;
+&lt;p&gt;M3는 취약한 통신에 관한 취약점입니다. 이 취약점은 악의적인 handshaking, 잘못된 SSL 버전, 약한 협상, 민감 정보의 평문 통신으로 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 피싱 및 MITM 공격에 의해 중요 정보가 노출될 수 있습니다.
+대응방안은 SSL/TLS 적용, 강한 cipher suites 사용, 인증서 확인 등이 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M2.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m4---insecure-authentication&quot;&gt;M4 - Insecure Authentication&lt;/h4&gt;
+&lt;p&gt;M4는 취약한 인증에 관한 취약점입니다. 이 취약점은 사용자 인증 또는 잘못된 세션 관리로 인해 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 약한 인증 패턴을 피하고, 인증을 강화하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M4.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m5---insufficient-cryptography&quot;&gt;M5 - Insufficient Cryptography&lt;/h4&gt;
+&lt;p&gt;M5는 취약한 암호화에 관한 취약점입니다. 이 취약점은 키관리 문제, 커스텀 암호화 생성, 취약한 암호화 알고리즘 사용 시 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 모바일 기기에 중요한 정보를 저장하지 말아야 하며, 검증된 암호화 표준을 적용하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M5.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m6---insecure-authorization&quot;&gt;M6 - Insecure Authorization&lt;/h4&gt;
+&lt;p&gt;M6는 취약한 권한에 관한 취약점입니다. 이 취약점은 안전하지 않은 권한을 부여하여 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 서버 단에서 사용자의 역할 및 권한을 확인해야 하며, 어플리케이션의 필요한 퍼미션만 설정하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M6.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m7---client-code-quality&quot;&gt;M7 - Client Code Quality&lt;/h4&gt;
+&lt;p&gt;M7는 클라이언트 코드 품질에 관한 취약점입니다. 이 취약점은 잘못된 코드 구현으로 인해 클라이언트에서 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 어렵고 영향도는 보통이며 버퍼오버플로우, XSS등의 취약점으로 이어질 수 있습니다.
+대응방안은 버퍼 사용 시 입력 버퍼의 길이를 확인하는 등 안전한 구문을 사용하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M7.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m8---code-tampering&quot;&gt;M8 - Code Tampering&lt;/h4&gt;
+&lt;p&gt;M8는 코드 변조에 관한 취약점입니다. 이 취약점은 바이너리 패치, 로컬 리소스 수정, 메소드 후킹 및 변경, 동적 메모리 수정등 코드 변조 시 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 무결성 체크, 루팅 탐지등의 방법이 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M8.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m9---reverse-engineering&quot;&gt;M9 - Reverse Engineering&lt;/h4&gt;
+&lt;p&gt;M9는 역공학에 관한 취약점입니다. 이 취약점은 라이브러리, 알고리즘, 핵심 바이너리 등의 분석을 통해 중요 로직을 파악하여 발생되는 문제 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 보통이며,
+대응방안은 바이너리 암호화와, 코드 난독화를 적용하여 리버싱을 방지하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M9.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m10---extraneous-functionality&quot;&gt;M10 - Extraneous Functionality&lt;/h4&gt;
+&lt;p&gt;마지막으로 M10는 불필요한 기능에 관한 취약점입니다. 이 취약점은 개발자가 숨겨놓은 기능이나 운영 환경에 적용하지 않는 개발 환경 기능을 악용하여 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 테스트 코드가 포함되어 있는지 확인하고, 모든 로그를 검사하여 과도한 설명이 포함되어 있는지 확인하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M10.png&quot; alt=&quot;[그림 1-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Mobile OWASP Top 10에 대해 간략히 리뷰해봤고, 자세한 내용은 원문에서 확인하실 수 있습니다.
+다음 포스트에서는 IDA를 이용해 정적 분석하는 방법을 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;감사합니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Chaem</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x00. Introduction</summary>
+      
+
+      
+      
+    </entry>
+  
+</feed>

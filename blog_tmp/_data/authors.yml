@@ -14,7 +14,7 @@ Joel:
   location: Seoul, Republic of Korea
   url_full: 
   url: 
-  bio: Joel is a member of LIN ARENA's Consulting Team. Also, in Red Team.
+  bio: psh@linarena.com
   picture: assets/images/CI_Logo.jpg
   facebook: False
   twitter: False
@@ -25,7 +25,7 @@ Sulla:
   location: Seoul, Republic of Korea
   url_full: 
   url: 
-  bio: Sulla is a member of LIN ARENA's Consulting Team. Also, in Red Team.
+  bio: ksh@linarena.com
   picture: assets/images/CI_Logo.jpg
   facebook: False
   twitter: False
@@ -36,7 +36,18 @@ Hackyu:
   location: Seoul, Republic of Korea
   url_full: 
   url: 
-  bio: hackyu is a member of LIN ARENA's Consulting Team. Also, in Red Team.
+  bio: ldk@linarena.com
+  picture: assets/images/CI_Logo.jpg
+  facebook: False
+  twitter: False
+  cover: assets/images/lin_logo.png
+Chaem:
+  username: Chaem
+  name: Chaem
+  location: Seoul, Republic of Korea
+  url_full: 
+  url: 
+  bio: lcm@linarena.com
   picture: assets/images/CI_Logo.jpg
   facebook: False
   twitter: False
