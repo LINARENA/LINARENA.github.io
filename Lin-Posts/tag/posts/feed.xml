@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-16T15:19:37+09:00</updated>
+  <updated>2019-03-16T15:25:23+09:00</updated>
   <id>/tag/posts/feed.xml</id>
 
   
@@ -56,7 +56,7 @@ OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어�
 그럼 Mobile OWASP Top 10의 각 취약점에 대해 리뷰해보도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/Mobile%20OWASP%20Top10.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/Mobile%20OWASP%20TOP10.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
 &lt;/figure&gt;
 
 &lt;h4 id=&quot;m1---improper-platform-usage&quot;&gt;M1 - Improper Platform Usage&lt;/h4&gt;
