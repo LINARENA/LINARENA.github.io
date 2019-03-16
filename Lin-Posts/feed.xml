@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-16T16:20:48+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">mobile-0x00</title><link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" /><published>2019-03-16T06:00:00+09:00</published><updated>2019-03-16T06:00:00+09:00</updated><id>/android-0x00</id><content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-16T16:24:18+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">mobile-0x00</title><link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" /><published>2019-03-16T06:00:00+09:00</published><updated>2019-03-16T06:00:00+09:00</updated><id>/android-0x00</id><content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
 
@@ -505,7 +505,7 @@ https://blog.vulnspy.com/2018/06/21/phpMyAdmin-4-8-x-Authorited-CLI-to-RCE/&lt;b
 https://www.vulnspy.com/phpmyadmin-4.8.1/&lt;br /&gt;
 https://medium.com/@happyholic1203/phpmyadmin-4-8-0-4-8-1-remote-code-execution-257bcc146f8e&lt;br /&gt;
 https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1</summary></entry><entry><title type="html">windows-0x05</title><link href="/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" /><published>2019-03-09T19:18:00+09:00</published><updated>2019-03-09T19:18:00+09:00</updated><id>/windows-0x05</id><content type="html" xml:base="/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>Hackyu</name></author><category term="Posts" /><summary type="html">LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1</summary></entry><entry><title type="html">windows-0x05</title><link href="/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" /><published>2019-03-09T19:18:00+09:00</published><updated>2019-03-09T19:18:00+09:00</updated><id>/windows-0x05</id><content type="html" xml:base="/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-gs&quot;&gt;What is GS?&lt;/h5&gt;
 
@@ -1074,7 +1074,7 @@ Privilege Escalation / Content Injection 취약점이 발생하는 핵심적인 
 https://www.twistlock.com/2017/06/08/wordpress-4-7-04-7-1/
 https://www.exploit-db.com/exploits/41223/
 https://blog.sucuri.net/2017/02/content-injection-vulnerability-wordpress-rest-api.html&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">Privilege Escalation / Content Injection On Wordpress 4.7.0 ~ 4.7.1</summary></entry><entry><title type="html">web-0x00</title><link href="/web-0x00" rel="alternate" type="text/html" title="web-0x00" /><published>2019-02-24T07:22:00+09:00</published><updated>2019-02-24T07:22:00+09:00</updated><id>/web-0x00</id><content type="html" xml:base="/web-0x00">&lt;p&gt;0x00. 서문&lt;/p&gt;
+&lt;/ul&gt;</content><author><name>Hackyu</name></author><category term="Posts" /><summary type="html">Privilege Escalation / Content Injection On Wordpress 4.7.0 ~ 4.7.1</summary></entry><entry><title type="html">web-0x00</title><link href="/web-0x00" rel="alternate" type="text/html" title="web-0x00" /><published>2019-02-24T07:22:00+09:00</published><updated>2019-02-24T07:22:00+09:00</updated><id>/web-0x00</id><content type="html" xml:base="/web-0x00">&lt;p&gt;0x00. 서문&lt;/p&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -1087,7 +1087,7 @@ https://blog.sucuri.net/2017/02/content-injection-vulnerability-wordpress-rest-a
 &lt;p&gt;흔히들 기존에 발견되어진 취약점이 아닌 새롭게 발견된 취약점을 0Day(Zero Day)취약점이라고 불리우는데, 해당 취약점에 대한 패치가 된 취약점을 1Day 취약점이라고 생각하시면 될 것 같습니다.
 CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요. 간략하게 흔히들 Wordpress, Gnuboard, Drupal과 같은 Framework 입니다.&lt;/p&gt;
 
-&lt;p&gt;처음 CMS 1Day Test 포스팅의 서문은 여기서 마치고, 앞으로 열심히하여 쉽고, 잘 정리가 된 1Day Test 내용을 포스팅 하도록 하겠습니다.&lt;/p&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">0x00. 서문</summary></entry><entry><title type="html">linux_0x02</title><link href="/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" /><published>2019-02-22T19:18:00+09:00</published><updated>2019-02-22T19:18:00+09:00</updated><id>/linux_0x02</id><content type="html" xml:base="/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
+&lt;p&gt;처음 CMS 1Day Test 포스팅의 서문은 여기서 마치고, 앞으로 열심히하여 쉽고, 잘 정리가 된 1Day Test 내용을 포스팅 하도록 하겠습니다.&lt;/p&gt;</content><author><name>Hackyu</name></author><category term="Posts" /><summary type="html">0x00. 서문</summary></entry><entry><title type="html">linux_0x02</title><link href="/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" /><published>2019-02-22T19:18:00+09:00</published><updated>2019-02-22T19:18:00+09:00</updated><id>/linux_0x02</id><content type="html" xml:base="/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;임돠.&lt;/p&gt;
 
