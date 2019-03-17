@@ -30,7 +30,7 @@ DLL Hijacking은 PE 프로그램이 의도하지 않은 external library(dll)을
  - Sysinternals suite
  - Visual Studio 2017
 
-##### Find the dlls which is loaded by target application.
+##### Find the dlls which are loaded by target application.
 
 ###### Procexp
 
