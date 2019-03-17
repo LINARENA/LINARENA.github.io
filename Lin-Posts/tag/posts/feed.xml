@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-16T16:24:18+09:00</updated>
+  <updated>2019-03-17T21:32:27+09:00</updated>
   <id>/tag/posts/feed.xml</id>
 
   
@@ -38,6 +38,157 @@
   
   
 
+  
+    <entry>
+      <title type="html">DLL Hijacking &amp;amp; Ghidra</title>
+      <link href="/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
+      <published>2019-03-17T19:18:00+09:00</published>
+      <updated>2019-03-17T19:18:00+09:00</updated>
+      <id>/Dll%20Hijacking%20&amp;%20Ghidra</id>
+      <content type="html" xml:base="/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;방구석에 누워있다 갑자기 DLL Hijacking 포스팅을 올리라는 일거리를 받아서 글을 쓰게 되었습니다. 허허..&lt;/p&gt;
+
+&lt;h5 id=&quot;overview&quot;&gt;Overview&lt;/h5&gt;
+
+&lt;p&gt;DLL Hijacking은 PE 프로그램이 의도하지 않은 external library(dll)을 실행하도록 만드는 것 입니다. 
+이 공격은 DLL Search Order 때문에 취약한 PE 프로그램이 공격자가 작성한 DLL을 로드하고 실행하게 됩니다.
+지금부터, 취약한 프로그램 분석과 Hijacking할 dll을 찾는 과정 등을 하나씩 살펴보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, 오늘 포스팅에서 사용한 Tool과 환경구축 내용입니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Ghidra (jdk 11 이상, 64bit 필수)&lt;/li&gt;
+  &lt;li&gt;PuTTY 0.65&lt;/li&gt;
+  &lt;li&gt;Sysinternals suite&lt;/li&gt;
+  &lt;li&gt;Visual Studio 2017&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h5 id=&quot;find-the-dlls-which-is-loaded-by-target-application&quot;&gt;Find the dlls which is loaded by target application.&lt;/h5&gt;
+
+&lt;h6 id=&quot;procexp&quot;&gt;Procexp&lt;/h6&gt;
+
+&lt;p&gt;PuTTY 0.65를 실행한 뒤, Sysinternals의 Procexp.exe를 통해 어떤 dll들을 사용하는지 확인해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_2.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Procexp.exe에서 [View]-[Lower Pane View]-[DLLs] 설정을 하면 PuTTY 프로그램이 로드한 dll 목록들을 확인할 수 있습니다.
+그런데 이것만 가지고는 어떤 dll을 hijack할 수 있는지 알 수가 없습니다. 결과만 보이기 때문이죠.&lt;/p&gt;
+
+&lt;p&gt;그래서 이번에는 Sysinternals의 Procmon을 실행시켜서 dll이 로드되는 과정을 살펴보겠습니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;procmon&quot;&gt;Procmon&lt;/h6&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_3.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Procmon을 실행한 후 필터를 위와 같이 설정합니다. 그럼 아래와 같이 PuTTY가 dll을 로드하는 과정에서 발생한 내용들을 볼 수가 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_4.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림과 Procexp의 내용을 종합해보면 PuTTY는 WINMM.dll을 자신이 있는 디렉터리에서 먼저 찾아서 로드하려고 한다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;하지만 해당 디렉터리에는 WINMM.dll이 없기에 결과적으로는 C:\Windows\SysWOW64\WINMM.dll을 로드하고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;만약 해당 디렉터리에 이 WINMM.dll이 존재한다면 어떻게 될까요? ^^&lt;/p&gt;
+
+&lt;p&gt;아 물론, 여기서 해당 디렉터리에 low priv user가 Write Access가 가능하다는 전제하에 진행하는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;만약, 해당 디렉터리가 C:\, C:\Program Files 등 Admin 권한이 필요한 경우에는 UAC 팝업이 뜨겠죠?&lt;/p&gt;
+
+&lt;p&gt;UAC 팝업은 쉽게 우회가 가능하나, 이 글의 범위를 넘어서므로 바탕화면 특정 디렉터리에서 진행합니다.&lt;/p&gt;
+
+&lt;p&gt;계속 갑니닷.&lt;/p&gt;
+
+&lt;h6 id=&quot;find-a-target-function-with-ghidra&quot;&gt;Find a Target Function with Ghidra&lt;/h6&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_5.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Target Function을 Ghidra를 이용해서 찾아보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_1.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;[Symbol Tree] - [Imports] - [WINMM.dll]을 따라가면 PlaySoundA라는 함수를 찾을 수 있습니다. 쉽죠??&lt;/p&gt;
+
+&lt;p&gt;그럼 이제 우리가 해야할 일은 Hijacking에 사용할 dll을 만드는 것 입니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;make-a-dll&quot;&gt;Make a DLL&lt;/h6&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &quot;stdafx.h&quot;
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+
+	switch (ul_reason_for_call) {
+	case DLL_PROCESS_ATTACH:
+		WinExec(&quot;calc&quot;, SW_NORMAL);
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+
+	}
+	return true;
+}
+
+extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
+	WinExec(&quot;calc&quot;, SW_NORMAL);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위와 같이 PuTTY가 실행될 때 계산기를 실행하도록 새로운 dll을 생성했습니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;execute-target-program&quot;&gt;Execute Target Program&lt;/h6&gt;
+
+&lt;p&gt;아래와 같이, 같은 디렉터리에 방금 만든 dll을 위치시킨 후, 실행해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;계산기가 잘 실행되네요. ^^&lt;/p&gt;
+
+&lt;p&gt;지금까지 DLL Hijacking에 대해서 알아봤습니다. 뿅!&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">DLL Hijacking &amp;amp; Ghidra</summary>
+      
+
+      
+      
+    </entry>
   
     <entry>
       <title type="html">mobile-0x00</title>
@@ -1756,154 +1907,6 @@ int main(int argc, char* argv[]) {
 
       
         <summary type="html">0x03 Basic Bof</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">windows-0x02</title>
-      <link href="/windows-0x02" rel="alternate" type="text/html" title="windows-0x02" />
-      <published>2019-02-18T19:18:00+09:00</published>
-      <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>/windows-0x02</id>
-      <content type="html" xml:base="/windows-0x02">&lt;h1 id=&quot;0x02-stack&quot;&gt;0x02 STACK&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-the-stack&quot;&gt;What is the STACK?&lt;/h5&gt;
-
-&lt;p&gt;STACK은 Main 함수를 포함한 각 함수들이 생성하는 &lt;strong&gt;지역변수&lt;/strong&gt;, &lt;strong&gt;결과값&lt;/strong&gt; 그리고 함수가 필요로 하는 &lt;strong&gt;인자&lt;/strong&gt;들을 저장할 수 있는 메모리 영역입니다.
-이 영역은 LIFO(Last In, First Out)이라는 데이터 구조를 가지고 있으며, CPU에 의해 관리되고 최적화되는 영역이기 때문에 데이터를 읽고 쓰는 속도가 매우 빠릅니다. 또한, 어떤 함수가 변수를 선언하면 그 새로운 변수는 스택에 생성되고(push), 함수가 종료될 때 함수가 생성한 모든 변수, 값등은 자동으로 해제됩니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;how-does-the-stack-work&quot;&gt;How does the STACK work?&lt;/h5&gt;
-
-&lt;p&gt;STACK을 설명할 때 가장 먼저 떠오르는 개념이 바로 LIFO입니다. LIFO는 Last In First Out의 앞 글자를 딴 용어이고 한글로는 후입선출이라고 합니다.
-설명을 하자면 ‘마지막에 들어온 것이 먼저 나간다’이죠. 아래 그림을 보면서 설명을 이어나가겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK은 위 그림처럼 한 쪽이 막혀 있고 입구가 하나인 구조를 가지고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;앞에서 제가 마지막에 들어온 것이 먼저 나간다라고 했는데, 들어오는 동작. 값을 STACK에 저장하는 동작을 &lt;strong&gt;push&lt;/strong&gt;라고 합니다.&lt;/p&gt;
-
-&lt;p&gt;반대로 나가는 동작. 값을 STACK에서 빼내는 동작을 &lt;strong&gt;pop&lt;/strong&gt;이라고 합니다. 이것이 STACK의 기본 구조이며 동작입니다.&lt;/p&gt;
-
-&lt;p&gt;그럼, 다음 코드를 가지고 STACK 동작 및 용어들을 조금 더 살펴보도록 하겠습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
-
-void plus(int input) {
-	int output = input+2;
-	printf(&quot;Result : %d\n&quot;, output);
-}
-
-int main(int argc, char* argv[]) {
-	int a = 4;
-	plus(a);
-
-	return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;위 코드는 입력 값에다 2를 더해서 출력해주는 간단한 내용입니다. 아래 [그림 1-1]은 plus 함수가 동작하고 있는 특정 순간의 STACK 상황을 표현한 내용입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK은 STACK Frame들이 모여서 만들어진다고도 표현합니다. 풀어서 설명을 좀 해보자면, 각 함수들마다 주어진 동작을 위한 공간이 주어지는데 이런 공간 하나 하나를 STACK Frame이라고 할 수 있겠습니다. 이 공간들이 모여 STACK을 구성하는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;위 그림의 오른편을 보면, Main Function STACK Frame이라고 적힌 것을 보실 수 있습니다. 
-그 아래로 Plus Function STACK Frame이라고 적혀 있죠.&lt;/p&gt;
-
-&lt;p&gt;위 그림처럼, 하나의 함수가 동작하는 중에 다른 함수가 동작되어지는 상황에서는 새롭게 실행되는 함수를 위한 공간을 마련합니다. 
-그리고나서 함수가 종료되면 마련해놓았던 공간을 해제합니다.&lt;/p&gt;
-
-&lt;p&gt;STACK은 Heap과는 다르게 여러분들이 직접 할당, 해제할 필요없이 자동으로 진행이 됩니다.&lt;/p&gt;
-
-&lt;p&gt;마지막으로, 함수가 실행되어 동작하는 과정에서 STACK에 값을 저장하거나, STACK의 값을 참조하는 등의 행동을 할 때는 Offset을 가지고 합니다.&lt;/p&gt;
-
-&lt;p&gt;그런데 이 Offset이라는 게 어떤 지점까지의 거리니까 기준점이 있어야겠죠? 그 기준점으로 주로 활용되는 것이 EBP와 ESP입니다.&lt;/p&gt;
-
-&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저하는 동작. 함수의 프롤로그 과정이죠.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;push ebp
-mov ebp,esp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저 프롤로그 과정을 통해 기준점을 생성합니다. 이 기준점을 생성할 때는 아무 값이나 설정하는 것이 아니라
-이전 STACK Frame의 기준점을 가지고 옵니다.&lt;/p&gt;
-
-&lt;p&gt;그래서 STACK에 그림으로 표기할 때, EBP(Extended Base Pointer)라는 용어와 SFP(Saved Frame Pointer)라는 용어도 같이 사용하죠.&lt;/p&gt;
-
-&lt;p&gt;이전 STACK의 기준점을 가지고와서 현재 STACK Frame의 기준으로 쓰다가 함수가 종료되는 시점. 에필로그 과정에서 다시 되돌려 줍니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mov esp, ebp
-pop ebp
-pop eip
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;이 과정을 통해 EBP를 원래대로 돌려줄 뿐만 아니라, 이전 Frame 안의 다음 주소로 이동하게 됩니다.
-Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성하는 행위는 변함없습니다.&lt;/p&gt;
-
-&lt;p&gt;아래는 지금까지 설명한 내용들을 정리한 내용들입니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;SFP&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-Saved Frame Pointer는 현재 STACK Frame의 지역 변수들을 위한 기준점 역할을 합니다.&lt;/p&gt;
-
-    &lt;p&gt;-예전 STACK Frame이 가지고 있던 EBP가 현재 STACK Frame의 EBP(Extended Base Pointer)에 저장됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;함수 호출&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-함수가 호출되면, 새로운 STACK Frame이 생성됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-함수 동작에 필요한 인자들을 STACK에 저장합니다.&lt;/p&gt;
-
-    &lt;p&gt;-현재 EBP와 Return Address가 저장됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-ESP는 새로운 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;함수 종료&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-함수 사용에 필요했던 STACK Frame이 제거됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-EBP가 이전에 저장했뒀던 값으로 되돌려지고, Return Address로 코드의 흐름이 바뀝니다.&lt;/p&gt;
-
-    &lt;p&gt;-ESP는 되돌아온 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;STACK에 대한 이야기는 이쯤해두고, 다음 연재부터는 본격적으로 Stack based overflow를 다루어보겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x02 STACK</summary>
       
 
       

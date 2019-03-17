@@ -11,7 +11,7 @@
 
 
 
-    <title>linux_0x00</title>
+    <title>DLL Hijacking & Ghidra</title>
     <meta name="HandheldFriendly" content="True" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="shortcut icon" type="image/x-icon" href="https://linarena.com/favicon.ico" >
@@ -37,26 +37,26 @@
     <!-- This tag outputs SEO meta+structured data and other important settings -->
     <meta name="description" content="LIN ARENA Technology Blog" />
     <link rel="shortcut icon" href="/" type="image/png" />
-    <link rel="canonical" href="/linux_0x00" />
+    <link rel="canonical" href="/Dll-Hijacking-&-Ghidra" />
     <meta name="referrer" content="no-referrer-when-downgrade" />
 
      <!--title below is coming from _includes/dynamic_title-->
     <meta property="og:site_name" content="LIN ARENA" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="linux_0x00" />
-    <meta property="og:description" content="0x00 - 시작에 앞서 안녕하세요. Sulla입니다. 팀장님(Joel-Park)께서 Windows Exploit 주제로 연재를 시작하시면서 저는 Linux 파트를 맡게 되었습니다…… :( 뉘신지요…? 저는 LINARENA에서 활동중인 김성회라고 합니다. 닉네임은 Sulla라는 닉을 사용하고있습니다. 게임 아이디입니다. 게임에서 Sulla 또는 술라Sulla 보시면 아는척 해주세요 :) 관심 분야는 웹 / 모바일 / 시스템 / IoT 보안에 관심을 갖고" />
-    <meta property="og:url" content="/linux_0x00" />
-    <meta property="og:image" content="/assets/images/linux_logo.png" />
+    <meta property="og:title" content="DLL Hijacking & Ghidra" />
+    <meta property="og:description" content="DLL Hijacking &amp; Ghidra 안녕하세요. Joel입니다. 방구석에 누워있다 갑자기 DLL Hijacking 포스팅을 올리라는 일거리를 받아서 글을 쓰게 되었습니다. 허허.. Overview DLL Hijacking은 PE 프로그램이 의도하지 않은 external library(dll)을 실행하도록 만드는 것 입니다. 이 공격은 DLL Search Order 때문에 취약한 PE 프로그램이 공격자가 작성한 DLL을 로드하고 실행하게 됩니다. 지금부터, 취약한 프로그램" />
+    <meta property="og:url" content="/Dll-Hijacking-&-Ghidra" />
+    <meta property="og:image" content="/assets/images/windows/dll/0x00_1.png" />
     <meta property="article:publisher" content="https://www.facebook.com/" />
     <meta property="article:author" content="https://www.facebook.com/" />
-    <meta property="article:published_time" content="2019-02-08T19:18:00+09:00" />
-    <meta property="article:modified_time" content="2019-02-08T19:18:00+09:00" />
+    <meta property="article:published_time" content="2019-03-17T19:18:00+09:00" />
+    <meta property="article:modified_time" content="2019-03-17T19:18:00+09:00" />
     <meta property="article:tag" content="Posts" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="linux_0x00" />
-    <meta name="twitter:description" content="0x00 - 시작에 앞서 안녕하세요. Sulla입니다. 팀장님(Joel-Park)께서 Windows Exploit 주제로 연재를 시작하시면서 저는 Linux 파트를 맡게 되었습니다…… :( 뉘신지요…? 저는 LINARENA에서 활동중인 김성회라고 합니다. 닉네임은 Sulla라는 닉을 사용하고있습니다. 게임 아이디입니다. 게임에서 Sulla 또는 술라Sulla 보시면 아는척 해주세요 :) 관심 분야는 웹 / 모바일 / 시스템 / IoT 보안에 관심을 갖고" />
+    <meta name="twitter:title" content="DLL Hijacking & Ghidra" />
+    <meta name="twitter:description" content="DLL Hijacking &amp; Ghidra 안녕하세요. Joel입니다. 방구석에 누워있다 갑자기 DLL Hijacking 포스팅을 올리라는 일거리를 받아서 글을 쓰게 되었습니다. 허허.. Overview DLL Hijacking은 PE 프로그램이 의도하지 않은 external library(dll)을 실행하도록 만드는 것 입니다. 이 공격은 DLL Search Order 때문에 취약한 PE 프로그램이 공격자가 작성한 DLL을 로드하고 실행하게 됩니다. 지금부터, 취약한 프로그램" />
     <meta name="twitter:url" content="/" />
-    <meta name="twitter:image" content="/assets/images/linux_logo.png" />
+    <meta name="twitter:image" content="/assets/images/windows/dll/0x00_1.png" />
     <meta name="twitter:label1" content="Written by" />
     <meta name="twitter:data1" content="LIN ARENA" />
     <meta name="twitter:label2" content="Filed under" />
@@ -75,18 +75,18 @@
         "name": "LIN ARENA",
         "logo": "/"
     },
-    "url": "/linux_0x00",
+    "url": "/Dll-Hijacking-&-Ghidra",
     "image": {
         "@type": "ImageObject",
-        "url": "/assets/images/linux_logo.png",
+        "url": "/assets/images/windows/dll/0x00_1.png",
         "width": 2000,
         "height": 666
     },
     "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "/linux_0x00"
+        "@id": "/Dll-Hijacking-&-Ghidra"
     },
-    "description": "0x00 - 시작에 앞서 안녕하세요. Sulla입니다. 팀장님(Joel-Park)께서 Windows Exploit 주제로 연재를 시작하시면서 저는 Linux 파트를 맡게 되었습니다…… :( 뉘신지요…? 저는 LINARENA에서 활동중인 김성회라고 합니다. 닉네임은 Sulla라는 닉을 사용하고있습니다. 게임 아이디입니다. 게임에서 Sulla 또는 술라Sulla 보시면 아는척 해주세요 :) 관심 분야는 웹 / 모바일 / 시스템 / IoT 보안에 관심을 갖고"
+    "description": "DLL Hijacking &amp; Ghidra 안녕하세요. Joel입니다. 방구석에 누워있다 갑자기 DLL Hijacking 포스팅을 올리라는 일거리를 받아서 글을 쓰게 되었습니다. 허허.. Overview DLL Hijacking은 PE 프로그램이 의도하지 않은 external library(dll)을 실행하도록 만드는 것 입니다. 이 공격은 DLL Search Order 때문에 취약한 PE 프로그램이 공격자가 작성한 DLL을 로드하고 실행하게 됩니다. 지금부터, 취약한 프로그램"
 }
     </script>
 
@@ -99,7 +99,7 @@
     </script> -->
 
     <meta name="generator" content="Jekyll 3.6.2" />
-    <link rel="alternate" type="application/rss+xml" title="linux_0x00" href="/feed.xml" />
+    <link rel="alternate" type="application/rss+xml" title="DLL Hijacking & Ghidra" href="/feed.xml" />
 
 
 </head>
@@ -149,11 +149,11 @@ into the {body} of the default.hbs template -->
 <main id="site-main" class="site-main outer" role="main">
     <div class="inner">
 
-        <article class="post-full post tag-linux ">
+        <article class="post-full post tag-windows ">
 
             <header class="post-full-header">
                 <section class="post-full-meta">
-                    <time class="post-full-meta-date" datetime=" 8 February 2019"> 8 February 2019</time>
+                    <time class="post-full-meta-date" datetime="17 March 2019">17 March 2019</time>
                     
                         <span class="date-divider">/</span>
                         
@@ -163,43 +163,134 @@ into the {body} of the default.hbs template -->
                         
                     
                 </section>
-                <h1 class="post-full-title">linux_0x00</h1>
+                <h1 class="post-full-title">DLL Hijacking & Ghidra</h1>
             </header>
 
             
-            <figure class="post-full-image" style="background-image: url(/assets/images/linux_logo.png)">
+            <figure class="post-full-image" style="background-image: url(/assets/images/windows/dll/0x00_1.png)">
             </figure>
             
 
             <section class="post-full-content">
                 <div class="kg-card-markdown">
-                    <h2 id="0x00---시작에-앞서">0x00 - 시작에 앞서</h2>
+                    <h1 id="dll-hijacking--ghidra">DLL Hijacking &amp; Ghidra</h1>
 
-<p>안녕하세요. <strong>Sulla</strong>입니다.</p>
+<p>안녕하세요. Joel입니다.</p>
 
-<p>팀장님(Joel-Park)께서 Windows Exploit 주제로 연재를 시작하시면서 저는 Linux 파트를 맡게 되었습니다…… :(</p>
+<p>방구석에 누워있다 갑자기 DLL Hijacking 포스팅을 올리라는 일거리를 받아서 글을 쓰게 되었습니다. 허허..</p>
 
-<h1 id="뉘신지요">뉘신지요…?</h1>
+<h5 id="overview">Overview</h5>
 
-<p>저는 <strong>LINARENA</strong>에서 활동중인 <strong>김성회</strong>라고 합니다.
-닉네임은 <strong>Sulla</strong>라는 닉을 사용하고있습니다. 게임 아이디입니다. 게임에서 <strong>Sulla</strong> 또는 <strong>술라Sulla</strong> 보시면 아는척 해주세요 :)
-관심 분야는 <strong>웹</strong> / <strong>모바일</strong> / <strong>시스템</strong> / <strong>IoT</strong> 보안에 관심을 갖고 활동중입니다.</p>
+<p>DLL Hijacking은 PE 프로그램이 의도하지 않은 external library(dll)을 실행하도록 만드는 것 입니다. 
+이 공격은 DLL Search Order 때문에 취약한 PE 프로그램이 공격자가 작성한 DLL을 로드하고 실행하게 됩니다.
+지금부터, 취약한 프로그램 분석과 Hijacking할 dll을 찾는 과정 등을 하나씩 살펴보도록 하겠습니다.</p>
 
-<h1 id="왜-하나요">왜 하나요?</h1>
+<p>먼저, 오늘 포스팅에서 사용한 Tool과 환경구축 내용입니다.</p>
 
-<p>최근에 bof에 재미를 느끼기 시작 했습니다. 그래서 linux bof 관련 공부 내용을 정리 할 겸 저처럼 해당 내용을 공부하시는 분들에게 좋은 참고 내용이 되기 위해서 포스팅 해볼까 생각이 들었습니다. 
-최대한 쉽게 하지만, 탄탄하게 정리해서 연제해 볼까 합니다.</p>
+<ul>
+  <li>Ghidra (jdk 11 이상, 64bit 필수)</li>
+  <li>PuTTY 0.65</li>
+  <li>Sysinternals suite</li>
+  <li>Visual Studio 2017</li>
+</ul>
 
-<h1 id="뭐-하나요">뭐 하나요?</h1>
+<h5 id="find-the-dlls-which-is-loaded-by-target-application">Find the dlls which is loaded by target application.</h5>
 
-<p>Window와 마찬가지로 주 내용은 스택, 힙 bof이며 관련한 추가적인 내용들도 함께 다룰까 합니다. 일단은 정해진 일정에 맞춰서 진행 하고 일정 완료 후에도 지속적으로 내용을 업데이트 할 생각입니다.</p>
+<h6 id="procexp">Procexp</h6>
 
-<h1 id="마치며">마치며…</h1>
+<p>PuTTY 0.65를 실행한 뒤, Sysinternals의 Procexp.exe를 통해 어떤 dll들을 사용하는지 확인해보겠습니다.</p>
 
-<p>글재주가 많이 부족합니다만, 부디 많은 분들에게 좋은 자료로 쓰이면 좋겠습니다. 
-많이들 봐주시고 지적도 많이 해주세요. 화이팅!</p>
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/dll/0x00_2.png" alt="[그림 1-1]" />
+</figure>
 
-<p>감사합니다.</p>
+<p>Procexp.exe에서 [View]-[Lower Pane View]-[DLLs] 설정을 하면 PuTTY 프로그램이 로드한 dll 목록들을 확인할 수 있습니다.
+그런데 이것만 가지고는 어떤 dll을 hijack할 수 있는지 알 수가 없습니다. 결과만 보이기 때문이죠.</p>
+
+<p>그래서 이번에는 Sysinternals의 Procmon을 실행시켜서 dll이 로드되는 과정을 살펴보겠습니다.</p>
+
+<h6 id="procmon">Procmon</h6>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/dll/0x00_3.png" alt="[그림 1-2]" />
+</figure>
+
+<p>Procmon을 실행한 후 필터를 위와 같이 설정합니다. 그럼 아래와 같이 PuTTY가 dll을 로드하는 과정에서 발생한 내용들을 볼 수가 있습니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/dll/0x00_4.png" alt="[그림 1-3]" />
+</figure>
+
+<p>위 그림과 Procexp의 내용을 종합해보면 PuTTY는 WINMM.dll을 자신이 있는 디렉터리에서 먼저 찾아서 로드하려고 한다는 것을 알 수 있습니다.</p>
+
+<p>하지만 해당 디렉터리에는 WINMM.dll이 없기에 결과적으로는 C:\Windows\SysWOW64\WINMM.dll을 로드하고 있습니다.</p>
+
+<p>만약 해당 디렉터리에 이 WINMM.dll이 존재한다면 어떻게 될까요? ^^</p>
+
+<p>아 물론, 여기서 해당 디렉터리에 low priv user가 Write Access가 가능하다는 전제하에 진행하는 것입니다.</p>
+
+<p>만약, 해당 디렉터리가 C:\, C:\Program Files 등 Admin 권한이 필요한 경우에는 UAC 팝업이 뜨겠죠?</p>
+
+<p>UAC 팝업은 쉽게 우회가 가능하나, 이 글의 범위를 넘어서므로 바탕화면 특정 디렉터리에서 진행합니다.</p>
+
+<p>계속 갑니닷.</p>
+
+<h6 id="find-a-target-function-with-ghidra">Find a Target Function with Ghidra</h6>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/dll/0x00_5.png" alt="[그림 1-4]" />
+</figure>
+
+<p>Target Function을 Ghidra를 이용해서 찾아보겠습니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/dll/0x00_1.png" alt="[그림 1-5]" />
+</figure>
+
+<p>[Symbol Tree] - [Imports] - [WINMM.dll]을 따라가면 PlaySoundA라는 함수를 찾을 수 있습니다. 쉽죠??</p>
+
+<p>그럼 이제 우리가 해야할 일은 Hijacking에 사용할 dll을 만드는 것 입니다.</p>
+
+<h6 id="make-a-dll">Make a DLL</h6>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#include "stdafx.h"
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+
+	switch (ul_reason_for_call) {
+	case DLL_PROCESS_ATTACH:
+		WinExec("calc", SW_NORMAL);
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+
+	}
+	return true;
+}
+
+extern "C" __declspec(dllexport) void PlaySoundA() {
+	WinExec("calc", SW_NORMAL);
+}
+</code></pre></div></div>
+
+<p>위와 같이 PuTTY가 실행될 때 계산기를 실행하도록 새로운 dll을 생성했습니다.</p>
+
+<h6 id="execute-target-program">Execute Target Program</h6>
+
+<p>아래와 같이, 같은 디렉터리에 방금 만든 dll을 위치시킨 후, 실행해보겠습니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/dll/0x00_6.png" alt="[그림 1-6]" />
+</figure>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/dll/0x00_7.png" alt="[그림 1-7]" />
+</figure>
+
+<p>계산기가 잘 실행되네요. ^^</p>
+
+<p>지금까지 DLL Hijacking에 대해서 알아봤습니다. 뿅!</p>
 
                 </div>
             </section>
@@ -214,22 +305,22 @@ into the {body} of the default.hbs template -->
                     
                 
                     
-                
-                    
                         <section class="author-card">
                             
-                                <img class="author-profile-image" src="/assets/images/CI_Logo.jpg" alt="Sulla" />
+                                <img class="author-profile-image" src="/assets/images/CI_Logo.jpg" alt="Joel" />
                             
                             <section class="author-card-content">
-                                <h4 class="author-card-name"><a href="/author/Sulla">Sulla</a></h4>
+                                <h4 class="author-card-name"><a href="/author/Joel">Joel Park</a></h4>
                                 
-                                    <p>ksh@linarena.com</p>
+                                    <p>psh@linarena.com</p>
                                 
                             </section>
                         </section>
                         <div class="post-full-footer-right">
-                            <a class="author-card-button" href="/author/Sulla">Read More</a>
+                            <a class="author-card-button" href="/author/Joel">Read More</a>
                         </div>
+                    
+                
                     
                 
                     
@@ -277,11 +368,6 @@ into the {body} of the default.hbs template -->
                                 
                                   
                                     
-                                        
-                                        
-                                            <li><a href="/Dll-Hijacking-&-Ghidra">DLL Hijacking & Ghidra</a></li>
-                                        
-                                    
                                   
                                 
                                   
@@ -306,12 +392,7 @@ into the {body} of the default.hbs template -->
                                     
                                         
                                         
-                                    
-                                  
-                                
-                                  
-                                    
-                                        
+                                            <li><a href="/web-0x02">web-0x02</a></li>
                                         
                                     
                                   
@@ -366,6 +447,16 @@ into the {body} of the default.hbs template -->
                                   
                                 
                                   
+                                    
+                                        
+                                        
+                                    
+                                  
+                                
+                                  
+                                    
+                                        
+                                        
                                     
                                   
                                 
@@ -398,68 +489,18 @@ into the {body} of the default.hbs template -->
 
             <!-- If there's a next post, display it using the same markup included from - partials/post-card.hbs -->
             
-                
-    <article class="post-card post-template">
-        
-            <a class="post-card-image-link" href="/linux_0x01">
-                <div class="post-card-image" style="background-image: url(/assets/images/linux/0x01/0x01-2.png)"></div>
-            </a>
-        
-        <div class="post-card-content">
-            <a class="post-card-content-link" href="/linux_0x01">
-                <header class="post-card-header">
-                    
-                        
-                            
-                                <span class="post-card-tags">Posts</span>
-                            
-                        
-                    
-
-                    <h2 class="post-card-title">linux_0x01</h2>
-                </header>
-                <section class="post-card-excerpt">
-                    
-                        <p></p>
-                    
-                </section>
-            </a>
-            <footer class="post-card-meta">
-                
-                    
-                
-                    
-                
-                    
-                        
-                        <img class="author-profile-image" src="/assets/images/CI_Logo.jpg" alt="Sulla" />
-                        
-                        <span class="post-card-author">
-                            <a href="/author/Sulla/">Sulla</a>
-                        </span>
-                    
-                
-                    
-                
-                    
-                
-            </footer>
-        </div>
-    </article>
-
-            
 
             <!-- If there's a previous post, display it using the same markup included from - partials/post-card.hbs -->
             
                 
     <article class="post-card post-template">
         
-            <a class="post-card-image-link" href="/windows-0x01">
-                <div class="post-card-image" style="background-image: url(/assets/images/windows/0x01_1.png)"></div>
+            <a class="post-card-image-link" href="/android-0x00">
+                <div class="post-card-image" style="background-image: url(/assets/images/android_logo.png)"></div>
             </a>
         
         <div class="post-card-content">
-            <a class="post-card-content-link" href="/windows-0x01">
+            <a class="post-card-content-link" href="/android-0x00">
                 <header class="post-card-header">
                     
                         
@@ -469,7 +510,7 @@ into the {body} of the default.hbs template -->
                         
                     
 
-                    <h2 class="post-card-title">windows-0x01</h2>
+                    <h2 class="post-card-title">mobile-0x00</h2>
                 </header>
                 <section class="post-card-excerpt">
                     
@@ -482,18 +523,18 @@ into the {body} of the default.hbs template -->
                     
                 
                     
+                
+                    
+                
+                    
+                
+                    
                         
-                        <img class="author-profile-image" src="/assets/images/CI_Logo.jpg" alt="Joel Park" />
+                        <img class="author-profile-image" src="/assets/images/CI_Logo.jpg" alt="Chaem" />
                         
                         <span class="post-card-author">
-                            <a href="/author/Joel/">Joel Park</a>
+                            <a href="/author/Chaem/">Chaem</a>
                         </span>
-                    
-                
-                    
-                
-                    
-                
                     
                 
             </footer>
@@ -515,18 +556,18 @@ into the {body} of the default.hbs template -->
         </a>
     </div>
     <span class="floating-header-divider">&mdash;</span>
-    <div class="floating-header-title">linux_0x00</div>
+    <div class="floating-header-title">DLL Hijacking & Ghidra</div>
     <div class="floating-header-share">
         <div class="floating-header-share-label">Share this <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M7.5 15.5V4a1.5 1.5 0 1 1 3 0v4.5h2a1 1 0 0 1 1 1h2a1 1 0 0 1 1 1H18a1.5 1.5 0 0 1 1.5 1.5v3.099c0 .929-.13 1.854-.385 2.748L17.5 23.5h-9c-1.5-2-5.417-8.673-5.417-8.673a1.2 1.2 0 0 1 1.76-1.605L7.5 15.5zm6-6v2m-3-3.5v3.5m6-1v2"/>
 </svg>
 </div>
-        <a class="floating-header-share-tw" href="https://twitter.com/share?text=linux_0x00&amp;url=https://jekyller.github.io/jasper2/linux_0x00"
+        <a class="floating-header-share-tw" href="https://twitter.com/share?text=DLL+Hijacking+%26+Ghidra&amp;url=https://jekyller.github.io/jasper2/Dll-Hijacking-&-Ghidra"
             onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
 
         </a>
-        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=https://jekyller.github.io/jasper2/linux_0x00"
+        <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=https://jekyller.github.io/jasper2/Dll-Hijacking-&-Ghidra"
             onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z"/></svg>
 
