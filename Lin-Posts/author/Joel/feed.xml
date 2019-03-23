@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-20T20:32:54+09:00</updated>
+  <updated>2019-03-23T20:56:24+09:00</updated>
   <id>/author/Joel/feed.xml</id>
 
   
@@ -38,6 +38,381 @@
   
   
 
+  
+    <entry>
+      <title type="html">windows-0x08</title>
+      <link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
+      <published>2019-03-19T20:18:00+09:00</published>
+      <updated>2019-03-19T20:18:00+09:00</updated>
+      <id>/windows-0x08</id>
+      <content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+
+&lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
+
+&lt;p&gt;지난 Post에서 RTL을 다루어 봤습니다.&lt;/p&gt;
+
+&lt;p&gt;이번 시간에는 RTL에 이어 Chaining RTL에 대해 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;chaining-rtl&quot;&gt;Chaining RTL&lt;/h5&gt;
+
+&lt;p&gt;Chaining RTL은 RTL이 Chain처럼 엮여서 반복되는 것을 말합니다.&lt;/p&gt;
+
+&lt;p&gt;RTL이 뭐였죠? DEP가 적용되어 Shellcode를 실행할 수 없게 되었을 때, 라이브러리 함수로 점프하여&lt;/p&gt;
+
+&lt;p&gt;내가 원하는 함수를 실행하는 것이었죠?&lt;/p&gt;
+
+&lt;p&gt;Chaining RTL은 말 그대로 내가 원하는 함수를 계속해서 실행하는 것을 뜻합니다.&lt;/p&gt;
+
+&lt;p&gt;의미는 알았으니, 본격적으로 알아볼텐데 STACK 구성에 집중해서 보시면 되겠습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, 지난 시간처럼 몇 가지 가정을 하겠습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;func1(argv1) : 인자를 하나만 필요로 하는 함수&lt;/li&gt;
+  &lt;li&gt;func2(argv1’, argv’2) : 인자를 두 개 필요로 하는 함수&lt;/li&gt;
+  &lt;li&gt;func3(argv’‘1, argv’‘2, argv’‘3) : 인자를 세 개 필요로 하는 함수&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;이 함수들을 차례대로 호출한다고 가정하고 이 때, Payload를 어떻게 구성해야하는 것인지를 살펴보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_2.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이 그림 기억나시나요?? 지난 시간에 살펴봤던 함수를 하나만 호출할 때의 STACK 그림입니다.&lt;/p&gt;
+
+&lt;p&gt;Main-ret가 다음 호출할 함수의 SFP로 변경되고 있죠? 그래서 그 다음 4 Byte가 호출된 함수가 종료되고 다음에 갈 곳의 주소인 것도 알고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 두 번째 함수(인자가 두 개)를 호출할 때 그림이 이렇게 되겠네요?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x08_1.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Func1() 함수의 RET 자리에 Func2() 함수의 주소를 넣어줬습니다. 그럼 Func1() 함수가 종료된 후, Func2() 함수가 실행됩니다.&lt;/p&gt;
+
+&lt;p&gt;간단하죠?&lt;/p&gt;
+
+&lt;p&gt;그런데 여기엔 문제가 있습니다. 이 방법으로는 내가 원하는 함수를 마음껏 호출할 수가 없습니다.&lt;/p&gt;
+
+&lt;p&gt;그냥 RET에 다른 함수 주소를 덮어주면 되는거 아니야? 라고 생각하실 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;자, 그럼 다음에 Func3() 함수를 호출한다고 생각해봅시다.&lt;/p&gt;
+
+&lt;p&gt;Func3() 함수의 주소는 어디에 넣어줘야 하죠?&lt;/p&gt;
+
+&lt;p&gt;이미 Func1() 함수의 첫 번째 인자가 위치하고 있습니다. 이제 이해가 가시죠??&lt;/p&gt;
+
+&lt;p&gt;이 한계를 해결하기 위해 지금부터는 Gadget을 사용할 겁니다.&lt;/p&gt;
+
+&lt;p&gt;RET로 끝나는 많고 많은 Gadget 중에 시스템 해킹에서 주로 사용되는 Gadget은 다음 3가지 입니다.
+(이것만 쓴다는 게 아닙니다!!)&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;pr : POP RET&lt;/li&gt;
+  &lt;li&gt;ppr : POP POP RET&lt;/li&gt;
+  &lt;li&gt;pppr : POP POP POP RET&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;POP 뒤에 Operand는 생략했습니다.&lt;/p&gt;
+
+&lt;p&gt;이 Gadget을 이용해서 내가 원하는만큼 함수를 호출하려면 STACK을 다음과 같이 구성하면 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x08_2.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;조금 이상하고 복잡한 듯이 느껴질 수 있는데, 에필로그 과정부터 Gadget 순으로 색깔별로 보시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;먼저 에필로그부터 살펴보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;RETN이 실행되면 POP EIP, JMP EIP를 수행하므로 실행되고 난 후, ESP의 위치는 빨간 ESP 위치가 됩니다.&lt;/p&gt;
+
+&lt;p&gt;JMP EIP가 실행되면 POP RETN이 실행되겠죠?&lt;/p&gt;
+
+&lt;p&gt;처음 POP이 실행되면 STACK 최상단의 값을 꺼내고 ESP가 올라가면서 ESP의 위치는 파란 ESP 위치가 됩니다.&lt;/p&gt;
+
+&lt;p&gt;다시 RETN이 실행되면 POP EIP, JMP EIP가 실행되겠네요.&lt;/p&gt;
+
+&lt;p&gt;그럼 그 때의 ESP는 초록색 위치가 되는데 POP EIP를 했으므로 EIP엔 두 번째 함수 Func2()의 주소가 들어가게 될 것이고&lt;/p&gt;
+
+&lt;p&gt;JMP EIP를 하면서 Func2() 함수가 실행됩니다.&lt;/p&gt;
+
+&lt;p&gt;세 번째 함수까지 모두 호출한다고 가정했을 때, STACK의 구조는 다음과 같이 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x08_3.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이런 식으로 STACK을 구성해서 내가 원하는 함수를 계속해서 호출하는 기법을 Chaining RTL이라고 부릅니다.&lt;/p&gt;
+
+&lt;p&gt;자, 이제 ROP를 하기 위한 기초 준비 작업을 모두 마쳤습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 Post에서 ROP를 알아보고 DEP편을 마무리 짓도록 하겠습니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x08 DEP(2)</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
+      <title type="html">windows-0x07</title>
+      <link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
+      <published>2019-03-19T19:18:00+09:00</published>
+      <updated>2019-03-19T19:18:00+09:00</updated>
+      <id>/windows-0x07</id>
+      <content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+
+&lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
+
+&lt;p&gt;DEP는 특정 메모리의 실행 권한을 제거하여, 메모리에 올라온 Shellcode의 실행을 막는 메모리 보호 기법입니다.&lt;/p&gt;
+
+&lt;p&gt;DEP는 Window XP Service Pack 2에서부터 적용된 기법이며, H/W 기반 DEP와 S/W 기반 DEP로 나눌 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이 두 가지 방식의 차이는 CPU가 하드웨어적으로 DEP를 지원 가능한가를 기준으로 나뉜다고 생각하시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;CPU에서 지원 가능한 경우 H/W DEP라 하고, 그렇지 않은 경우 S/W로 그 기능을 지원하는 방식인 것이죠.&lt;/p&gt;
+
+&lt;p&gt;최근 나온 CPU들은 대부분 H/W 기능을 지원하므로 일반적으로 DEP라고 하면 H/W DEP라고 생각하시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;DEP에는 아래와 같이 4가지 종류의 옵션이 존재합니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;OptIn : 지정된 Binary만 보호&lt;/li&gt;
+  &lt;li&gt;OptOut : 지정된 Binary를 제외하고 보호&lt;/li&gt;
+  &lt;li&gt;AlwaysOn : 모든 Process 항상 보호&lt;/li&gt;
+  &lt;li&gt;AlwaysOff : 모든 Process 보호하지 않음&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;OS를 설치한 후, 직접 변경한 적이 없다면 Default로 OptIn 옵션이 적용되어 있고 다음과 같이 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;DEP가 적용되면 Shellcode를 STACK에 넣어서 실행해왔던 지금까지의 방법으로는 성공할 수가 없게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;하지만 이 기법 역시 우회가 가능하며, DEP를 우회하기 위해 필요한 기법과 개념들은 다음과 같습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Gadget&lt;/li&gt;
+  &lt;li&gt;RTL&lt;/li&gt;
+  &lt;li&gt;Chaining RTL&lt;/li&gt;
+  &lt;li&gt;ROP&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;지금부터 하나씩 살펴보겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;gadget&quot;&gt;Gadget&lt;/h5&gt;
+
+&lt;p&gt;Gadget이란 “mov esp, ebp” 등의 명령어 조각을 의미했었습니다.&lt;/p&gt;
+
+&lt;p&gt;하지만 지금 시스템 해킹에서의 Gadget은 RET로 끝나는 명령어 조각을 의미하게 되었습니다.&lt;/p&gt;
+
+&lt;p&gt;이 Gadget이 공격에서 왜 중요한지는 Chaining RTL과 ROP를 다루면서 이야기하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;rtl&quot;&gt;RTL&lt;/h5&gt;
+
+&lt;p&gt;RTL은 Return to Library의 약자로 해석을 하면 Library로 돌아간다는 의미입니다.&lt;/p&gt;
+
+&lt;p&gt;Library로 돌아간다?&lt;/p&gt;
+
+&lt;p&gt;아까 앞에서 DEP가 적용되면 Shellcode를 실행할 수가 없다고 했었던 것 기억나시죠?&lt;/p&gt;
+
+&lt;p&gt;그래서 RET를 Shellcode의 주소로 변조하는 것이 아니라, 실행 권한이 있을 수 밖에 없는 Library의 함수의 주소로 변조하는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;그리고!!!&lt;/p&gt;
+
+&lt;p&gt;RTL에서 가장 중요한 것은 함수의 인자를 직접 생성해야 한다는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;Shellcode를 실행했을 때와는 다르게 이 방법은 RET 주소를 원하는 함수의 주소로 바꿔줬을 뿐이기 때문이죠.&lt;/p&gt;
+
+&lt;p&gt;그 함수가 실행되기 위해서는 함수의 동작에 필요한 인자들이 있어야하겠죠?&lt;/p&gt;
+
+&lt;p&gt;CPU가 알아서 자동으로 만들어 줄리가 없으니,,STACK에 직접 구성해줘야 합니다.&lt;/p&gt;
+
+&lt;p&gt;인자를 1개만 취하는 함수 Func()가 있다고 가정하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;RTL 기법으로 이 함수를 호출하기 위해서는 STACK을 다음과 같이 구성해야 합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림에서 중간 STACK 그림을 보면 Func을 호출하기 위해 RET를 Func 함수의 주소로 변조하고, 그 위치에서 +8만큼 떨어진 곳에 함수의 인자를 구성한 것을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 왜 인자의 위치를 저렇게 구성해줘야 할까요?&lt;/p&gt;
+
+&lt;p&gt;다음 그림을 보면서 설명해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;빨간 색으로 표시된 부분은 Main 함수의 에필로그 과정, 파란 색으로 표신된 부분은 Func 함수의 프롤로그 과정을 나타낸 것 입니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, 빨간 색. Main 함수의 에필로그 과정을 봅시다.&lt;/p&gt;
+
+&lt;p&gt;POP EIP, JMP EIP를 코드를 수행했을 때의 위치가 가장 왼쪽 STACK에 표시된 ESP가 가르키는 곳 입니다.&lt;/p&gt;
+
+&lt;p&gt;이후, JMP EIP 코드가 실행되면 새로운 함수가 실행되고 새 함수의 프롤로그 과정이 진행됩니다.&lt;/p&gt;
+
+&lt;p&gt;프롤로그 과정의 일부인 PUSH EBP가 실행되면 새 STACK Frame의 기준점을 만듭니다.&lt;/p&gt;
+
+&lt;p&gt;여기까지 진행된 후, STACK을 살펴봅시다.&lt;/p&gt;
+
+&lt;p&gt;Main 함수의 RET가 뒤이어 실행되는 함수의 SFP 자리로 바뀐다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 그 다음에, RET를 만들어주었습니다.&lt;/p&gt;
+
+&lt;p&gt;RTL이 아니라 정상적인 방식인 CALL을 통해 함수가 실행된다면 STACK에 다음에 실행할 곳의 위치를 넣어줍니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 우리는 컴파일러가 만들어주는 것이 아니기 때문에 직접 만들어줘야 합니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 저 위치에 다음에 실행할 곳의 주소 역할을 할 값을 직접 넣어 구성해주는 것 입니다.&lt;/p&gt;
+
+&lt;p&gt;쉽게 생각하면 컴파일러가 만들어주는 구조를 똑같이 흉내낸다고 생각하시면 되겠습니다.&lt;/p&gt;
+
+&lt;p&gt;이것이 RTL의 전부입니다.&lt;/p&gt;
+
+&lt;p&gt;다음은 디버거를 통해 RTL을 진행한 그림입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;잘 실행이 되네요^^&lt;/p&gt;
+
+&lt;p&gt;그런데 이 방식은 실제 환경에서는 거의 불가능한 방법이라는 것도 알아두셔야 합니다.&lt;/p&gt;
+
+&lt;p&gt;실제 환경에서는 ASLR, Safe SEH 등이 기본적으로 적용되어 있기 때문에 내가 원하는 함수의 주소를 찾아내기 힘들기 때문입니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 이 기법은 ROP를 위한 기본 개념 정도로만 이해하시기 바랍니다.&lt;/p&gt;
+
+&lt;p&gt;글이 너무 길어졌네요. 이만 줄이고 다음 편에서 ROP를 알아보도록 하겠습니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x07 DEP(1)</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
+      <title type="html">windows-0x06</title>
+      <link href="/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
+      <published>2019-03-18T19:18:00+09:00</published>
+      <updated>2019-03-18T19:18:00+09:00</updated>
+      <id>/windows-0x06</id>
+      <content type="html" xml:base="/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+
+&lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
+
+&lt;p&gt;SafeSEH는 SEH Overwite를 방어하기 위해 도입된 메모리 보호 기법입니다.&lt;/p&gt;
+
+&lt;p&gt;SafeSEH가 하는 일은 아주 간단합니다.&lt;/p&gt;
+
+&lt;p&gt;Exception Handler가 실행되기 전에 Handler 주소 값에 대한 검증을 수행합니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1) 등록된 Handler의 주소가 STACK인지 확인해서 STACK이면 호출하지 않음.&lt;/li&gt;
+  &lt;li&gt;2) Handler의 주소가 현재 로드된 모듈의 주소이고, SafeSEH 컴파일이 되어 있다면 적절한 절차로 등록된 것인지 검증.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;까다롭죠??&lt;/p&gt;
+
+&lt;p&gt;그런데 해법이 상당이 간단합니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1) Handler의 주소가 STACK이 아니면 된다.&lt;/li&gt;
+  &lt;li&gt;2) SafeSEH 컴파일이 되어 있지 않으면 된다.&lt;/li&gt;
+  &lt;li&gt;결론 : SafeSEH가 안걸려 있는 모듈에서 Gadget을 찾아오면 된다!!&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;간단하죠?&lt;/p&gt;
+
+&lt;p&gt;Immunity Debugger에서 mona.py를 이용하면 Module들에 어떤 보호기법들이 적용되어 있는지 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!mona modules
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x06_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이 중에 SafeSEH가 적용되어 있지 않은 Module을 골라서 우회 공격을 동일하게 진행하면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;이상으로 GS편을 모두 마치겠습니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x06 GS(2)</summary>
+      
+
+      
+      
+    </entry>
   
     <entry>
       <title type="html">DLL Hijacking &amp;amp; Ghidra</title>
@@ -488,6 +863,151 @@ JMP ESP의 주소를 찾을 수 있게 됩니다.&lt;/p&gt;
     </entry>
   
     <entry>
+      <title type="html">windows-0x03</title>
+      <link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
+      <published>2019-02-18T19:18:00+09:00</published>
+      <updated>2019-02-18T19:18:00+09:00</updated>
+      <id>/windows-0x03</id>
+      <content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
+
+&lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
+
+&lt;p&gt;Buffer Overflow(이하 BOF)는 데이터의 저장 또는 보관을 위해 주어진 메모리 공간의 크기보다 더 많은 값을 입력해 인접 메모리의 값을 변조할 수 있는 공격 기법입니다. 공격자들이 BOF를 이용해서 주로 하는 일은 변수의 값을 변조하는 것과 RET를 변조해서 프로그램의 흐름을 조작하는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;이 취약점은 왜 발생할까요?&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;strcpy, gets 등의 입력 값 길이를 체크하지 않는 취약한 문자열 함수의 사용&lt;/li&gt;
+  &lt;li&gt;길이 값 검증을 하지 않은 취약한 프로그램 설계&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;BOF는 흔히 위의 두 가지 이유로 발생합니다. 그렇다면 이 취약점이 발생하지 않게 하려면 어떻게 하면 될까요?
+입력 값 길이를 체크하는 안전한 문자열 함수를 사용하면 되겠죠? 물론 이것도 중요하지만 안전한 함수의 사용만으로는 이 공격을 100% 막을 수는 없습니다. 안전한 함수로 문자열 길이 500만큼 받도록 해놓더라도 버퍼의 크기가 300이면 BOF가 일어날 수 있습니다. 그렇기 때문에 안전한 문자열 함수의 사용과 더불어 &lt;strong&gt;안전한 프로그램 설계&lt;/strong&gt;도 뒷받침되어야 합니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;direct-eip-overwrite&quot;&gt;Direct EIP Overwrite&lt;/h5&gt;
+
+&lt;p&gt;아래 소스코드를 가지고 가장 기초적인 BOF를 다루어보도록 하겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+
+#pragma warning (disable:4996)
+#define _CRT_SECURE_NO_WARNINGS
+
+int main(int argc, char* argv[]) {
+
+    char content_buffer[1000];
+    char display_buffer[300];
+    FILE *f = fopen(argv[1], &quot;rb&quot;);
+
+    fgets(content_buffer, 1000, f);
+    strcpy(display_buffer,content_buffer);
+
+    printf(&quot;%s\n&quot;, display_buffer);
+
+    fclose(f);
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;fgets로 길이 1000만큼 파일을 읽어와서 content_buffer에 값을 저장하고, 다시 content_buffer에서 display_buffer로 값을 복사한 후 출력해주는 프로그램입니다. 여기서 문제는 strcpy로 content_buffer에서 display_buffer로 값을 복사한다는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;본격적으로 공격을 시작해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Buffer 시작 주소에서 RET까지의 거리 알아내기&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Buffer 시작 위치에서 값을 얼마나 넣어야 RET를 변조할 수 있는지 알아야 공격이 가능하겠죠?&lt;/p&gt;
+
+&lt;p&gt;지금은 거리를 모르니 다음과 같이 간단하게 “A” 100개만 넣어서 분석을 해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Buffer 시작 위치가 EBP-12C인 것을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;SFP도 덮어줘야 하니까 거리는 304가 되겠네요.(12C = 300)&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Exploit 작성하기&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;메모리 보호기법이 적용되지 않은 프로그램이기 때문에 RET를 Shellcode가 있는 곳의 주소로 변조하기만 하면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 Payload는 아래 코드와 같이 Nop과 Shellcode를 합쳐서 304만큼 만들어주고, RET는 Shellcode 시작 전 Nop이 있는 위치로 지정하면 되겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;immunity debugger로 프로그램 흐름을 한 번 살펴보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Strcpy가 동작이 완료된 후, RET가 Buffer 시작 주소로 잘 변조되었네요.&lt;/p&gt;
+
+&lt;p&gt;Main 함수의 RET를 변조했기 때문에 실제로 Shellcode가 실행되는 시점은 Main 함수의 에필로그 과정이 진행된 다음입니다.&lt;/p&gt;
+
+&lt;p&gt;에필로그 과정의 마지막에서 변조된 RET 주소로 프로그램의 흐름이 바뀌면 다음과 같이 Shellcode를 만나러 갑니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;공격 결과 확인&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;[그림 1-6]&lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;CMD가 정상적으로 잘 실행되네요^^&lt;/p&gt;
+
+&lt;p&gt;지금까지 Direct EIP Overwrite에 대해서 알아봤습니다. 다음 연재에서는 메모리 보호 기법 중 하나인 ASLR의 개념과 우회 방법을 다루어보도록 하겠습니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x03 Basic Bof</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
       <title type="html">windows-0x02</title>
       <link href="/windows-0x02" rel="alternate" type="text/html" title="windows-0x02" />
       <published>2019-02-18T19:18:00+09:00</published>
@@ -629,151 +1149,6 @@ Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성�
 
       
         <summary type="html">0x02 STACK</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">windows-0x03</title>
-      <link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
-      <published>2019-02-18T19:18:00+09:00</published>
-      <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>/windows-0x03</id>
-      <content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
-
-&lt;p&gt;Buffer Overflow(이하 BOF)는 데이터의 저장 또는 보관을 위해 주어진 메모리 공간의 크기보다 더 많은 값을 입력해 인접 메모리의 값을 변조할 수 있는 공격 기법입니다. 공격자들이 BOF를 이용해서 주로 하는 일은 변수의 값을 변조하는 것과 RET를 변조해서 프로그램의 흐름을 조작하는 것입니다.&lt;/p&gt;
-
-&lt;p&gt;이 취약점은 왜 발생할까요?&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;strcpy, gets 등의 입력 값 길이를 체크하지 않는 취약한 문자열 함수의 사용&lt;/li&gt;
-  &lt;li&gt;길이 값 검증을 하지 않은 취약한 프로그램 설계&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;BOF는 흔히 위의 두 가지 이유로 발생합니다. 그렇다면 이 취약점이 발생하지 않게 하려면 어떻게 하면 될까요?
-입력 값 길이를 체크하는 안전한 문자열 함수를 사용하면 되겠죠? 물론 이것도 중요하지만 안전한 함수의 사용만으로는 이 공격을 100% 막을 수는 없습니다. 안전한 함수로 문자열 길이 500만큼 받도록 해놓더라도 버퍼의 크기가 300이면 BOF가 일어날 수 있습니다. 그렇기 때문에 안전한 문자열 함수의 사용과 더불어 &lt;strong&gt;안전한 프로그램 설계&lt;/strong&gt;도 뒷받침되어야 합니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;direct-eip-overwrite&quot;&gt;Direct EIP Overwrite&lt;/h5&gt;
-
-&lt;p&gt;아래 소스코드를 가지고 가장 기초적인 BOF를 다루어보도록 하겠습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
-#include &amp;lt;stdlib.h&amp;gt;
-#include &amp;lt;string.h&amp;gt;
-
-#pragma warning (disable:4996)
-#define _CRT_SECURE_NO_WARNINGS
-
-int main(int argc, char* argv[]) {
-
-    char content_buffer[1000];
-    char display_buffer[300];
-    FILE *f = fopen(argv[1], &quot;rb&quot;);
-
-    fgets(content_buffer, 1000, f);
-    strcpy(display_buffer,content_buffer);
-
-    printf(&quot;%s\n&quot;, display_buffer);
-
-    fclose(f);
-    return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;fgets로 길이 1000만큼 파일을 읽어와서 content_buffer에 값을 저장하고, 다시 content_buffer에서 display_buffer로 값을 복사한 후 출력해주는 프로그램입니다. 여기서 문제는 strcpy로 content_buffer에서 display_buffer로 값을 복사한다는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;본격적으로 공격을 시작해보도록 하겠습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Buffer 시작 주소에서 RET까지의 거리 알아내기&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Buffer 시작 위치에서 값을 얼마나 넣어야 RET를 변조할 수 있는지 알아야 공격이 가능하겠죠?&lt;/p&gt;
-
-&lt;p&gt;지금은 거리를 모르니 다음과 같이 간단하게 “A” 100개만 넣어서 분석을 해보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Buffer 시작 위치가 EBP-12C인 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;SFP도 덮어줘야 하니까 거리는 304가 되겠네요.(12C = 300)&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Exploit 작성하기&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;메모리 보호기법이 적용되지 않은 프로그램이기 때문에 RET를 Shellcode가 있는 곳의 주소로 변조하기만 하면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;그럼 Payload는 아래 코드와 같이 Nop과 Shellcode를 합쳐서 304만큼 만들어주고, RET는 Shellcode 시작 전 Nop이 있는 위치로 지정하면 되겠네요.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;immunity debugger로 프로그램 흐름을 한 번 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Strcpy가 동작이 완료된 후, RET가 Buffer 시작 주소로 잘 변조되었네요.&lt;/p&gt;
-
-&lt;p&gt;Main 함수의 RET를 변조했기 때문에 실제로 Shellcode가 실행되는 시점은 Main 함수의 에필로그 과정이 진행된 다음입니다.&lt;/p&gt;
-
-&lt;p&gt;에필로그 과정의 마지막에서 변조된 RET 주소로 프로그램의 흐름이 바뀌면 다음과 같이 Shellcode를 만나러 갑니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;공격 결과 확인&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-6]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;CMD가 정상적으로 잘 실행되네요^^&lt;/p&gt;
-
-&lt;p&gt;지금까지 Direct EIP Overwrite에 대해서 알아봤습니다. 다음 연재에서는 메모리 보호 기법 중 하나인 ASLR의 개념과 우회 방법을 다루어보도록 하겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x03 Basic Bof</summary>
       
 
       
