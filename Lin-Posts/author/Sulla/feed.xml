@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="http://localhost:4000/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-03-24T06:07:11+09:00</updated>
-  <id>http://localhost:4000/author/Sulla/feed.xml</id>
+  <link href="/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-03-24T06:09:04+09:00</updated>
+  <id>/author/Sulla/feed.xml</id>
 
   
   
@@ -41,11 +41,11 @@
   
     <entry>
       <title type="html">linux_0x04</title>
-      <link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
+      <link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
       <published>2019-03-24T15:18:00+09:00</published>
       <updated>2019-03-24T15:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x04</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+      <id>/linux_0x04</id>
+      <content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
@@ -188,11 +188,11 @@
   
     <entry>
       <title type="html">linux_0x03</title>
-      <link href="http://localhost:4000/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" />
+      <link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" />
       <published>2019-03-11T19:18:00+09:00</published>
       <updated>2019-03-11T19:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x03</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+      <id>/linux_0x03</id>
+      <content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
 
@@ -354,11 +354,11 @@
   
     <entry>
       <title type="html">linux_0x02</title>
-      <link href="http://localhost:4000/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" />
+      <link href="/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" />
       <published>2019-02-22T19:18:00+09:00</published>
       <updated>2019-02-22T19:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x02</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
+      <id>/linux_0x02</id>
+      <content type="html" xml:base="/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;임돠.&lt;/p&gt;
 
@@ -605,11 +605,11 @@
   
     <entry>
       <title type="html">linux_0x01</title>
-      <link href="http://localhost:4000/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
+      <link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
       <published>2019-02-18T19:18:00+09:00</published>
       <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x01</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
+      <id>/linux_0x01</id>
+      <content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다. 오늘부터 본격적으로 &lt;strong&gt;BOF&lt;/strong&gt;에 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -738,11 +738,11 @@
   
     <entry>
       <title type="html">linux_0x00</title>
-      <link href="http://localhost:4000/linux_0x00" rel="alternate" type="text/html" title="linux_0x00" />
+      <link href="/linux_0x00" rel="alternate" type="text/html" title="linux_0x00" />
       <published>2019-02-08T19:18:00+09:00</published>
       <updated>2019-02-08T19:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x00</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x00">&lt;h2 id=&quot;0x00---시작에-앞서&quot;&gt;0x00 - 시작에 앞서&lt;/h2&gt;
+      <id>/linux_0x00</id>
+      <content type="html" xml:base="/linux_0x00">&lt;h2 id=&quot;0x00---시작에-앞서&quot;&gt;0x00 - 시작에 앞서&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다.&lt;/p&gt;
 

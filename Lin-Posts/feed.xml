@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-03-24T06:07:11+09:00</updated><id>http://localhost:4000/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x04</title><link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-03-24T15:18:00+09:00</published><updated>2019-03-24T15:18:00+09:00</updated><id>http://localhost:4000/linux_0x04</id><content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-24T06:09:04+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x04</title><link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-03-24T15:18:00+09:00</published><updated>2019-03-24T15:18:00+09:00</updated><id>/linux_0x04</id><content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
@@ -111,7 +111,7 @@
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/exm1.png&quot; alt=&quot;[그림 4-8]&quot; /&gt;
 &lt;/figure&gt;
 &lt;p&gt;원하던 shell을 떨어졌습니다. 짧게 끝날줄 알았는데 이번편도 주절주절 양이 많았네요. 다음 포스팅에서는 RTL Chaining을 알아보겠습니다. 감사합니다.
-뿅!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL(Return to Library)</summary></entry><entry><title type="html">windows-0x08</title><link href="http://localhost:4000/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" /><published>2019-03-19T20:18:00+09:00</published><updated>2019-03-19T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x08</id><content type="html" xml:base="http://localhost:4000/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+뿅!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL(Return to Library)</summary></entry><entry><title type="html">windows-0x08</title><link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" /><published>2019-03-19T20:18:00+09:00</published><updated>2019-03-19T20:18:00+09:00</updated><id>/windows-0x08</id><content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -214,7 +214,7 @@
 
 &lt;p&gt;자, 이제 ROP를 하기 위한 기초 준비 작업을 모두 마쳤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 Post에서 ROP를 알아보고 DEP편을 마무리 짓도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x08 DEP(2)</summary></entry><entry><title type="html">windows-0x07</title><link href="http://localhost:4000/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" /><published>2019-03-19T19:18:00+09:00</published><updated>2019-03-19T19:18:00+09:00</updated><id>http://localhost:4000/windows-0x07</id><content type="html" xml:base="http://localhost:4000/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+&lt;p&gt;다음 Post에서 ROP를 알아보고 DEP편을 마무리 짓도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x08 DEP(2)</summary></entry><entry><title type="html">windows-0x07</title><link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" /><published>2019-03-19T19:18:00+09:00</published><updated>2019-03-19T19:18:00+09:00</updated><id>/windows-0x07</id><content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -346,7 +346,7 @@
 
 &lt;p&gt;그래서 이 기법은 ROP를 위한 기본 개념 정도로만 이해하시기 바랍니다.&lt;/p&gt;
 
-&lt;p&gt;글이 너무 길어졌네요. 이만 줄이고 다음 편에서 ROP를 알아보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x07 DEP(1)</summary></entry><entry><title type="html">windows-0x06</title><link href="http://localhost:4000/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" /><published>2019-03-18T19:18:00+09:00</published><updated>2019-03-18T19:18:00+09:00</updated><id>http://localhost:4000/windows-0x06</id><content type="html" xml:base="http://localhost:4000/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+&lt;p&gt;글이 너무 길어졌네요. 이만 줄이고 다음 편에서 ROP를 알아보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x07 DEP(1)</summary></entry><entry><title type="html">windows-0x06</title><link href="/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" /><published>2019-03-18T19:18:00+09:00</published><updated>2019-03-18T19:18:00+09:00</updated><id>/windows-0x06</id><content type="html" xml:base="/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
 
@@ -384,7 +384,7 @@
 
 &lt;p&gt;이 중에 SafeSEH가 적용되어 있지 않은 Module을 골라서 우회 공격을 동일하게 진행하면 됩니다.&lt;/p&gt;
 
-&lt;p&gt;이상으로 GS편을 모두 마치겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x06 GS(2)</summary></entry><entry><title type="html">DLL Hijacking &amp;amp; Ghidra</title><link href="http://localhost:4000/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" /><published>2019-03-17T19:18:00+09:00</published><updated>2019-03-17T19:18:00+09:00</updated><id>http://localhost:4000/Dll%20Hijacking%20&amp;%20Ghidra</id><content type="html" xml:base="http://localhost:4000/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+&lt;p&gt;이상으로 GS편을 모두 마치겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x06 GS(2)</summary></entry><entry><title type="html">DLL Hijacking &amp;amp; Ghidra</title><link href="/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" /><published>2019-03-17T19:18:00+09:00</published><updated>2019-03-17T19:18:00+09:00</updated><id>/Dll%20Hijacking%20&amp;%20Ghidra</id><content type="html" xml:base="/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -501,7 +501,7 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
 
 &lt;p&gt;계산기가 잘 실행되네요. ^^&lt;/p&gt;
 
-&lt;p&gt;지금까지 DLL Hijacking에 대해서 알아봤습니다. 뿅!&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">DLL Hijacking &amp;amp; Ghidra</summary></entry><entry><title type="html">mobile-0x00</title><link href="http://localhost:4000/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" /><published>2019-03-16T06:00:00+09:00</published><updated>2019-03-16T06:00:00+09:00</updated><id>http://localhost:4000/android-0x00</id><content type="html" xml:base="http://localhost:4000/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+&lt;p&gt;지금까지 DLL Hijacking에 대해서 알아봤습니다. 뿅!&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">DLL Hijacking &amp;amp; Ghidra</summary></entry><entry><title type="html">mobile-0x00</title><link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" /><published>2019-03-16T06:00:00+09:00</published><updated>2019-03-16T06:00:00+09:00</updated><id>/android-0x00</id><content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
 
@@ -608,7 +608,7 @@ OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어�
 &lt;p&gt;Mobile OWASP Top 10에 대해 간략히 리뷰해봤고, 자세한 내용은 원문에서 확인하실 수 있습니다.
 다음 포스트에서는 IDA를 이용해 정적 분석하는 방법을 알아보도록 하겠습니다.&lt;/p&gt;
 
-&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">0x00. Introduction</summary></entry><entry><title type="html">linux_0x03</title><link href="http://localhost:4000/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>http://localhost:4000/linux_0x03</id><content type="html" xml:base="http://localhost:4000/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">0x00. Introduction</summary></entry><entry><title type="html">linux_0x03</title><link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>/linux_0x03</id><content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
 
@@ -740,7 +740,7 @@ OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어�
 고생하셨습니다. 다음 포스팅까지 차근차근 준비해서 다시 뵙겠습니다.&lt;/p&gt;
 
 &lt;p&gt;감사합니다!
-&lt;strong&gt;뿅&lt;/strong&gt;!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x03 - Basic BOF &amp;amp; 메모리 보호 기법</summary></entry><entry><title type="html">web-0x02</title><link href="http://localhost:4000/web-0x02" rel="alternate" type="text/html" title="web-0x02" /><published>2019-03-11T04:00:00+09:00</published><updated>2019-03-11T04:00:00+09:00</updated><id>http://localhost:4000/web-0x02</id><content type="html" xml:base="http://localhost:4000/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
+&lt;strong&gt;뿅&lt;/strong&gt;!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x03 - Basic BOF &amp;amp; 메모리 보호 기법</summary></entry><entry><title type="html">web-0x02</title><link href="/web-0x02" rel="alternate" type="text/html" title="web-0x02" /><published>2019-03-11T04:00:00+09:00</published><updated>2019-03-11T04:00:00+09:00</updated><id>/web-0x02</id><content type="html" xml:base="/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -1008,7 +1008,7 @@ https://blog.vulnspy.com/2018/06/21/phpMyAdmin-4-8-x-Authorited-CLI-to-RCE/&lt;b
 https://www.vulnspy.com/phpmyadmin-4.8.1/&lt;br /&gt;
 https://medium.com/@happyholic1203/phpmyadmin-4-8-0-4-8-1-remote-code-execution-257bcc146f8e&lt;br /&gt;
 https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Hackyu</name></author><category term="Posts" /><summary type="html">LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1</summary></entry><entry><title type="html">windows-0x05</title><link href="http://localhost:4000/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" /><published>2019-03-09T19:18:00+09:00</published><updated>2019-03-09T19:18:00+09:00</updated><id>http://localhost:4000/windows-0x05</id><content type="html" xml:base="http://localhost:4000/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>Hackyu</name></author><category term="Posts" /><summary type="html">LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1</summary></entry><entry><title type="html">windows-0x05</title><link href="/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" /><published>2019-03-09T19:18:00+09:00</published><updated>2019-03-09T19:18:00+09:00</updated><id>/windows-0x05</id><content type="html" xml:base="/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-gs&quot;&gt;What is GS?&lt;/h5&gt;
 
@@ -1166,7 +1166,7 @@ https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
 
 &lt;p&gt;우회가 잘 되죠??&lt;/p&gt;
 
-&lt;p&gt;지금까지 GS에 대한 설명을 했습니다. 다음 연재에서는 Safe SEH 기법에 대해 설명하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x05 GS</summary></entry><entry><title type="html">windows-0x04</title><link href="http://localhost:4000/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" /><published>2019-03-03T19:18:00+09:00</published><updated>2019-03-03T19:18:00+09:00</updated><id>http://localhost:4000/windows-0x04</id><content type="html" xml:base="http://localhost:4000/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
+&lt;p&gt;지금까지 GS에 대한 설명을 했습니다. 다음 연재에서는 Safe SEH 기법에 대해 설명하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x05 GS</summary></entry><entry><title type="html">windows-0x04</title><link href="/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" /><published>2019-03-03T19:18:00+09:00</published><updated>2019-03-03T19:18:00+09:00</updated><id>/windows-0x04</id><content type="html" xml:base="/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-random-stack&quot;&gt;What is Random STACK?&lt;/h5&gt;
 
