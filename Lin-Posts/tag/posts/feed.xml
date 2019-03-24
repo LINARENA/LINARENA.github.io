@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-24T15:17:15+09:00</updated>
+  <updated>2019-03-24T18:03:39+09:00</updated>
   <id>/tag/posts/feed.xml</id>
 
   
@@ -40,6 +40,163 @@
 
   
     <entry>
+      <title type="html">windows-0x09</title>
+      <link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
+      <published>2019-03-24T20:18:00+09:00</published>
+      <updated>2019-03-24T20:18:00+09:00</updated>
+      <id>/windows-0x09</id>
+      <content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+
+&lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;rop-return-oriented-programming&quot;&gt;ROP (Return Oriented Programming)&lt;/h5&gt;
+
+&lt;p&gt;ROP는 Gadget으로 Chain을 구성하여 API를 호출하는 방식의 공격 기법입니다.&lt;/p&gt;
+
+&lt;p&gt;주로 VirtualProtect()나 SetProcessDEPPolicy() 등 메모리와 관련된 함수들을 호출하며,&lt;/p&gt;
+
+&lt;p&gt;Shellcode를 실행할 수 있도록 실행 권한을 추가하는 방향으로 진행됩니다.&lt;/p&gt;
+
+&lt;p&gt;이번 연재에서는 가장 흔하고 쉬운 방식인 VirtualProtect() API를 호출해서 DEP를 우회하도록 하겠습니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;virtualprotect-함수&quot;&gt;VirtualProtect 함수&lt;/h6&gt;
+
+&lt;p&gt;VirtualProtect는 4개의 인자를 가지며, 특정 메모리 영역의 실행 권한을 변경해주는 함수입니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;BOOL WINAPI VirtualProtect (
+		_In_ LPVOID lpAddress, 		 # 권한을 변경할 메모리 영역의 시작 주소
+		_In_ SIZE_T dwSize,	   		 # 변경할 크기
+		_In_ flNewProtect,     		 # 변경할 속성 값
+		_Out_ PDWORD lpflOldProtect, # 이전 값 저장 (쓰기 가능한 영역)
+	);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;VirtualProtect 함수는 변경을 원하는 메모리 영역의 시작 주소를 기준으로 원하는 크기만큼 실행 권한을 변경해줍니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 ShellCode를 넣어둔 뒤, 그 크기만큼 실행 권한을 주면 되겠네요.&lt;/p&gt;
+
+&lt;p&gt;이 내용을 STACK으로 구성하면 다음과 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그림처럼 STACK을 구성할 경우, VirtualProtect()가 호출되어 ShellCode가 들어있는 메모리 주소에 실행 권한이 생길 것이고,&lt;/p&gt;
+
+&lt;p&gt;다음 RET에서 JMP ESP가 호출되어 ShellCode가 실행될 것 입니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 이 모양의 STACK을 구성하기 위해 PUSHAD 명령어를 이용할 것 입니다. STACK 구성이 좀 더 쉽겠죠?&lt;/p&gt;
+
+&lt;h5 id=&quot;payload-구성&quot;&gt;PAYLOAD 구성&lt;/h5&gt;
+
+&lt;p&gt;Mona.py를 이용해서 ROP Chain 구성에 사용할 Gadget들을 찾아 보겠습니다. ( !mona modules )&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Gadget은 위의 Module들 중에 ASLR이 적용되어 있지 않은 example.dll에서 가져다 쓰면 되겠네요.&lt;/p&gt;
+
+&lt;p&gt;이제 여기서 Gadget을 구해서 값들을 맞춰주기만 하면 되는데,,, 일일이 하나씩 찾아서 넣으면 엄청나게 많은 시간이 소요되겠죠??&lt;/p&gt;
+
+&lt;p&gt;하나하나 다 찾아다닐 시간은 없으니까 mona.py에서 제공하는 기능을 활용하겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!mona rop -m example
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이 명령어를 사용하면 mona.py에서 자동으로 rop 공격에 필요한 Gadget들을 example.dll에서 찾아 파일로 생성해줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;여러 언어에 맞게 추천을 해주는데 여러분 환경에 맞는 값을 사용하시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;이제 필요한 Gadget들을 아주 손쉽게 찾아왔는데 한 가지 생각해야 할 점이 있습니다.&lt;/p&gt;
+
+&lt;p&gt;바로 VirtualProtect의 함수 주소입니다.&lt;/p&gt;
+
+&lt;p&gt;ASLR이 적용되어 있으면 Window API 함수들의 주소도 계속해서 변할텐데 어떻게 주소를 가지고 올 수 있는 걸까요?&lt;/p&gt;
+
+&lt;p&gt;Gadget 파일을 잘 보시면 VirtualProtect에 IAT라고 적혀있는 것을 보실 수 있을 겁니다.&lt;/p&gt;
+
+&lt;p&gt;IAT(Import Address Table)는 프로그램에서 사용되는 라이브러리에서 어떤 함수들을 사용하고 있는지, 그 함수들의 정보를 기술한 테이블입니다.&lt;/p&gt;
+
+&lt;p&gt;아래와 같이 example.dll의 IAT를 살펴보면 우리가 사용하고자 하는 VirtualProtect() 함수의 정보가 들어있는 것을 확인하실 수 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이렇게 VirtualProtect() 정보가 들어 있는 경우에는 IAT 값에서 시작 주소를 가져다가 쓰면 되는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;없다면? 동적으로 찾아오도록 Gadget을 구성하면 됩니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;null-byte-제거&quot;&gt;Null Byte 제거&lt;/h5&gt;
+
+&lt;p&gt;공격을 성공적으로 하기 위해 Payload에 존재하는 Null Byte들을 제거해줘야겠죠?&lt;/p&gt;
+
+&lt;p&gt;mona가 만들어 준 값들엔 Null Byte가 존재해서 Payload 전달이 완전하게 이루어지지 않는답니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 다음과 같이 수정을 했습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;먼저, 0x201, 0x40 같은 값을 넣어줘야 하는데 Null이 존재하므로 0xfffffdff, 0xffffffc0를 넣고 neg를 사용해서 값을 생성해줬습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 Gadget 주소 중에 Null이 존재하는 것은 다른 Gadget 찾아서 교체해준 내용입니다.&lt;/p&gt;
+
+&lt;p&gt;mona만 믿고 Payload를 구성하시면 안됩니다. 잘 살펴보고 Null은 반드시 제거해주셔야 합니다.&lt;/p&gt;
+
+&lt;p&gt;이어서 DBG로 살펴보면 다음과 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;strcpy가 실행되고 나서의 모습입니다. 각 Gadget들이 연속해서 실행된 뒤, VirtualProtect() 함수가 실행될 것이고,&lt;/p&gt;
+
+&lt;p&gt;마지막에 JMP ESP가 실행되면서 ShellCode가 실행되겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;잘 실행되네요^^&lt;/p&gt;
+
+&lt;p&gt;지금까지 DEP에 대해서 알아봤습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 연재부터는 Heap Exploit으로 찾아뵙도록 하겠습니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x09 DEP(3)</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
       <title type="html">linux_0x04</title>
       <link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
       <published>2019-03-24T15:18:00+09:00</published>
@@ -49,9 +206,8 @@
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
-&lt;p&gt;이번에 알아볼 내용은 &lt;strong&gt;RTL&lt;/strong&gt;(Return to Library)입니다.&lt;/p&gt;
-
-&lt;p&gt;먼저 &lt;strong&gt;RTL&lt;/strong&gt;이 뭔지를 알아보도록 하겠습니다.&lt;/p&gt;
+&lt;p&gt;이번에 알아볼 내용은 &lt;strong&gt;RTL&lt;/strong&gt;(Return to Library)입니다.
+먼저 &lt;strong&gt;RTL&lt;/strong&gt;이 뭔지를 알아보도록 하겠습니다.&lt;/p&gt;
 
 &lt;h1 id=&quot;rtlreturn-to-library-1&quot;&gt;RTL(Return to Library)&lt;/h1&gt;
 
@@ -60,122 +216,84 @@
 &lt;p&gt;메모리에서의 코드 실행이 막혔기 때문에(Shellcode 실행 차단) 다른 방법을 찾아야 합니다. &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 직접 실행할 수 있다면 가능할 듯 합니다.&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-1.png&quot; alt=&quot;[그림 4-1]&quot; /&gt;
-
 &lt;/figure&gt;
 
-&lt;p&gt;그럼 어떻게 해야할까요? 첫 포스팅에서 메모리 구조를 설명 드릴 때 위 그림을 보여 드렸었습니다.&lt;strong&gt;[스택 -&lt;/strong&gt; &lt;strong&gt;공유라이브러리 -&lt;/strong&gt; &lt;strong&gt;힙 - BSS/Data - Code]&lt;/strong&gt;으로 이뤄지며, 공유 라이브러리는 &lt;strong&gt;메모리에 미리 필요한 중요 함수들을 저장해두는 장소&lt;/strong&gt;라고 간단하게 설명 드렸었죠.&lt;/p&gt;
-
-&lt;p&gt;저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt;를 사용하여 &lt;strong&gt;/bin/sh&lt;/strong&gt;을 실행할 수 있지 않을까???라는 생각으로 &lt;strong&gt;RTL&lt;/strong&gt;이 연구되었다 생각되네요….(&lt;strong&gt;뇌피셜)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;그럼 어떻게 해야할까요? 첫 포스팅에서 메모리 구조를 설명 드릴 때 위 그림을 보여 드렸었습니다.&lt;strong&gt;[스택 -&lt;/strong&gt; &lt;strong&gt;공유라이브러리 -&lt;/strong&gt; &lt;strong&gt;힙 - BSS/Data - Code]&lt;/strong&gt;으로 이뤄지며, 공유 라이브러리는 &lt;strong&gt;메모리에 미리 필요한 중요 함수들을 저장해두는 장소&lt;/strong&gt;라고 간단하게 설명 드렸었죠.
+저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt;를 사용하여 &lt;strong&gt;/bin/sh&lt;/strong&gt;을 실행할 수 있지 않을까???라는 생각으로 &lt;strong&gt;RTL&lt;/strong&gt;이 연구되었다 생각되네요….(&lt;strong&gt;뇌피셜)&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;공유 라이버르러리를 간단하게 정리하자면 다음과 같습니다.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;여러 프로세스에서 동시에 사용 가능한 라이브러리&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;프로그램이 시작될 때 메모리에 적재됨&lt;/p&gt;
-  &lt;/li&gt;
+  &lt;li&gt;여러 프로세스에서 동시에 사용 가능한 라이브러리&lt;/li&gt;
+  &lt;li&gt;프로그램이 시작될 때 메모리에 적재됨&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;우리는 저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt; 중에서 &lt;strong&gt;system()&lt;/strong&gt; 함수를 사용하겠습니다. 해당 함수는 입력받은 문자열을 실행시키는 함수입니다. 즉, 인자값으로 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 입력한다면 &lt;strong&gt;system(“/bin/sh”);&lt;/strong&gt;과 같은 형태가 되며 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt;를 실행하게 됩니다.&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-2.png&quot; alt=&quot;[그림 4-2]&quot; /&gt;
-
 &lt;/figure&gt;
 
-&lt;p&gt;&lt;strong&gt;RTL&lt;/strong&gt;의 흐름을 위와 같이 표현했습니다. &lt;strong&gt;libc&lt;/strong&gt;(공유라이브러리)의 함수(&lt;strong&gt;system()&lt;/strong&gt;)를 사용해서 &lt;strong&gt;8byte&lt;/strong&gt; 뒤에 &lt;strong&gt;/bin/sh&lt;/strong&gt; 의 주소를 박아두면 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 실행하여 &lt;strong&gt;shell&lt;/strong&gt;을 따내게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;즉, &lt;strong&gt;버퍼 + sfp + system() + AAAA + /bin/sh&lt;/strong&gt; 처럼 표현 가능할 듯 합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RTL&lt;/strong&gt;의 흐름을 위와 같이 표현했습니다. &lt;strong&gt;libc&lt;/strong&gt;(공유라이브러리)의 함수(&lt;strong&gt;system()&lt;/strong&gt;)를 사용해서 &lt;strong&gt;8byte&lt;/strong&gt; 뒤에 &lt;strong&gt;/bin/sh&lt;/strong&gt; 의 주소를 박아두면 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 실행하여 &lt;strong&gt;shell&lt;/strong&gt;을 따내게 됩니다. 
+즉, &lt;strong&gt;버퍼 + sfp + system() + AAAA + /bin/sh&lt;/strong&gt; 처럼 표현 가능할 듯 합니다.&lt;/p&gt;
 
 &lt;p&gt;여기서 왜 &lt;strong&gt;system()&lt;/strong&gt; 뒤에 인자값으로 바로 &lt;strong&gt;/bin/sh/&lt;/strong&gt;가 아닌 잉여값 “&lt;strong&gt;AAAA&lt;/strong&gt;“을 입력할까요? 그냥 바로 인자값을 입력하면 인식을 못할까요?&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-3.png&quot; alt=&quot;[그림 4-3]&quot; /&gt;
-
 &lt;/figure&gt;
 
-&lt;p&gt;&lt;strong&gt;system(“/bin/sh”)&lt;/strong&gt; 이 입력된 상태에서 함수가 종료되면 에필로그 과정을 가집니다. 에필로그 과정 중 ret(pop eip) 과정을 거치며 system() 함수의 주소를 eip에  옮기게 되죠.이과정에 pop 명령을 사용 했기에 스택에 공간이 생깁니다. 그런 다음 system() 함수의 프롤로그 과정을 가지며 push ebp, mov ebp, esp 과정을 거치며 새롭게 메모리의 영역을 확보하죠.&lt;/p&gt;
-
-&lt;p&gt;즉, AAAA의 위치는 system 함수가 끝난 뒤의 ret 구역이 되며 잉여값을 배치해주고, 다음 공간에 원하는 주소값을 위치시켜 줍니다. 좀더 확실하게 알아보도록 하죠.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;system(“/bin/sh”)&lt;/strong&gt; 이 입력된 상태에서 함수가 종료되면 에필로그 과정을 가집니다. 에필로그 과정 중 ret(pop eip) 과정을 거치며 system() 함수의 주소를 eip에  옮기게 되죠.이과정에 pop 명령을 사용 했기에 스택에 공간이 생깁니다. 그런 다음 system() 함수의 프롤로그 과정을 가지며 push ebp, mov ebp, esp 과정을 거치며 새롭게 메모리의 영역을 확보하죠. 
+즉, AAAA의 위치는 system 함수가 끝난 뒤의 ret 구역이 되며 잉여값을 배치해주고, 다음 공간에 원하는 주소값을 위치시켜 줍니다. 좀더 확실하게 알아보도록 하죠.&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-4.png&quot; alt=&quot;[그림 4-4]&quot; /&gt;
-
 &lt;/figure&gt;
 
 &lt;p&gt;위 사진에서와 같이 system() 내부를 들여다 보면 프로로그 과정을 거치고 EBP에서 8byte 떨어진 주소를 참조합니다. EBP 는 4byte를 가지고 우리는 남은 4byte만 채워준 뒤 원하는 주소를 입력해준다면 인자값을 정상적으로 인식하게 됩니다.&lt;/p&gt;
 
-&lt;p&gt;전체적으로 &lt;strong&gt;Return to Library&lt;/strong&gt;라는 이름을 아주 성실하게 이행하는 모습이네요. 그럼 직접 시작해보곘습니다. 먼저 찾아야 할 주소는 아래와 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Return to Library&lt;/strong&gt;라는 이름을 아주 성실하게 이행하는 모습이네요. 사실 더 설명드릴게 없습니다. 약간만 응용한 기술이기에 새롭게 설명 들릴만한 내용은 없다고 생각 되네요. 그럼 직접 시작해보곘습니다. 먼저 찾아야 할 주소는 아래와 같습니다.&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = ????&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/p&gt;
-  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = ????&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;1번 system 주소부터 확인 하도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-5.png&quot; alt=&quot;[그림 4-5]&quot; /&gt;
-
 &lt;/figure&gt;
 
 &lt;p&gt;먼저 브레이크를 main 함수에 잡아주고 구동 시킵니다.bp에 멈추고 나면 print 명령을 사용해 system()의 주소를 확인 하시면 됩니다.(system의 주소를 못 찾는 심볼을 찾을수 없다는 에러가 뜨는 경우 static 옵션을 뺴고 ggdb 옵션을 붙여서 컴파일 해주세요….개고생 했습니다…..)&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/p&gt;
-  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;이제 /bin/sh의 주소를 구해야 합니다. 실제로는 /lib/libc.so.6 라이브러리 파일 내의 /bin/sh와 system 의 오프셋을 구해서 최종적인 문자열 주소를 찾을수 있지만 아래의 반복문을 통해서 쉽게 구해보겠습니다.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;01 #include &amp;lt;stdio.h&amp;gt;
-
 02 
-
 03 int main(){
-
 04   long shell=0x4203f2c0; //system()의 주소를 입력해 주시면 됩니다.
-
 05 	 while(memcmp((void*)shell,(&quot;/bin/sh&quot;),8))
-
 06   shell++;
-
 07 	 printf(&quot;%p\n&quot;,shell);
-
 08 }
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;코드의 중요 라인인 5라인만 설명 드리자면 &lt;strong&gt;memcmp&lt;/strong&gt; 함수를 사용해서 &lt;strong&gt;바이트 데이터를 비교&lt;/strong&gt; 하는 과정입니다. &lt;strong&gt;memcmp(인자1, 인자2, 사이즈)&lt;/strong&gt;의 기본형을 가지며 &lt;strong&gt;인자 1&lt;/strong&gt;의 첫 바이트와 &lt;strong&gt;인자 2&lt;/strong&gt;의 첫 바이트를 &lt;strong&gt;사이즈&lt;/strong&gt; 만큼 비교하는 것이며, 이 과정을 통해서 &lt;strong&gt;system()내부에 /bin/sh 문자열을&lt;/strong&gt; 찾아내며 결과적으로 &lt;strong&gt;주소값으로 리턴&lt;/strong&gt; 해줍니다. 돌려줍시다~&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-6.png&quot; alt=&quot;[그림 4-6]&quot; /&gt;
-
 &lt;/figure&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = &lt;strong&gt;0x42127ea4&lt;/strong&gt;&lt;/p&gt;
-  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = &lt;strong&gt;0x42127ea4&lt;/strong&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;최종적으로 system() 과 /bin/sh 의 주소값을 찾아냈습니다. 이제 찾아낸 정보를 바탕으로 공격 페이로드를 작성해 보겠습니다.&lt;/p&gt;
@@ -186,9 +304,7 @@
 &lt;p&gt;마지막으로 페이로드를 정리 하고 직접 때려보도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-7.png&quot; alt=&quot;[그림 4-7]&quot; /&gt;
-
 &lt;/figure&gt;
 
 &lt;p&gt;먼저 버버 크기(40byte)와 sfp(4byte) 를 채워 주고 공유 라이브러리에 위치한 system() 함수를 저장시킵니다. 다음 위치에는 AAAA의 4byte를 채워 줍니다. 이유는 위에서 알려 드렸듯 system()의 인자값은 8byte 뒤에 위치하기에 그 거리만큼 벌려 주고 우리가 필요로 하는 /bin/sh을 위치 시켜 줌으로서 system()이 인자값으로 /bin/sh을 정상적으로 받을수 있게 설계해준겁니다.&lt;/p&gt;
@@ -196,10 +312,10 @@
 &lt;p&gt;설명은 이쯤 해두고 진짜 직접 떄려보도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
-
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-7.png&quot; alt=&quot;[그림 4-7]&quot; /&gt;
-
-&lt;/figure&gt;</content>
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/exm1.png&quot; alt=&quot;[그림 4-8]&quot; /&gt;
+&lt;/figure&gt;
+&lt;p&gt;원하던 shell을 떨어졌습니다. 짧게 끝날줄 알았는데 이번편도 주절주절 양이 많았네요. 다음 포스팅에서는 RTL Chaining을 알아보겠습니다. 감사합니다.
+뿅!&lt;/p&gt;</content>
 
       
       
@@ -1548,111 +1664,6 @@ https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
 
       
         <summary type="html">0x05 GS</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">windows-0x04</title>
-      <link href="/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" />
-      <published>2019-03-03T19:18:00+09:00</published>
-      <updated>2019-03-03T19:18:00+09:00</updated>
-      <id>/windows-0x04</id>
-      <content type="html" xml:base="/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-random-stack&quot;&gt;What is Random STACK?&lt;/h5&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Random STACK은 메모리에서 STACK이 할당되는 주소가 프로그램 실행시마다 변경되는 방어 기법입니다.&lt;/p&gt;
-
-&lt;p&gt;이 방어 기법이 적용되면 Shellcode의 주소를 정확히 알 수가 없기 때문에 기존의 Direct EIP Overwrite로는 공격을 성공할 수가 없습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;jmp-esp&quot;&gt;JMP ESP&lt;/h5&gt;
-
-&lt;p&gt;Shellcode의 주소를 알 수 없는 상황을 우회하기 위해서 사용하는 방법 중 하나가 “JMP ESP”를 활용하는 것입니다.&lt;/p&gt;
-
-&lt;p&gt;RET 주소에 JMP ESP의 주소를 넣는다는 것인데 어떻게 우회가 가능한지 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 그림은 우리가 지금 실습하고 있는 프로그램의 공격 전/후 STACK 구조입니다.&lt;/p&gt;
-
-&lt;p&gt;Main의 에필로그 과정에서 마지막 RETN이 실행될 때 Shellcode를 실행하러 가기 때문에 그 과정을 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;mov esp, ebp : 이전 Frame으로 돌아가기 위해 ESP를 현재 Frame의 기준점으로 데리고 옵니다.&lt;/li&gt;
-  &lt;li&gt;POP ebp : 이전 Frame의 기준 값을 POP하여 EBP에 넣어주어 이전 Frame의 기준 값으로 돌아갑니다.&lt;/li&gt;
-  &lt;li&gt;RETN : POP EIP, JMP EIP을 통해 다음 실행할 곳으로 이동합니다.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;RETN이 일어날 때의 ESP를 유심히 보면, 항상 RET 다음에 위치하고 있다는 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;따라서 RET를 &amp;amp;JMP ESP로 해둔다면 다음 실행할 곳의 위치는 RET 다음 위치가 됩니다.&lt;/p&gt;
-
-&lt;p&gt;이 점을 이용하기 위해 Payload의 구성도 다음과 같이 변경됩니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 Payload와 그림 1-1의 오른편 공격 후 STACK 구조를 다시 봅시다.&lt;/p&gt;
-
-&lt;p&gt;이전과는 다르게 RET 뒤에 Shellcode가 위치하도록 Payload를 구성한 것을 보실 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;이런 방법을 이용하면 Shellcode의 주소를 정확히 알 수 없는 환경에서도 공격을 성공시킬 수가 있습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;how-to-find-jmp-esp&quot;&gt;How to Find &amp;amp;JMP ESP?&lt;/h5&gt;
-
-&lt;p&gt;공격의 흐름과 방법은 아마 이제 다들 아실거라 생각됩니다. 그런데 한 가지 의문이 남죠?&lt;/p&gt;
-
-&lt;p&gt;아마도 “&amp;amp;JMP ESP는 어떻게 찾습니까?”일텐데요.&lt;/p&gt;
-
-&lt;p&gt;이번 연재에서는 Immunity Debugger를 통해서 찾는 방법을 알려드리겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Immunity Debugger에서 ALT+M을 하면 메모리 창이 띄어집니다. 메모리 창에서 CTRL+F를 눌러 “FF E4”(=JMP ESP)를 검색하면 아래와 같이 
-JMP ESP의 주소를 찾을 수 있게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;다음 편에서는 GS 기법에 대해 알아보도록 하겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x04 Random STACK</summary>
       
 
       
