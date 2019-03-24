@@ -23,6 +23,126 @@
     
       
       <item>
+        <title>CVE-2019-5736 (runC Container 취약점)</title>
+        
+          <description>&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Mon, 25 Mar 2019 09:29:00 +0900</pubDate>
+        <link>
+        /runC-Container</link>
+        <guid isPermaLink="true">/runC-Container</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>windows-0x09</title>
+        
+          <description>&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Sun, 24 Mar 2019 20:18:00 +0900</pubDate>
+        <link>
+        /windows-0x09</link>
+        <guid isPermaLink="true">/windows-0x09</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>linux_0x04</title>
+        
+          <description>&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Sun, 24 Mar 2019 15:18:00 +0900</pubDate>
+        <link>
+        /linux_0x04</link>
+        <guid isPermaLink="true">/linux_0x04</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>windows-0x08</title>
+        
+          <description>&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Tue, 19 Mar 2019 20:18:00 +0900</pubDate>
+        <link>
+        /windows-0x08</link>
+        <guid isPermaLink="true">/windows-0x08</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>windows-0x07</title>
+        
+          <description>&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Tue, 19 Mar 2019 19:18:00 +0900</pubDate>
+        <link>
+        /windows-0x07</link>
+        <guid isPermaLink="true">/windows-0x07</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>windows-0x06</title>
+        
+          <description>&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Mon, 18 Mar 2019 19:18:00 +0900</pubDate>
+        <link>
+        /windows-0x06</link>
+        <guid isPermaLink="true">/windows-0x06</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>DLL Hijacking &amp; Ghidra</title>
+        
+          <description>&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Sun, 17 Mar 2019 19:18:00 +0900</pubDate>
+        <link>
+        /Dll-Hijacking-&-Ghidra</link>
+        <guid isPermaLink="true">/Dll-Hijacking-&-Ghidra</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>mobile-0x00</title>
+        
+          <description>&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Sat, 16 Mar 2019 06:00:00 +0900</pubDate>
+        <link>
+        /android-0x00</link>
+        <guid isPermaLink="true">/android-0x00</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>linux_0x03</title>
         
           <description>&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
