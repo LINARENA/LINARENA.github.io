@@ -36,8 +36,8 @@
     
     <!-- This tag outputs SEO meta+structured data and other important settings -->
     <meta name="description" content="LIN ARENA Technology Blog" />
-    <link rel="shortcut icon" href="/" type="image/png" />
-    <link rel="canonical" href="/windows-0x09" />
+    <link rel="shortcut icon" href="http://localhost:4000/" type="image/png" />
+    <link rel="canonical" href="http://localhost:4000/windows-0x09" />
     <meta name="referrer" content="no-referrer-when-downgrade" />
 
      <!--title below is coming from _includes/dynamic_title-->
@@ -45,8 +45,8 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="windows-0x09" />
     <meta property="og:description" content="0x09 DEP(3) 이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다. ROP (Return Oriented Programming) ROP는 Gadget으로 Chain을 구성하여 API를 호출하는 방식의 공격 기법입니다. 주로 VirtualProtect()나 SetProcessDEPPolicy() 등 메모리와 관련된 함수들을 호출하며, Shellcode를 실행할 수 있도록 실행 권한을 추가하는 방향으로 진행됩니다. 이번 연재에서는 가장 흔하고 쉬운 방식인 VirtualProtect() API를 호출해서" />
-    <meta property="og:url" content="/windows-0x09" />
-    <meta property="og:image" content="/assets/images/windows/0x09_7.png" />
+    <meta property="og:url" content="http://localhost:4000/windows-0x09" />
+    <meta property="og:image" content="http://localhost:4000/assets/images/windows/0x09_7.png" />
     <meta property="article:publisher" content="https://www.facebook.com/" />
     <meta property="article:author" content="https://www.facebook.com/" />
     <meta property="article:published_time" content="2019-03-24T20:18:00+09:00" />
@@ -55,8 +55,8 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="windows-0x09" />
     <meta name="twitter:description" content="0x09 DEP(3) 이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다. ROP (Return Oriented Programming) ROP는 Gadget으로 Chain을 구성하여 API를 호출하는 방식의 공격 기법입니다. 주로 VirtualProtect()나 SetProcessDEPPolicy() 등 메모리와 관련된 함수들을 호출하며, Shellcode를 실행할 수 있도록 실행 권한을 추가하는 방향으로 진행됩니다. 이번 연재에서는 가장 흔하고 쉬운 방식인 VirtualProtect() API를 호출해서" />
-    <meta name="twitter:url" content="/" />
-    <meta name="twitter:image" content="/assets/images/windows/0x09_7.png" />
+    <meta name="twitter:url" content="http://localhost:4000/" />
+    <meta name="twitter:image" content="http://localhost:4000/assets/images/windows/0x09_7.png" />
     <meta name="twitter:label1" content="Written by" />
     <meta name="twitter:data1" content="LIN ARENA" />
     <meta name="twitter:label2" content="Filed under" />
@@ -73,18 +73,18 @@
     "publisher": {
         "@type": "Organization",
         "name": "LIN ARENA",
-        "logo": "/"
+        "logo": "http://localhost:4000/"
     },
-    "url": "/windows-0x09",
+    "url": "http://localhost:4000/windows-0x09",
     "image": {
         "@type": "ImageObject",
-        "url": "/assets/images/windows/0x09_7.png",
+        "url": "http://localhost:4000/assets/images/windows/0x09_7.png",
         "width": 2000,
         "height": 666
     },
     "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "/windows-0x09"
+        "@id": "http://localhost:4000/windows-0x09"
     },
     "description": "0x09 DEP(3) 이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다. ROP (Return Oriented Programming) ROP는 Gadget으로 Chain을 구성하여 API를 호출하는 방식의 공격 기법입니다. 주로 VirtualProtect()나 SetProcessDEPPolicy() 등 메모리와 관련된 함수들을 호출하며, Shellcode를 실행할 수 있도록 실행 권한을 추가하는 방향으로 진행됩니다. 이번 연재에서는 가장 흔하고 쉬운 방식인 VirtualProtect() API를 호출해서"
 }
@@ -374,8 +374,15 @@ into the {body} of the default.hbs template -->
                                 
                                 
                                   
+                                    
+                                  
                                 
                                   
+                                    
+                                        
+                                        
+                                            <li><a href="/linux_0x04">linux_0x04</a></li>
+                                        
                                     
                                   
                                 
@@ -400,8 +407,6 @@ into the {body} of the default.hbs template -->
                                   
                                     
                                         
-                                        
-                                            <li><a href="/windows-0x06">windows-0x06</a></li>
                                         
                                     
                                   
@@ -516,7 +521,7 @@ into the {body} of the default.hbs template -->
                         <footer class="read-next-card-footer">
                             <a href="/tag/posts/">
                                 
-                                    See all 18 posts  →
+                                    See all 19 posts  →
                                 
                             </a>
                         </footer>
@@ -526,51 +531,18 @@ into the {body} of the default.hbs template -->
 
             <!-- If there's a next post, display it using the same markup included from - partials/post-card.hbs -->
             
-                
-    <article class="post-card  no-image">
-        
-        <div class="post-card-content">
-            <a class="post-card-content-link" href="/2019-03-24-linux_0x04">
-                <header class="post-card-header">
-                    
-
-                    <h2 class="post-card-title"></h2>
-                </header>
-                <section class="post-card-excerpt">
-                    
-                        <p></p>
-                    
-                </section>
-            </a>
-            <footer class="post-card-meta">
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-                    
-                
-            </footer>
-        </div>
-    </article>
-
-            
 
             <!-- If there's a previous post, display it using the same markup included from - partials/post-card.hbs -->
             
                 
     <article class="post-card post-template">
         
-            <a class="post-card-image-link" href="/windows-0x08">
-                <div class="post-card-image" style="background-image: url(/assets/images/windows/0x08_2.png)"></div>
+            <a class="post-card-image-link" href="/linux_0x04">
+                <div class="post-card-image" style="background-image: url(/assets/images/linux/0x04/0x04-12.png)"></div>
             </a>
         
         <div class="post-card-content">
-            <a class="post-card-content-link" href="/windows-0x08">
+            <a class="post-card-content-link" href="/linux_0x04">
                 <header class="post-card-header">
                     
                         
@@ -580,7 +552,7 @@ into the {body} of the default.hbs template -->
                         
                     
 
-                    <h2 class="post-card-title">windows-0x08</h2>
+                    <h2 class="post-card-title">linux_0x04</h2>
                 </header>
                 <section class="post-card-excerpt">
                     
@@ -593,14 +565,14 @@ into the {body} of the default.hbs template -->
                     
                 
                     
+                
+                    
                         
-                        <img class="author-profile-image" src="/assets/images/CI_Logo.jpg" alt="Joel Park" />
+                        <img class="author-profile-image" src="/assets/images/CI_Logo.jpg" alt="Sulla" />
                         
                         <span class="post-card-author">
-                            <a href="/author/Joel/">Joel Park</a>
+                            <a href="/author/Sulla/">Sulla</a>
                         </span>
-                    
-                
                     
                 
                     
@@ -620,7 +592,7 @@ into the {body} of the default.hbs template -->
 <!-- Floating header which appears on-scroll, included from includes/floating-header.hbs -->
 <div class="floating-header">
     <div class="floating-header-logo">
-        <a href="/">
+        <a href="http://localhost:4000/">
             
             <span>LIN ARENA</span>
         </a>
@@ -662,7 +634,7 @@ into the {body} of the default.hbs template -->
         <!-- The footer at the very bottom of the screen -->
         <footer class="site-footer outer">
             <div class="site-footer-content inner">
-                <section class="copyright"><a href="/">LIN ARENA</a> &copy; 2019</section>
+                <section class="copyright"><a href="http://localhost:4000/">LIN ARENA</a> &copy; 2019</section>
                 <section class="poweredby">All rights reserved. Powered by GitHub Pages.</section>
                 <nav class="site-footer-nav">
                     <a href="/">[Latest Posts]</a>
