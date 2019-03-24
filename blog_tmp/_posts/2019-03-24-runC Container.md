@@ -1,10 +1,10 @@
 ---
 layout: post
 current: post
-cover: 'assets/images/linux/jobs/CVE-2019-5736(docker eunC)/5736-3.png'
+cover: 'assets/images/linux/jobs/runC Container/5736-3.png'
 navigation: True
 title: CVE-2019-5736 (runC Container 취약점)
-date: 2019-03-24 06:18:00
+date: 2019-03-25 00:29:00
 tags: Posts
 class: post-template
 subclass: 'post tag-linux'
