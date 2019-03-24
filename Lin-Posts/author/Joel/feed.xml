@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="http://localhost:4000/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-03-25T00:38:34+09:00</updated>
-  <id>http://localhost:4000/author/Joel/feed.xml</id>
+  <link href="/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-03-25T00:40:12+09:00</updated>
+  <id>/author/Joel/feed.xml</id>
 
   
   
@@ -41,11 +41,11 @@
   
     <entry>
       <title type="html">windows-0x09</title>
-      <link href="http://localhost:4000/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
+      <link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
       <published>2019-03-24T20:18:00+09:00</published>
       <updated>2019-03-24T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x09</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+      <id>/windows-0x09</id>
+      <content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -198,11 +198,11 @@
   
     <entry>
       <title type="html">windows-0x08</title>
-      <link href="http://localhost:4000/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
+      <link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
       <published>2019-03-19T20:18:00+09:00</published>
       <updated>2019-03-19T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x08</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+      <id>/windows-0x08</id>
+      <content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -335,11 +335,11 @@
   
     <entry>
       <title type="html">windows-0x07</title>
-      <link href="http://localhost:4000/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
+      <link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
       <published>2019-03-19T19:18:00+09:00</published>
       <updated>2019-03-19T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x07</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+      <id>/windows-0x07</id>
+      <content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -501,11 +501,11 @@
   
     <entry>
       <title type="html">windows-0x06</title>
-      <link href="http://localhost:4000/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
+      <link href="/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
       <published>2019-03-18T19:18:00+09:00</published>
       <updated>2019-03-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x06</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+      <id>/windows-0x06</id>
+      <content type="html" xml:base="/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
 
@@ -573,11 +573,11 @@
   
     <entry>
       <title type="html">DLL Hijacking &amp;amp; Ghidra</title>
-      <link href="http://localhost:4000/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
+      <link href="/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
       <published>2019-03-17T19:18:00+09:00</published>
       <updated>2019-03-17T19:18:00+09:00</updated>
-      <id>http://localhost:4000/Dll%20Hijacking%20&amp;%20Ghidra</id>
-      <content type="html" xml:base="http://localhost:4000/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+      <id>/Dll%20Hijacking%20&amp;%20Ghidra</id>
+      <content type="html" xml:base="/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -724,11 +724,11 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
   
     <entry>
       <title type="html">windows-0x05</title>
-      <link href="http://localhost:4000/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" />
+      <link href="/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" />
       <published>2019-03-09T19:18:00+09:00</published>
       <updated>2019-03-09T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x05</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
+      <id>/windows-0x05</id>
+      <content type="html" xml:base="/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-gs&quot;&gt;What is GS?&lt;/h5&gt;
 
@@ -916,11 +916,11 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
   
     <entry>
       <title type="html">windows-0x04</title>
-      <link href="http://localhost:4000/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" />
+      <link href="/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" />
       <published>2019-03-03T19:18:00+09:00</published>
       <updated>2019-03-03T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x04</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
+      <id>/windows-0x04</id>
+      <content type="html" xml:base="/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-random-stack&quot;&gt;What is Random STACK?&lt;/h5&gt;
 
@@ -1021,11 +1021,11 @@ JMP ESP의 주소를 찾을 수 있게 됩니다.&lt;/p&gt;
   
     <entry>
       <title type="html">windows-0x02</title>
-      <link href="http://localhost:4000/windows-0x02" rel="alternate" type="text/html" title="windows-0x02" />
+      <link href="/windows-0x02" rel="alternate" type="text/html" title="windows-0x02" />
       <published>2019-02-18T19:18:00+09:00</published>
       <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x02</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x02">&lt;h1 id=&quot;0x02-stack&quot;&gt;0x02 STACK&lt;/h1&gt;
+      <id>/windows-0x02</id>
+      <content type="html" xml:base="/windows-0x02">&lt;h1 id=&quot;0x02-stack&quot;&gt;0x02 STACK&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-the-stack&quot;&gt;What is the STACK?&lt;/h5&gt;
 
@@ -1169,11 +1169,11 @@ Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성�
   
     <entry>
       <title type="html">windows-0x03</title>
-      <link href="http://localhost:4000/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
+      <link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
       <published>2019-02-18T19:18:00+09:00</published>
       <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x03</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
+      <id>/windows-0x03</id>
+      <content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
 
@@ -1314,11 +1314,11 @@ int main(int argc, char* argv[]) {
   
     <entry>
       <title type="html">windows-0x01</title>
-      <link href="http://localhost:4000/windows-0x01" rel="alternate" type="text/html" title="windows-0x01" />
+      <link href="/windows-0x01" rel="alternate" type="text/html" title="windows-0x01" />
       <published>2019-02-07T19:18:00+09:00</published>
       <updated>2019-02-07T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x01</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x01">&lt;h1 id=&quot;0x01-윈도우-메모리&quot;&gt;0x01 윈도우 메모리&lt;/h1&gt;
+      <id>/windows-0x01</id>
+      <content type="html" xml:base="/windows-0x01">&lt;h1 id=&quot;0x01-윈도우-메모리&quot;&gt;0x01 윈도우 메모리&lt;/h1&gt;
 
 &lt;h3 id=&quot;가상-메모리&quot;&gt;가상 메모리&lt;/h3&gt;
 
