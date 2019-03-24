@@ -1,7 +1,7 @@
 ---
 layout: post
 current: post
-cover: 'assets/images/linux/jobs/runC Container/5736-3.png'
+cover: 'assets/images/linux/jobs/runC_Container/5736-3.png'
 navigation: True
 title: CVE-2019-5736 (runC Container 취약점)
 date: 2019-03-25 00:29:00
@@ -46,26 +46,26 @@ author: Sulla
 화면 구성은 위쪽은 **Host Server(이하 HS라 하겠습니다.)**, 아래쪽은 **Container** 입니다.
 
 <figure>
-  <img data-action="zoom" src='{{ "/assets/images/linux/jobs/runC Container/5736-1.png" | relative_url }}' alt='[그림 5736-1]'>
+  <img data-action="zoom" src='{{ "/assets/images/linux/jobs/runC_Container/5736-1.png" | relative_url }}' alt='[그림 5736-1]'>
 </figure>
 
 첫 번째 방법 부터 보도록 하죠. 진행 자체는 굉장히 간단하게 진행됩니다.(물론 저는 삽질 했습니다......Aㅏ.....) 먼저 **HS**쪽에 해당 파일이 없음을 확인 합니다. 후에는 컨테이너에서 악성 파일을 실행하면 준비가 끝납니다. 함정 처럼 **/bin/sh**를 **#!/proc/self/exe** 바꿔놓고 기다리는 단계입니다.
 
 <figure>
-  <img data-action="zoom" src='{{ "/assets/images/linux/jobs/runC Container/5736-2.png" | relative_url }}' alt='[그림 5736-2]'>
+  <img data-action="zoom" src='{{ "/assets/images/linux/jobs/runC_Container/5736-2.png" | relative_url }}' alt='[그림 5736-2]'>
 </figure>
 
 그리고 호스트가 컨테이너쪽으로  **docker exec** 명령을 통해 **/bin/sh**의 실행을 명하게 되면 위에서 설치해뒀던 함정이 발동하게 됩니다. 함정 카드..... **(/bin/sh를 쓸것이라 추측하고 세팅 하는겁니다.)** 
 다음으로 **runC**의 **PID**를 찾고 **핸들링(O_PATH ,O_WRONLY 플래그 사용)**을 위한 여러 과정을 거치고 최종적으로 호스트의 **runC** 바이너리 파일을 **악성 runC** 로 변조되며 악성 파일에 미리 정의 되있던 행위를 **호스트**쪽에서 **루트 권한**으로 수행하게 됩니다.
 
 <figure>
-  <img data-action="zoom" src='{{ "/assets/images/linux/jobs/runC Container/5736-3.png" | relative_url }}' alt='[그림 5736-3]'>
+  <img data-action="zoom" src='{{ "/assets/images/linux/jobs/runC_Container/5736-3.png" | relative_url }}' alt='[그림 5736-3]'>
 </figure>
 
 처음에는 없던 shadow 파일이 root 권한으로 생성된 것을 확인할 수 있습니다. 해당파일을 열람시 실제 shadow 파일임을 확인 가능합니다.
 
 <figure>
-  <img data-action="zoom" src='{{ "/assets/images/linux/jobs/runC Container/5736-4.png" | relative_url }}' alt='[그림 5736-4]'>
+  <img data-action="zoom" src='{{ "/assets/images/linux/jobs/runC_Container/5736-4.png" | relative_url }}' alt='[그림 5736-4]'>
 </figure>
 
 위 과정을 거치면서 **HS**쪽의 runC 파일이 변조됩니다. 해쉬값을 비교하면 쉽게 확인 가능하며 위쪽 해쉬값이 원본이면 아래쪽은 변조된 runC 바이너리의 해쉬값입니다.
