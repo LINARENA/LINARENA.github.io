@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-25T00:40:12+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">CVE-2019-5736 (runC Container 취약점)</title><link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" /><published>2019-03-25T09:29:00+09:00</published><updated>2019-03-25T09:29:00+09:00</updated><id>/runC%20Container</id><content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-25T00:45:25+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">CVE-2019-5736 (runC Container 취약점)</title><link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" /><published>2019-03-25T09:29:00+09:00</published><updated>2019-03-25T09:29:00+09:00</updated><id>/runC%20Container</id><content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
 
@@ -19,7 +19,7 @@
 
 &lt;h1 id=&quot;cve-2019-5736&quot;&gt;CVE-2019-5736&lt;/h1&gt;
 
-&lt;p&gt;해당 취약점은 위에서 알아본 &lt;strong&gt;runC&lt;/strong&gt;에서 발생하는 취약점입니다. &lt;strong&gt;**컨테이너 내부에서 **루트 권한&lt;/strong&gt;으로 악의적인 프로세스를 실행할 경우 &lt;strong&gt;runC 버그&lt;/strong&gt;를 이용하여 컨테이터를 실행하는 &lt;strong&gt;호스트에 대한 루트 권한&lt;/strong&gt;을 탈취하는 취약점입니다. 따라서, 서버에 대한 접근 및 해당 서버의 다른 컨테이너 또한 접근이 가능합니다.&lt;/p&gt;
+&lt;p&gt;해당 취약점은 위에서 알아본 &lt;strong&gt;runC&lt;/strong&gt;에서 발생하는 취약점입니다. &lt;strong&gt;컨테이너 내부에서 루트 권한&lt;/strong&gt;으로 악의적인 프로세스를 실행할 경우 &lt;strong&gt;runC 버그&lt;/strong&gt;를 이용하여 컨테이터를 실행하는 &lt;strong&gt;호스트에 대한 루트 권한&lt;/strong&gt;을 탈취하는 취약점입니다. 따라서, 서버에 대한 접근 및 해당 서버의 다른 컨테이너 또한 접근이 가능합니다.&lt;/p&gt;
 
 &lt;p&gt;쉽게 말해 &lt;strong&gt;악성 컨테이너&lt;/strong&gt;를 통해 &lt;strong&gt;호스트 서버의 루트 권한 탈취&lt;/strong&gt;가 가능하게 됩니다.&lt;/p&gt;
 
@@ -44,7 +44,7 @@
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-2.png&quot; alt=&quot;[그림 5736-2]&quot; /&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;그리고 호스트가 컨테이너쪽으로  &lt;strong&gt;docker exec&lt;/strong&gt; 명령을 통해 &lt;strong&gt;/bin/sh&lt;/strong&gt;의 실행을 명하게 되면 위에서 설치해뒀던 함정이 발동하게 됩니다. 함정 카드….. &lt;strong&gt;(/bin/sh를 쓸것이라 추측하고 세팅 하는겁니다.)&lt;/strong&gt; 
+&lt;p&gt;그리고 호스트가 컨테이너쪽으로  &lt;strong&gt;docker exec&lt;/strong&gt; 명령을 통해 &lt;strong&gt;/bin/sh&lt;/strong&gt;의 실행을 명하게 되면 위에서 설치해뒀던 함정이 발동하게 됩니다. 함정 카드….. &lt;strong&gt;(/bin/sh를 쓸것이라 추측하고 세팅 하는겁니다.)&lt;/strong&gt;
 다음으로 &lt;strong&gt;runC&lt;/strong&gt;의 &lt;strong&gt;PID&lt;/strong&gt;를 찾고 &lt;strong&gt;핸들링(O_PATH ,O_WRONLY 플래그 사용)&lt;/strong&gt;을 위한 여러 과정을 거치고 최종적으로 호스트의 &lt;strong&gt;runC&lt;/strong&gt; 바이너리 파일을 &lt;strong&gt;악성 runC&lt;/strong&gt; 로 변조되며 악성 파일에 미리 정의 되있던 행위를 &lt;strong&gt;호스트&lt;/strong&gt;쪽에서 &lt;strong&gt;루트 권한&lt;/strong&gt;으로 수행하게 됩니다.&lt;/p&gt;
 
 &lt;figure&gt;
