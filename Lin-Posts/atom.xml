@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>web-0x03</title>
+        
+          <description>&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Mon, 25 Mar 2019 14:00:00 +0900</pubDate>
+        <link>
+        /web-0x03</link>
+        <guid isPermaLink="true">/web-0x03</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>linux_0x03</title>
         
           <description>&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
