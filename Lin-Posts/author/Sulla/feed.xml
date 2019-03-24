@@ -2,10 +2,17 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
+<<<<<<< HEAD
   <link href="http://localhost:4000/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
   <link href="http://localhost:4000/" rel="alternate" type="text/html" />
   <updated>2019-03-24T22:32:17+09:00</updated>
   <id>http://localhost:4000/author/Sulla/feed.xml</id>
+=======
+  <link href="/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-03-24T18:03:39+09:00</updated>
+  <id>/author/Sulla/feed.xml</id>
+>>>>>>> f5aab1f91c667710953505cd85461d458b704c30
 
   
   
@@ -87,8 +94,13 @@
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-3.png&quot; alt=&quot;[그림 4-3]&quot; /&gt;
 &lt;/figure&gt;
 
+<<<<<<< HEAD
 &lt;p&gt;&lt;strong&gt;system(“/bin/sh”)&lt;/strong&gt; 이 입력된 상태에서 함수가 종료되면 에필로그 과정을 가집니다. 에필로그 과정 중 ret(pop eip) 과정을 거치며 system() 함수의 주소를 eip에  옮기게 되죠. 이 과정에 pop 명령을 사용 했기에 스택에 공간이 생깁니다.(가운데) 그런 다음 system() 함수의 프롤로그 과정을 가지며 push ebp, mov ebp, esp 과정을 거치며 새롭게 메모리의 영역을 확보하죠. 
 즉, AAAA의 위치는 system 함수가 끝난 뒤의 ret 구역이 되며 잉여값을 배치해주고, 다음 공간에 원하는 주소값을 위치시켜 줍니다. 좀더 확실하게 알아보도록 하죠. (참고로 root로 생성된 실행파일은 디버깅이 안되니 /tmp/ 하위에 다른 폴더로 복사해서 분석해주세요!!)&lt;/p&gt;
+=======
+&lt;p&gt;&lt;strong&gt;system(“/bin/sh”)&lt;/strong&gt; 이 입력된 상태에서 함수가 종료되면 에필로그 과정을 가집니다. 에필로그 과정 중 ret(pop eip) 과정을 거치며 system() 함수의 주소를 eip에  옮기게 되죠.이과정에 pop 명령을 사용 했기에 스택에 공간이 생깁니다. 그런 다음 system() 함수의 프롤로그 과정을 가지며 push ebp, mov ebp, esp 과정을 거치며 새롭게 메모리의 영역을 확보하죠. 
+즉, AAAA의 위치는 system 함수가 끝난 뒤의 ret 구역이 되며 잉여값을 배치해주고, 다음 공간에 원하는 주소값을 위치시켜 줍니다. 좀더 확실하게 알아보도록 하죠.&lt;/p&gt;
+>>>>>>> f5aab1f91c667710953505cd85461d458b704c30
 
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-4.png&quot; alt=&quot;[그림 4-4]&quot; /&gt;
@@ -96,7 +108,11 @@
 
 &lt;p&gt;위 사진에서와 같이 system() 내부를 들여다 보면 프로로그 과정을 거치고 EBP에서 8byte 떨어진 주소를 참조합니다. EBP에서 4byte를 가지고 우리는 남은 4byte만(RET) 채워준 뒤 원하는 주소를 입력해준다면 인자값을 정상적으로 인식하게 됩니다.&lt;/p&gt;
 
+<<<<<<< HEAD
 &lt;p&gt;&lt;strong&gt;Return to Library&lt;/strong&gt;라는 이름을 아주 성실하게 이행하는 모습이네요. 그럼 직접 시작해보곘습니다. 먼저 찾아야 할 주소는 아래와 같습니다.&lt;/p&gt;
+=======
+&lt;p&gt;&lt;strong&gt;Return to Library&lt;/strong&gt;라는 이름을 아주 성실하게 이행하는 모습이네요. 사실 더 설명드릴게 없습니다. 약간만 응용한 기술이기에 새롭게 설명 들릴만한 내용은 없다고 생각 되네요. 그럼 직접 시작해보곘습니다. 먼저 찾아야 할 주소는 아래와 같습니다.&lt;/p&gt;
+>>>>>>> f5aab1f91c667710953505cd85461d458b704c30
 
 &lt;ol&gt;
   &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = ????&lt;/li&gt;
@@ -123,7 +139,11 @@
 03 int main(){
 04   long shell=0x4203f2c0; //system()의 주소를 입력해 주시면 됩니다.
 05 	 while(memcmp((void*)shell,(&quot;/bin/sh&quot;),8))
+<<<<<<< HEAD
 06   shell++; 
+=======
+06   shell++;
+>>>>>>> f5aab1f91c667710953505cd85461d458b704c30
 07 	 printf(&quot;%p\n&quot;,shell);
 08 }
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -155,6 +175,7 @@
 &lt;p&gt;설명은 이쯤 해두고 직접 떄려보도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+<<<<<<< HEAD
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-8.png&quot; alt=&quot;[그림 4-8]&quot; /&gt;
 &lt;/figure&gt;
 
@@ -276,6 +297,12 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 &lt;p&gt;다음 포스팅은 Chaining RTL이란 것을 정말…간단히 볼 수 있도록 해보겠습니다.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;뿅!&lt;/strong&gt;&lt;/p&gt;</content>
+=======
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/exm1.png&quot; alt=&quot;[그림 4-8]&quot; /&gt;
+&lt;/figure&gt;
+&lt;p&gt;원하던 shell을 떨어졌습니다. 짧게 끝날줄 알았는데 이번편도 주절주절 양이 많았네요. 다음 포스팅에서는 RTL Chaining을 알아보겠습니다. 감사합니다.
+뿅!&lt;/p&gt;</content>
+>>>>>>> f5aab1f91c667710953505cd85461d458b704c30
 
       
       
