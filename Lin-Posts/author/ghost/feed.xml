@@ -2,17 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-<<<<<<< HEAD
-  <link href="http://localhost:4000/author/ghost/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-03-24T22:32:17+09:00</updated>
-  <id>http://localhost:4000/author/ghost/feed.xml</id>
-=======
   <link href="/author/ghost/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-24T18:03:39+09:00</updated>
+  <updated>2019-03-24T22:34:49+09:00</updated>
   <id>/author/ghost/feed.xml</id>
->>>>>>> f5aab1f91c667710953505cd85461d458b704c30
 
   
   
