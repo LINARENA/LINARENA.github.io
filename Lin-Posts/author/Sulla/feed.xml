@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="http://localhost:4000/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
   <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-03-25T00:34:54+09:00</updated>
+  <updated>2019-03-25T00:36:24+09:00</updated>
   <id>http://localhost:4000/author/Sulla/feed.xml</id>
 
   
@@ -82,26 +82,26 @@
 &lt;p&gt;화면 구성은 위쪽은 &lt;strong&gt;Host Server(이하 HS라 하겠습니다.)&lt;/strong&gt;, 아래쪽은 &lt;strong&gt;Container&lt;/strong&gt; 입니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/CVE-2019-5736(docker%20eunC)/5736-1.png&quot; alt=&quot;[그림 5736-1]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC%20Container/5736-1.png&quot; alt=&quot;[그림 5736-1]&quot; /&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;첫 번째 방법 부터 보도록 하죠. 진행 자체는 굉장히 간단하게 진행됩니다.(물론 저는 삽질 했습니다……Aㅏ…..) 먼저 &lt;strong&gt;HS&lt;/strong&gt;쪽에 해당 파일이 없음을 확인 합니다. 후에는 컨테이너에서 악성 파일을 실행하면 준비가 끝납니다. 함정 처럼 &lt;strong&gt;/bin/sh&lt;/strong&gt;를 &lt;strong&gt;#!/proc/self/exe&lt;/strong&gt; 바꿔놓고 기다리는 단계입니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/CVE-2019-5736(docker%20eunC)/5736-2.png&quot; alt=&quot;[그림 5736-2]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC%20Container/5736-2.png&quot; alt=&quot;[그림 5736-2]&quot; /&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;그리고 호스트가 컨테이너쪽으로  &lt;strong&gt;docker exec&lt;/strong&gt; 명령을 통해 &lt;strong&gt;/bin/sh&lt;/strong&gt;의 실행을 명하게 되면 위에서 설치해뒀던 함정이 발동하게 됩니다. 함정 카드….. &lt;strong&gt;(/bin/sh를 쓸것이라 추측하고 세팅 하는겁니다.)&lt;/strong&gt; 
 다음으로 &lt;strong&gt;runC&lt;/strong&gt;의 &lt;strong&gt;PID&lt;/strong&gt;를 찾고 &lt;strong&gt;핸들링(O_PATH ,O_WRONLY 플래그 사용)&lt;/strong&gt;을 위한 여러 과정을 거치고 최종적으로 호스트의 &lt;strong&gt;runC&lt;/strong&gt; 바이너리 파일을 &lt;strong&gt;악성 runC&lt;/strong&gt; 로 변조되며 악성 파일에 미리 정의 되있던 행위를 &lt;strong&gt;호스트&lt;/strong&gt;쪽에서 &lt;strong&gt;루트 권한&lt;/strong&gt;으로 수행하게 됩니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/CVE-2019-5736(docker%20eunC)/5736-3.png&quot; alt=&quot;[그림 5736-3]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC%20Container/5736-3.png&quot; alt=&quot;[그림 5736-3]&quot; /&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;처음에는 없던 shadow 파일이 root 권한으로 생성된 것을 확인할 수 있습니다. 해당파일을 열람시 실제 shadow 파일임을 확인 가능합니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/CVE-2019-5736(docker%20eunC)/5736-4.png&quot; alt=&quot;[그림 5736-4]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC%20Container/5736-4.png&quot; alt=&quot;[그림 5736-4]&quot; /&gt;
 &lt;/figure&gt;
 
 &lt;p&gt;위 과정을 거치면서 &lt;strong&gt;HS&lt;/strong&gt;쪽의 runC 파일이 변조됩니다. 해쉬값을 비교하면 쉽게 확인 가능하며 위쪽 해쉬값이 원본이면 아래쪽은 변조된 runC 바이너리의 해쉬값입니다.&lt;/p&gt;
