@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-24T15:17:15+09:00</updated>
-  <id>/author/Sulla/feed.xml</id>
+  <link href="http://localhost:4000/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
+  <updated>2019-03-24T22:32:17+09:00</updated>
+  <id>http://localhost:4000/author/Sulla/feed.xml</id>
 
   
   
@@ -41,17 +41,16 @@
   
     <entry>
       <title type="html">linux_0x04</title>
-      <link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
+      <link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
       <published>2019-03-24T15:18:00+09:00</published>
       <updated>2019-03-24T15:18:00+09:00</updated>
-      <id>/linux_0x04</id>
-      <content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x04</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
-&lt;p&gt;이번에 알아볼 내용은 &lt;strong&gt;RTL&lt;/strong&gt;(Return to Library)입니다.&lt;/p&gt;
-
-&lt;p&gt;먼저 &lt;strong&gt;RTL&lt;/strong&gt;이 뭔지를 알아보도록 하겠습니다.&lt;/p&gt;
+&lt;p&gt;이번에 알아볼 내용은 &lt;strong&gt;RTL&lt;/strong&gt;(Return to Library)입니다.
+먼저 &lt;strong&gt;RTL&lt;/strong&gt;이 뭔지를 알아보도록 하겠습니다.&lt;/p&gt;
 
 &lt;h1 id=&quot;rtlreturn-to-library-1&quot;&gt;RTL(Return to Library)&lt;/h1&gt;
 
@@ -60,122 +59,84 @@
 &lt;p&gt;메모리에서의 코드 실행이 막혔기 때문에(Shellcode 실행 차단) 다른 방법을 찾아야 합니다. &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 직접 실행할 수 있다면 가능할 듯 합니다.&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-1.png&quot; alt=&quot;[그림 4-1]&quot; /&gt;
-
 &lt;/figure&gt;
 
-&lt;p&gt;그럼 어떻게 해야할까요? 첫 포스팅에서 메모리 구조를 설명 드릴 때 위 그림을 보여 드렸었습니다.&lt;strong&gt;[스택 -&lt;/strong&gt; &lt;strong&gt;공유라이브러리 -&lt;/strong&gt; &lt;strong&gt;힙 - BSS/Data - Code]&lt;/strong&gt;으로 이뤄지며, 공유 라이브러리는 &lt;strong&gt;메모리에 미리 필요한 중요 함수들을 저장해두는 장소&lt;/strong&gt;라고 간단하게 설명 드렸었죠.&lt;/p&gt;
-
-&lt;p&gt;저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt;를 사용하여 &lt;strong&gt;/bin/sh&lt;/strong&gt;을 실행할 수 있지 않을까???라는 생각으로 &lt;strong&gt;RTL&lt;/strong&gt;이 연구되었다 생각되네요….(&lt;strong&gt;뇌피셜)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;그럼 어떻게 해야할까요? 첫 포스팅에서 메모리 구조를 설명 드릴 때 위 그림을 보여 드렸었습니다.&lt;strong&gt;[스택 -&lt;/strong&gt; &lt;strong&gt;공유라이브러리 -&lt;/strong&gt; &lt;strong&gt;힙 - BSS/Data - Code]&lt;/strong&gt;으로 이뤄지며, 공유 라이브러리는 &lt;strong&gt;메모리에 미리 필요한 중요 함수들을 저장해두는 장소&lt;/strong&gt;라고 간단하게 설명 드렸었죠.
+저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt;를 사용하여 &lt;strong&gt;/bin/sh&lt;/strong&gt;을 실행할 수 있지 않을까???라는 생각으로 &lt;strong&gt;RTL&lt;/strong&gt;이 연구되었다 생각되네요….(&lt;strong&gt;뇌피셜)&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;공유 라이버르러리를 간단하게 정리하자면 다음과 같습니다.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;여러 프로세스에서 동시에 사용 가능한 라이브러리&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;프로그램이 시작될 때 메모리에 적재됨&lt;/p&gt;
-  &lt;/li&gt;
+  &lt;li&gt;여러 프로세스에서 동시에 사용 가능한 라이브러리&lt;/li&gt;
+  &lt;li&gt;프로그램이 시작될 때 메모리에 적재됨&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;우리는 저 &lt;strong&gt;공유 라이브러리&lt;/strong&gt; 중에서 &lt;strong&gt;system()&lt;/strong&gt; 함수를 사용하겠습니다. 해당 함수는 입력받은 문자열을 실행시키는 함수입니다. 즉, 인자값으로 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 입력한다면 &lt;strong&gt;system(“/bin/sh”);&lt;/strong&gt;과 같은 형태가 되며 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt;를 실행하게 됩니다.&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-2.png&quot; alt=&quot;[그림 4-2]&quot; /&gt;
-
 &lt;/figure&gt;
 
-&lt;p&gt;&lt;strong&gt;RTL&lt;/strong&gt;의 흐름을 위와 같이 표현했습니다. &lt;strong&gt;libc&lt;/strong&gt;(공유라이브러리)의 함수(&lt;strong&gt;system()&lt;/strong&gt;)를 사용해서 &lt;strong&gt;8byte&lt;/strong&gt; 뒤에 &lt;strong&gt;/bin/sh&lt;/strong&gt; 의 주소를 박아두면 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 실행하여 &lt;strong&gt;shell&lt;/strong&gt;을 따내게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;즉, &lt;strong&gt;버퍼 + sfp + system() + AAAA + /bin/sh&lt;/strong&gt; 처럼 표현 가능할 듯 합니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RTL&lt;/strong&gt;의 흐름을 위와 같이 표현했습니다. &lt;strong&gt;libc&lt;/strong&gt;(공유라이브러리)의 함수(&lt;strong&gt;system()&lt;/strong&gt;)를 사용해서 &lt;strong&gt;8byte&lt;/strong&gt; 뒤에 &lt;strong&gt;/bin/sh&lt;/strong&gt; 의 주소를 박아두면 &lt;strong&gt;system()&lt;/strong&gt;이 &lt;strong&gt;/bin/sh&lt;/strong&gt; 를 실행하여 &lt;strong&gt;shell&lt;/strong&gt;을 따내게 됩니다. 
+즉, &lt;strong&gt;버퍼 + sfp + system() + AAAA + /bin/sh&lt;/strong&gt; 처럼 표현 가능할 듯 합니다.&lt;/p&gt;
 
 &lt;p&gt;여기서 왜 &lt;strong&gt;system()&lt;/strong&gt; 뒤에 인자값으로 바로 &lt;strong&gt;/bin/sh/&lt;/strong&gt;가 아닌 잉여값 “&lt;strong&gt;AAAA&lt;/strong&gt;“을 입력할까요? 그냥 바로 인자값을 입력하면 인식을 못할까요?&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-3.png&quot; alt=&quot;[그림 4-3]&quot; /&gt;
-
 &lt;/figure&gt;
 
-&lt;p&gt;&lt;strong&gt;system(“/bin/sh”)&lt;/strong&gt; 이 입력된 상태에서 함수가 종료되면 에필로그 과정을 가집니다. 에필로그 과정 중 ret(pop eip) 과정을 거치며 system() 함수의 주소를 eip에  옮기게 되죠.이과정에 pop 명령을 사용 했기에 스택에 공간이 생깁니다. 그런 다음 system() 함수의 프롤로그 과정을 가지며 push ebp, mov ebp, esp 과정을 거치며 새롭게 메모리의 영역을 확보하죠.&lt;/p&gt;
-
-&lt;p&gt;즉, AAAA의 위치는 system 함수가 끝난 뒤의 ret 구역이 되며 잉여값을 배치해주고, 다음 공간에 원하는 주소값을 위치시켜 줍니다. 좀더 확실하게 알아보도록 하죠.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;system(“/bin/sh”)&lt;/strong&gt; 이 입력된 상태에서 함수가 종료되면 에필로그 과정을 가집니다. 에필로그 과정 중 ret(pop eip) 과정을 거치며 system() 함수의 주소를 eip에  옮기게 되죠. 이 과정에 pop 명령을 사용 했기에 스택에 공간이 생깁니다.(가운데) 그런 다음 system() 함수의 프롤로그 과정을 가지며 push ebp, mov ebp, esp 과정을 거치며 새롭게 메모리의 영역을 확보하죠. 
+즉, AAAA의 위치는 system 함수가 끝난 뒤의 ret 구역이 되며 잉여값을 배치해주고, 다음 공간에 원하는 주소값을 위치시켜 줍니다. 좀더 확실하게 알아보도록 하죠. (참고로 root로 생성된 실행파일은 디버깅이 안되니 /tmp/ 하위에 다른 폴더로 복사해서 분석해주세요!!)&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-4.png&quot; alt=&quot;[그림 4-4]&quot; /&gt;
-
 &lt;/figure&gt;
 
-&lt;p&gt;위 사진에서와 같이 system() 내부를 들여다 보면 프로로그 과정을 거치고 EBP에서 8byte 떨어진 주소를 참조합니다. EBP 는 4byte를 가지고 우리는 남은 4byte만 채워준 뒤 원하는 주소를 입력해준다면 인자값을 정상적으로 인식하게 됩니다.&lt;/p&gt;
+&lt;p&gt;위 사진에서와 같이 system() 내부를 들여다 보면 프로로그 과정을 거치고 EBP에서 8byte 떨어진 주소를 참조합니다. EBP에서 4byte를 가지고 우리는 남은 4byte만(RET) 채워준 뒤 원하는 주소를 입력해준다면 인자값을 정상적으로 인식하게 됩니다.&lt;/p&gt;
 
-&lt;p&gt;전체적으로 &lt;strong&gt;Return to Library&lt;/strong&gt;라는 이름을 아주 성실하게 이행하는 모습이네요. 그럼 직접 시작해보곘습니다. 먼저 찾아야 할 주소는 아래와 같습니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Return to Library&lt;/strong&gt;라는 이름을 아주 성실하게 이행하는 모습이네요. 그럼 직접 시작해보곘습니다. 먼저 찾아야 할 주소는 아래와 같습니다.&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = ????&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/p&gt;
-  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = ????&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;1번 system 주소부터 확인 하도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-5.png&quot; alt=&quot;[그림 4-5]&quot; /&gt;
-
 &lt;/figure&gt;
 
-&lt;p&gt;먼저 브레이크를 main 함수에 잡아주고 구동 시킵니다.bp에 멈추고 나면 print 명령을 사용해 system()의 주소를 확인 하시면 됩니다.(system의 주소를 못 찾는 심볼을 찾을수 없다는 에러가 뜨는 경우 static 옵션을 뺴고 ggdb 옵션을 붙여서 컴파일 해주세요….개고생 했습니다…..)&lt;/p&gt;
+&lt;p&gt;먼저 브레이크를 main 함수에 잡아주고 구동 시킵니다.bp에 멈추고 나면 print 명령을 사용해 system()의 주소를 확인 하시면 됩니다.(system의 주소를 못 찾는 심볼을 찾을수 없다는 에러가 뜨는 경우 static 옵션을 뺴고 컴파일 해주세요….개고생 했습니다…..)&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/p&gt;
-  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = ????&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;이제 /bin/sh의 주소를 구해야 합니다. 실제로는 /lib/libc.so.6 라이브러리 파일 내의 /bin/sh와 system 의 오프셋을 구해서 최종적인 문자열 주소를 찾을수 있지만 아래의 반복문을 통해서 쉽게 구해보겠습니다.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;01 #include &amp;lt;stdio.h&amp;gt;
-
 02 
-
 03 int main(){
-
 04   long shell=0x4203f2c0; //system()의 주소를 입력해 주시면 됩니다.
-
 05 	 while(memcmp((void*)shell,(&quot;/bin/sh&quot;),8))
-
-06   shell++;
-
+06   shell++; 
 07 	 printf(&quot;%p\n&quot;,shell);
-
 08 }
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;코드의 중요 라인인 5라인만 설명 드리자면 &lt;strong&gt;memcmp&lt;/strong&gt; 함수를 사용해서 &lt;strong&gt;바이트 데이터를 비교&lt;/strong&gt; 하는 과정입니다. &lt;strong&gt;memcmp(인자1, 인자2, 사이즈)&lt;/strong&gt;의 기본형을 가지며 &lt;strong&gt;인자 1&lt;/strong&gt;의 첫 바이트와 &lt;strong&gt;인자 2&lt;/strong&gt;의 첫 바이트를 &lt;strong&gt;사이즈&lt;/strong&gt; 만큼 비교하는 것이며, 이 과정을 통해서 &lt;strong&gt;system()내부에 /bin/sh 문자열을&lt;/strong&gt; 찾아내며 결과적으로 &lt;strong&gt;주소값으로 리턴&lt;/strong&gt; 해줍니다. 돌려줍시다~&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-6.png&quot; alt=&quot;[그림 4-6]&quot; /&gt;
-
 &lt;/figure&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = &lt;strong&gt;0x42127ea4&lt;/strong&gt;&lt;/p&gt;
-  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;system()&lt;/strong&gt; 주소 = &lt;strong&gt;0x4203f2c0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/bin/sh&lt;/strong&gt; 주소 = &lt;strong&gt;0x42127ea4&lt;/strong&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;최종적으로 system() 과 /bin/sh 의 주소값을 찾아냈습니다. 이제 찾아낸 정보를 바탕으로 공격 페이로드를 작성해 보겠습니다.&lt;/p&gt;
@@ -186,20 +147,135 @@
 &lt;p&gt;마지막으로 페이로드를 정리 하고 직접 때려보도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
-
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-7.png&quot; alt=&quot;[그림 4-7]&quot; /&gt;
-
 &lt;/figure&gt;
 
 &lt;p&gt;먼저 버버 크기(40byte)와 sfp(4byte) 를 채워 주고 공유 라이브러리에 위치한 system() 함수를 저장시킵니다. 다음 위치에는 AAAA의 4byte를 채워 줍니다. 이유는 위에서 알려 드렸듯 system()의 인자값은 8byte 뒤에 위치하기에 그 거리만큼 벌려 주고 우리가 필요로 하는 /bin/sh을 위치 시켜 줌으로서 system()이 인자값으로 /bin/sh을 정상적으로 받을수 있게 설계해준겁니다.&lt;/p&gt;
 
-&lt;p&gt;설명은 이쯤 해두고 진짜 직접 떄려보도록 하겠습니다.&lt;/p&gt;
+&lt;p&gt;설명은 이쯤 해두고 직접 떄려보도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-8.png&quot; alt=&quot;[그림 4-8]&quot; /&gt;
+&lt;/figure&gt;
 
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-7.png&quot; alt=&quot;[그림 4-7]&quot; /&gt;
+&lt;p&gt;shell이 떨어지네요. 지금 한 방식처럼 system() 내부의 /bin/sh 문자열을 찾는 방법도 있고 전 포스팅에서 했던 환경변수를 이용 하는 방법도 있습니다. 빠르게 보고 넘어가죠.&lt;/p&gt;
 
-&lt;/figure&gt;</content>
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-9.png&quot; alt=&quot;[그림 4-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위에서 설명 드렸듯 bof라는 환경변수에 /bin/sh 문자열을 저장하고 해당 환경변수의 주소를 확인합니다. 아래쪽은 bof 환경변수의 동작 여부를 확인 했습니다.&lt;/p&gt;
+
+&lt;p&gt;system()의 주소는 알고 있으니 환경변수의 주소만 추가해서 바로 페이로드를 작성하고 떄려봅시다&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-10.png&quot; alt=&quot;[그림 4-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;shell은 마찬가지로 잘 떨어집니다만…우리가 원하는 root 권한이 아니라서 아쉽습니다…..ㅠ 아쉬움을 달래봅시다.&lt;/p&gt;
+
+&lt;p&gt;우선 system()의 근본적인 문제를 알아 봅시다.&lt;/p&gt;
+
+&lt;p&gt;system()의 경우 내부적으로 &lt;strong&gt;/bin/sh -c argument&lt;/strong&gt;를 실행합니다.
+따라서 &lt;strong&gt;/bin/sh -c /bin/sh&lt;/strong&gt; 로 처리가 되며, root 권한을 얻는것은 system()의 내부에서 /bin/sh를 실행 후 다시 /bin/sh을 실행하기에 불가능합니다. 
+따라서 &lt;strong&gt;setuid()&lt;/strong&gt;함수 를 0으로 셋팅해주고 system()가 실행되도록 하여 &lt;strong&gt;미리 실행전에 root 권한으로 준비시킨 후 system()을 실행&lt;/strong&gt;시킨다면 가능하며 system() 함수의 주소가 아닌 다른 함수가 필요한데 그것이 &lt;strong&gt;execl()&lt;/strong&gt;함수입니다.
+먼저 setuid()를 셋팅해 줄 소스부터 작성 해보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;01 #include &amp;lt;stdio.h&amp;gt;
+02 
+03 int main(){
+04   setuid(0);
+05 	 system(&quot;/bin/sh&quot;);
+06   return 0;
+07 }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;해당 파일을 컴파일해주시고 마찬가지로 환경변수에 저장 해줍니다. execl()의 주소도 위에서 system() 주소값을 찾았던 방식으로 찾아주시면 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-11.png&quot; alt=&quot;[그림 4-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;execl()&lt;/strong&gt; 주소 = &lt;strong&gt;0x420acaa0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;새로 작성한 &lt;strong&gt;/tmp/bof1/rootsh&lt;/strong&gt; 주소 = &lt;strong&gt;??&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;이제 페이로드를 짜야 하는데 한가지 주의점은 execl()은 끝에 null로 끝나야 합니다.
+execl(const char *path, const char *arg0, const char *arg1, const char *arg2,…const char *argn, (char *)0);의 형태로 구성 되있는데 조금더 보기 쉽게 하자면
+execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩니다. 마지막은 인자의 끝을 의미로 null값이 위치하게 됩니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./bof1 `python -c 'print &quot;AAAA&quot;*11 + &quot;execl주소&quot; + &quot;AAAA&quot; + &quot;rootsh 주소&quot;'`
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;공격 페이로드는 위와 같이 구성 될것입니다.&lt;/p&gt;
+
+&lt;p&gt;페이로드 전에 execl()을 사용하기 위해 메모리 상태를 봐야합니다. 이유는 끝이 null값으로 끝나는 적당한 지점을 골라야 하기 때문입니다. 직접 보는게 이해하기 빠를겁니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-12.png&quot; alt=&quot;[그림 4-12]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위에서 그림과 같이 BBBB는 execl()의 주소가 되며(파란색) CCCC는 불필요한 값이며(초록색) DDDD가 새로 작성한 rootsh의 주소(노란색)가 됩니다. 위에서 execl()의 인자값의 형태를 봤습니다. 경로 + 인자1 + 인자2 +인자n + NULL의 형태를 띄우며 DDDD 하나는 경로에 들어가며 DDDD가 하나더 들어가면 인자 1에 들어갑니다. 그렇다는 것은 마지막이 마지막으로 DDDD의 뒤의 한 바이트는 NULL이 되어야 4바이트가 전부 NULL로 자리를 잡게 됩니다. 다음 그림과 위 그림의 하늘색 박스의 1byte값인 2c를 확인해보면 무슨 말인지 이해 되실거라 생각 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-13.png&quot; alt=&quot;[그림 4-13]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;상단에 입력한 페이로드를 보면 DDDD를 &lt;em&gt;2 했으며 아래쪽에 하늘색 박스가 2c가 아닌 00으로 바뀌었음을 확인 간으합니다. 즉 DDDD DDDD가 들어간 다음 1byte는 NULL로 바꾸게 됩니다. 이제 DDDD&lt;/em&gt;3을 입력하여 우리가 원하는 0xbffffe4a0(보라색)의 값이 바뀌는지 확인하도록 합시다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-14.png&quot; alt=&quot;[그림 4-14]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;우리가 원하는 모양으로 메모리 값이 바뀌는걸 확인 했으니 페이로드를 다시 정리 해보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./bof1 &quot;`python -c 'print &quot;AAAA&quot;*11 + &quot;\xa0\xca\x0a\x42&quot; + &quot;AAAA&quot; + &quot;rootsh 주소&quot;*3'`&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이제 rootsh 의 주소를 알아내고 *3만 붙여주면 될 듯 합니다. 고지가 보이네요.&lt;/p&gt;
+
+&lt;p&gt;위에서 작성하고 컴파일한 rootsh를 주소가 변하지않는 값을 찾아서 심볼릭 링크를 걸어줘야 합니다. 변하지 않는 곳은 Data segment 영역입니다.&lt;/p&gt;
+
+&lt;p&gt;Data segment 영역의 주소는 0x08049000 부터 시작합니다. 해당 주소를 dbg를 이용해서 열어보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-15.png&quot; alt=&quot;[그림 4-15]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;0x08049014 주소의 값이 0x01(=0x00000001)을 갖고있습니다. 다른 값을 쓰셔도 됩니다만 입력에 있어서 편안한 간단한 값을 선택 합니다. 0x08049014 = 0x01 이라는것을 알아 두시면 됩니다. 이제 rootsh 코드와 0x01의 주소를 심볼릭 링크 시켜줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-16.png&quot; alt=&quot;[그림 4-16]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;자 이제 준비가 끝났습니다. 위에서 찾아본 내용을 바탕으로 페이로드를 재구성 해보겠습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;execl()&lt;/strong&gt; 주소 = &lt;strong&gt;0x420acaa0&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;/tmp/bof1/rootsh 심볼릭 링크 주소&lt;/strong&gt; = &lt;strong&gt;0x08049014&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;[AAAA(44byte)] + [execl() 주소] + [잉여값(4byte)] + [rootsh sl 주소] 과 구성되며 실제 공격 페이로드는 아래와 같습니다.(공격 페이로드는 root 권한의 파일을 대상으로 확인하셔야 합니다.)&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;../bof/bof1 &quot;`python -c 'print &quot;AAAA&quot;*11 + &quot;\xa0\xca\x0a\x42&quot; + &quot;AAAA&quot; 
++ &quot;\x14\x90\x04\x08&quot;*3'`&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이때 주의할 점은 페이로드 전체를 ““로 감싸야 합니다. \x0a를 \x00으로 인식하는 문제가 있어서 “&lt;code class=&quot;highlighter-rouge&quot;&gt;python -c 'print .......'&lt;/code&gt;” 이런식로 감싸주셔야 똑바로 값이 들어갑니다. 꼭 ““으로 감싸주세요!&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x04/0x04-17.png&quot; alt=&quot;[그림 4-17]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;짜잔….개…root 권한으로 shell을 땄습니다. 
+이번에도 역시나 간단하게 하고 싶었는데 고생도 하느라 이것저것 실수 했던것들 다 담느라 많이 길어졌네요…..ㅂㄷㅂㄷ….&lt;/p&gt;
+
+&lt;p&gt;RTL이란 기법은 나중에 알아볼 ROP를 위한 초석입니다. 꼭 잘 숙지 해주셔야 합니다….. :(&lt;/p&gt;
+
+&lt;p&gt;다음 포스팅은 Chaining RTL이란 것을 정말…간단히 볼 수 있도록 해보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;뿅!&lt;/strong&gt;&lt;/p&gt;</content>
 
       
       
@@ -229,11 +305,11 @@
   
     <entry>
       <title type="html">linux_0x03</title>
-      <link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" />
+      <link href="http://localhost:4000/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" />
       <published>2019-03-11T19:18:00+09:00</published>
       <updated>2019-03-11T19:18:00+09:00</updated>
-      <id>/linux_0x03</id>
-      <content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x03</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
 
@@ -395,11 +471,11 @@
   
     <entry>
       <title type="html">linux_0x02</title>
-      <link href="/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" />
+      <link href="http://localhost:4000/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" />
       <published>2019-02-22T19:18:00+09:00</published>
       <updated>2019-02-22T19:18:00+09:00</updated>
-      <id>/linux_0x02</id>
-      <content type="html" xml:base="/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x02</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;임돠.&lt;/p&gt;
 
@@ -646,11 +722,11 @@
   
     <entry>
       <title type="html">linux_0x01</title>
-      <link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
+      <link href="http://localhost:4000/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
       <published>2019-02-18T19:18:00+09:00</published>
       <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>/linux_0x01</id>
-      <content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x01</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다. 오늘부터 본격적으로 &lt;strong&gt;BOF&lt;/strong&gt;에 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -779,11 +855,11 @@
   
     <entry>
       <title type="html">linux_0x00</title>
-      <link href="/linux_0x00" rel="alternate" type="text/html" title="linux_0x00" />
+      <link href="http://localhost:4000/linux_0x00" rel="alternate" type="text/html" title="linux_0x00" />
       <published>2019-02-08T19:18:00+09:00</published>
       <updated>2019-02-08T19:18:00+09:00</updated>
-      <id>/linux_0x00</id>
-      <content type="html" xml:base="/linux_0x00">&lt;h2 id=&quot;0x00---시작에-앞서&quot;&gt;0x00 - 시작에 앞서&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x00</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x00">&lt;h2 id=&quot;0x00---시작에-앞서&quot;&gt;0x00 - 시작에 앞서&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다.&lt;/p&gt;
 

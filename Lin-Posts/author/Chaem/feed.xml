@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="/author/Chaem/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-24T15:17:15+09:00</updated>
-  <id>/author/Chaem/feed.xml</id>
+  <link href="http://localhost:4000/author/Chaem/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
+  <updated>2019-03-24T22:32:17+09:00</updated>
+  <id>http://localhost:4000/author/Chaem/feed.xml</id>
 
   
   
@@ -41,11 +41,11 @@
   
     <entry>
       <title type="html">mobile-0x00</title>
-      <link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
+      <link href="http://localhost:4000/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
       <published>2019-03-16T06:00:00+09:00</published>
       <updated>2019-03-16T06:00:00+09:00</updated>
-      <id>/android-0x00</id>
-      <content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+      <id>http://localhost:4000/android-0x00</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
 
