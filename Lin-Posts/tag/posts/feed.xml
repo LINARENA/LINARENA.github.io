@@ -4,11 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-<<<<<<< HEAD
-  <updated>2019-03-27T21:47:49+09:00</updated>
-=======
-  <updated>2019-03-25T05:17:31+09:00</updated>
->>>>>>> 42fc3c61c57b1220bfb9ac41f4f2586846302035
+  <updated>2019-03-27T21:54:31+09:00</updated>
   <id>/tag/posts/feed.xml</id>
 
   
@@ -44,147 +40,10 @@
 
   
     <entry>
-      <title type="html">web-0x03</title>
-      <link href="/web-0x03" rel="alternate" type="text/html" title="web-0x03" />
-      <published>2019-03-25T14:00:00+09:00</published>
-      <updated>2019-03-25T14:00:00+09:00</updated>
-      <id>/web-0x03</id>
-      <content type="html" xml:base="/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
-
-&lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
-
-&lt;p&gt;오늘은 Wordpress 환경에서의 검색 기능을 제공하는 Relevanssi Search Plugin 4.0.4 이전버전(Version 4.0.4 포함)에서 발생한 CVE-2018-9034 XSS(Cross Site Scripting - Reflected) 취약점에 대한 포스팅입니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;환경구성&lt;/strong&gt;&lt;br /&gt;
-    &lt;ul&gt;
-      &lt;li&gt;Apache 2.4.18&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;PHP 7.0.30&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;Wordpress 4.9.4&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;Wordpress Relevanssi Search Plugin 4.0.4&lt;br /&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_1.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - CVE-2018-9034 Flow -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;다음은 취약점이 발생한 Relevanssi Search Plugin lib/interface.php를 확인해보면, tab 파라미터에 스크립트를 삽입하여 요청하는 경우 취약점이 발생이 가능한 것을 확인할 수 있습니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_2.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - relevanssi.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_3.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - interface.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-공격-테스트&quot;&gt;취약점 공격 테스트&lt;/h5&gt;
-&lt;p&gt;제일 기본적으로 스크립트가 정상적으로 구동이 되는지
-&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;script&amp;gt;alert('TEST');&amp;lt;/script&amp;gt;&lt;/code&gt;를 tab 파라미터로 요청한 결과로 스크립트가 구동되지 않고, 기본적으로 스크립트에 사용될 수 있는 ‘, “ 등 Escape 문자인 경우 ‘'가 붙어 응답되어 스크립트가 정상적으로 구동되지 않았고, 스크립트 삽입 시 Escape문자를 사용할 수 없는 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_4.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - XSS 구문 삽입 테스트 Escape문자로 인해 실행되지 않음 -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;Escape 문자를 사용할 수 없는 경우 다음과 그림과 같이 Javascript의 substring(), String()를 이용하여 ‘/’(인덱스 start, end)를 제외한 문자열을 다시 변수 x에 대입하여 원하는 문자열을 이용하여 스크립트를 사용할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_5.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - Javascript 테스트 -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;공격 시 사용되는 tab 파라미터를 통한 Payload는 다음과 같습니다.&lt;/p&gt;
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;nx&quot;&gt;Server&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;IP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;wordpress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;wp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;general&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;php&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;relevanssi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;relevanssi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;php&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tab&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'&amp;gt;&amp;lt;script&amp;gt;var x = String(/hackyu CVE-2018-9034 TEST/);x = x.substring(1, x.length-1);alert(x)&amp;lt;/script&amp;gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;위의 Payload를 이용하여 다음과 같이 정상적으로 스크립트가 실행되는 것을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_6.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - XSS 시도 및 결과  -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;패치 및 대응방안&lt;/strong&gt;
-&lt;br /&gt;
--Update to version
-&lt;br /&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_7.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - Relevanssi Version 4.0.4(좌), 4.0.5(우) -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;References&lt;/strong&gt;
-&lt;br /&gt;
-https://www.exploit-db.com/exploits/44366&lt;br /&gt;
-https://ppbuz.com/8644&lt;br /&gt;
-https://nvd.nist.gov/vuln/detail/CVE-2018-9034&lt;br /&gt;
-https://pluginarchive.com/wordpress/relevanssi/v/4-0-4&lt;br /&gt;
-https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
-&lt;/ul&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>hackyu</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">CVE-2018-9034 1Day Test</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
       <title type="html">CVE-2019-5736 (runC Container 취약점)</title>
       <link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
-<<<<<<< HEAD
       <published>2019-03-28T02:43:00+09:00</published>
       <updated>2019-03-28T02:43:00+09:00</updated>
-=======
-      <published>2019-03-25T09:29:00+09:00</published>
-      <updated>2019-03-25T09:29:00+09:00</updated>
->>>>>>> 42fc3c61c57b1220bfb9ac41f4f2586846302035
       <id>/runC%20Container</id>
       <content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
 
@@ -395,6 +254,138 @@ func main() {
 
       
         <summary type="html">CVE-2019-5736 (runC Container 취약점)</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
+      <title type="html">web-0x03</title>
+      <link href="/web-0x03" rel="alternate" type="text/html" title="web-0x03" />
+      <published>2019-03-25T14:00:00+09:00</published>
+      <updated>2019-03-25T14:00:00+09:00</updated>
+      <id>/web-0x03</id>
+      <content type="html" xml:base="/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘은 Wordpress 환경에서의 검색 기능을 제공하는 Relevanssi Search Plugin 4.0.4 이전버전(Version 4.0.4 포함)에서 발생한 CVE-2018-9034 XSS(Cross Site Scripting - Reflected) 취약점에 대한 포스팅입니다.&lt;br /&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;환경구성&lt;/strong&gt;&lt;br /&gt;
+    &lt;ul&gt;
+      &lt;li&gt;Apache 2.4.18&lt;br /&gt;&lt;/li&gt;
+      &lt;li&gt;PHP 7.0.30&lt;br /&gt;&lt;/li&gt;
+      &lt;li&gt;Wordpress 4.9.4&lt;br /&gt;&lt;/li&gt;
+      &lt;li&gt;Wordpress Relevanssi Search Plugin 4.0.4&lt;br /&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_1.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - CVE-2018-9034 Flow -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;다음은 취약점이 발생한 Relevanssi Search Plugin lib/interface.php를 확인해보면, tab 파라미터에 스크립트를 삽입하여 요청하는 경우 취약점이 발생이 가능한 것을 확인할 수 있습니다.&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_2.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - relevanssi.php -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_3.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - interface.php -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;취약점-공격-테스트&quot;&gt;취약점 공격 테스트&lt;/h5&gt;
+&lt;p&gt;제일 기본적으로 스크립트가 정상적으로 구동이 되는지
+&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;script&amp;gt;alert('TEST');&amp;lt;/script&amp;gt;&lt;/code&gt;를 tab 파라미터로 요청한 결과로 스크립트가 구동되지 않고, 기본적으로 스크립트에 사용될 수 있는 ‘, “ 등 Escape 문자인 경우 ‘'가 붙어 응답되어 스크립트가 정상적으로 구동되지 않았고, 스크립트 삽입 시 Escape문자를 사용할 수 없는 것을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_4.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - XSS 구문 삽입 테스트 Escape문자로 인해 실행되지 않음 -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Escape 문자를 사용할 수 없는 경우 다음과 그림과 같이 Javascript의 substring(), String()를 이용하여 ‘/’(인덱스 start, end)를 제외한 문자열을 다시 변수 x에 대입하여 원하는 문자열을 이용하여 스크립트를 사용할 수 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_5.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - Javascript 테스트 -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;공격 시 사용되는 tab 파라미터를 통한 Payload는 다음과 같습니다.&lt;/p&gt;
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;nx&quot;&gt;Server&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;IP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;wordpress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;wp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;general&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;php&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;relevanssi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;relevanssi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;php&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tab&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'&amp;gt;&amp;lt;script&amp;gt;var x = String(/hackyu CVE-2018-9034 TEST/);x = x.substring(1, x.length-1);alert(x)&amp;lt;/script&amp;gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;위의 Payload를 이용하여 다음과 같이 정상적으로 스크립트가 실행되는 것을 확인할 수 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_6.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - XSS 시도 및 결과  -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;패치 및 대응방안&lt;/strong&gt;
+&lt;br /&gt;
+-Update to version
+&lt;br /&gt;&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_7.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;  
+   - Relevanssi Version 4.0.4(좌), 4.0.5(우) -
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;References&lt;/strong&gt;
+&lt;br /&gt;
+https://www.exploit-db.com/exploits/44366&lt;br /&gt;
+https://ppbuz.com/8644&lt;br /&gt;
+https://nvd.nist.gov/vuln/detail/CVE-2018-9034&lt;br /&gt;
+https://pluginarchive.com/wordpress/relevanssi/v/4-0-4&lt;br /&gt;
+https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
+&lt;/ul&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>hackyu</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">CVE-2018-9034 1Day Test</summary>
       
 
       
@@ -1655,309 +1646,4 @@ OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어�
       
     </entry>
   
-<<<<<<< HEAD
-    <entry>
-      <title type="html">web-0x02</title>
-      <link href="/web-0x02" rel="alternate" type="text/html" title="web-0x02" />
-      <published>2019-03-11T04:00:00+09:00</published>
-      <updated>2019-03-11T04:00:00+09:00</updated>
-      <id>/web-0x02</id>
-      <content type="html" xml:base="/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
-
-&lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
-
-&lt;p&gt;오늘은 CVE-2018-12613 PHPMyAdmin LFI to RCE 취약점에 대한 포스팅입니다.&lt;br /&gt;&lt;br /&gt; 
-해당 취약점은 PMA(PHP My Admin) 버전 4.8.0 ~ 4.8.1에서 발생하는 취약점이며, index.php 요청 시 사용되는 target 파라미터의 값이 조건을 만족하게되는 경우 include()를 통해 발생되는 LFI 취약점을 이용한 RCE 공격입니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;lfi--rce&quot;&gt;LFI / RCE?&lt;/h5&gt;
-
-&lt;p&gt;LFI와 RCE 취약점에 대해 간략하게 설명드리겠습니다.&lt;br /&gt;&lt;br /&gt;
-LFI(Local File Inclusion) 취약점이란 클라이언트에 의한 서버로의 요청 시 반환하는 응답의 결과 내에 서버 내 존재하는 파일이 포함되어 노출되는 취약점을 말합니다.&lt;br /&gt;&lt;br /&gt;
-RCE(Remote Command Execution) 취약점이란 말그대로 원격 명령 실행으로 공격자가 삽입하는 또는 전달하는 값으로 서버 측의 환경에서 시스템 명령어를 실행할 수 있는 취약점을 말합니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;해당 취약점을 이해하기 위해서 세션에 대해서 간략하게 말씀드리자면, 서버가 클라이언트를 식별하는데 사용하는 일종의 별명이라고 생각하시면 될 것 같습니다. 또한, 일반적으로 세션은 서버 측에서 파일로 관리하게 됩니다.&lt;br /&gt;&lt;br /&gt;
-세션이 파일로 관리되는 부분에 대해서는 본 포스팅의 뒷부분 취약점 분석 부분에서 간략히 확인하실 수 있으실 것 같습니다. 더불어 해당 취약점은 관리자로의 접근 이후 단계에서의 진행되는 것으로 생각하시면 될 것 같습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;환경구성&lt;/strong&gt;&lt;br /&gt;
-    &lt;ul&gt;
-      &lt;li&gt;Apache 2.4.18&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;PHP 7.0.30&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;PHPMyadmin 4.8.1&lt;br /&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_1.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - LFI to RCE Vulnerability Flow -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;다음은 취약점이 발생한 PHPMyAdmin 4.8.1 소스코드 부분입니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// phpmyadmin 4.8.1 index.php line 53 ~ 62
-&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// If we have a valid target, let's load that script instead 
-&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;                            &lt;span class=&quot;c1&quot;&gt;// Request 시 target 파라미터 값 empty 야부
-&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;is_string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;                       &lt;span class=&quot;c1&quot;&gt;// Request 요청 파라미터 target 값의 타입 문자열 여부
-&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;preg_match&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'/^index/'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;//Request 요청 파라미터 target값에 'index' 문자열 매칭 여부
-&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$target_blacklist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;// equest 요청 파라미터 target의 값이 blacklist에 속해 있는지 여부
-&lt;/span&gt;    &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Core&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;checkPageValidity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;         &lt;span class=&quot;c1&quot;&gt;// Core 클래스의 checkPageValidity 함수의 인자로 호출 결과 여부
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_REQUEST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'target'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;                            &lt;span class=&quot;c1&quot;&gt;// 위의 조건이 만족하는 경우 include
-&lt;/span&gt;    &lt;span class=&quot;k&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;figure&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - PHPMyAdmin 4.8.1 index.php line 53 to 62 -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// whitelist of /phpmyadmin/libraries/Core.php
-&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$goto_whitelist&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_datadict.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_events.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;        
-    &lt;span class=&quot;s1&quot;&gt;'db_importdocsql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_multi_table_query.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_structure.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_operations.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_search.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'db_routines.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'index.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'pdf_pages.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'pdf_schema.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_binlog.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_collations.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_databases.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_engines.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_privileges.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status_advisor.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status_monitor.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status_queries.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_status_variables.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'server_variables.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_addfield.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_change.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_create.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_import.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_indexes.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_sql.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_export.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_operations.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_structure.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_relation.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_replace.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_row_action.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_select.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'tbl_zoom_select.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'transformation_overview.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'transformation_wrapper.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s1&quot;&gt;'user_password.php'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;figure&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - PHPMyAdmin 4.8.1 whitelist of phpmyadmin/libraries/Core.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// checkPageValidity of /phpmyadmin/libraries/Core.php
-&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;checkPageValidity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;array&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[])&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$goto_whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;isset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;is_string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-   &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;mb_substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-       &lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-       &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-       &lt;span class=&quot;nb&quot;&gt;mb_strpos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-   &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;urldecode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;// url decoding 
-&lt;/span&gt;   &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;mb_substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-       &lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-       &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-       &lt;span class=&quot;nb&quot;&gt;mb_strpos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'?'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-   &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;in_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$whitelist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-   &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;figure&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - PHPMyAdmin 4.8.1 checkPageValidity of phpmyadmin/libraries/Core.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;위 코드들이 해당 취약점에 발생되는 부분이며 간략하게 바로 드러나는 부분에 대해서는 주석처리로 설명하였습니다.&lt;br /&gt;&lt;br /&gt; 
-사용자가 입력한 값에 대한 검증에 미흡한 검증 절차가 있으며, checkPageValidity()에서 whitelist에 존재하는 값을 이용하여 db_sql.php?와 같이 bypass하기에 include() 함수를 이용하여 LFI가 가능한 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-공격-테스트&quot;&gt;취약점 공격 테스트&lt;/h5&gt;
-&lt;p&gt;먼저 다음과 같이 현재 php 관련 정보를 확인할 수 있는 것을 알 수 있습니다. 또한, 이번 취약점을 분석하는데 있어 중요하게 봐야할 부분 중 하나인 기본 세션 저장 경로(session_save_path)를 확인할 수 있습니다.&lt;br /&gt;&lt;br /&gt;
-현재 테스트 경로는 기본적으로 /var/lib/php/sessions라는 경로로 생성된 세션 파일이 저장되는 것으로 볼 수 있습니다.
-&lt;?php phpinfo(); ?&gt;&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_2.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - phpinfo() 결과 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;phpmyadmin으로 로그인 한 이후, SQL문을 실행할 수 있는 부분에서 다음과 같이 입력 한 후 실행하겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_3.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - SQL문 실행 시도 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;정상적으로 SQL문이 실행이 되고, 로그인 또는 페이지 접근 시 생성된 쿠키 정보 중 phpMyAdmin 세션 값을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_4.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - SQL문 실행 결과 확인 및 쿠키, 세션정보 확인 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;위에서 봤던 것과 같이 해당 경로에 이전단계에서 확인한 세션값 앞에 ‘sess_‘이라는 문자열이 연결된 세션 파일이 생성되고, 존재하는 것을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_5.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - 세션 파일 확인 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;해당 세션 파일의 내용을 확인해보면 앞서 실행하였던 SQL 쿼리문이 세션 파일 내용으로 포함된 것을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_6.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - 세션 파일 내용 확인 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;다음 그림과 같이 화이트리스트에 존재하는 목록(db_sql.php) 이용한 index.php의 파라미터 target으로 사용하며, 추가적으로 파일다운로드 취약점을 이용한 공격 시 많이 알려지고 사용되는 상대경로 ex) ../../../ 를 이용하여 세션저장경로의 세션파일 연결하여 파라미터 값으로 요청한 결과입니다.&lt;br /&gt;&lt;br /&gt;
-본 그림에서 보이는 것과 같이 앞서 실행한 SQL문이 포함되어 phpinfo()가 정상적으로 동작된 결과가 LFI를 통해 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_7.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - LFI 시도 및 결과 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;지금까지 입력한 SQL문이 세션 파일 내 포함이 되며 정상적으로 실행된 결과를 LFI를 통해 확인할 수 있는 부분까지 진행하였습니다.&lt;br /&gt;&lt;br /&gt; 본격적인 RCE를 위해 다음과 같이 SQL문을 실행하여 세션파일 내 포함하도록 합니다. 본 SQL문에 포함되는 php구문에 시스템 명렁어를 실행하는 함수 중 system() 함수를 이용하였습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_8.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - 세션 파일 내용 확인 -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;다음 그림으로 정상적으로 RCE가 가능한 것을 확인할 수 있습니다. 앞에서 수행했던 방식과 조금의 차이점은 파라미터를 포함하여 요청 하였습니다. cmd라는 파라미터로 입력한 시스템 명령어가 정상적으로 실행되는 것을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_9.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - RCE 시도 및 결과 (id) -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x02_10.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;
-   - RCE 시도 및 결과 (cat /etc/passwd) -
-&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;취약점 분석한 결과를 요약하면 다음과 같습니다.&lt;br /&gt;&lt;br /&gt;
-사용자가 실행한 SQL문이 세션 파일 내 포함됨&lt;br /&gt;
-Whitelist 값을 이용한 index.php의 target 파라미터로 요청 시 LFI 취약점 확인&lt;br /&gt;
-LFI를 이용한 원활한 RCE 사용 가능&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;패치 및 대응방안&lt;/strong&gt;
-&lt;br /&gt;
- https://www.phpmyadmin.net/files/4.8.2/ 를 통해 본 취약점과 타 취약점들에 대해서 패치가 된 버전인 4.8.2로 업데이트 된 것을 확인할 수 있습니다.&lt;br /&gt;&lt;br /&gt;
- ./phpmyadmin/libraries/classes/Core.php의 checkPageValidity()와 index.php의 checkPageValidity 호출 시 사용되는 파라미터 부분이 변경된 것을 확인하였습니다.
-&lt;br /&gt;&lt;br /&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;References&lt;/strong&gt;
-&lt;br /&gt;
-https://blog.vulnspy.com/2018/06/21/phpMyAdmin-4-8-x-Authorited-CLI-to-RCE/&lt;br /&gt;
-https://www.vulnspy.com/phpmyadmin-4.8.1/&lt;br /&gt;
-https://medium.com/@happyholic1203/phpmyadmin-4-8-0-4-8-1-remote-code-execution-257bcc146f8e&lt;br /&gt;
-https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
-&lt;/ul&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Hackyu</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1</summary>
-      
-
-      
-      
-    </entry>
-  
-=======
->>>>>>> 42fc3c61c57b1220bfb9ac41f4f2586846302035
 </feed>
