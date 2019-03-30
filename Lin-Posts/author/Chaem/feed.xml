@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="/author/Chaem/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-27T21:54:31+09:00</updated>
-  <id>/author/Chaem/feed.xml</id>
+  <link href="http://localhost:4000/author/Chaem/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
+  <updated>2019-03-30T00:41:11+09:00</updated>
+  <id>http://localhost:4000/author/Chaem/feed.xml</id>
 
   
   
@@ -41,11 +41,11 @@
   
     <entry>
       <title type="html">mobile-0x00</title>
-      <link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
+      <link href="http://localhost:4000/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
       <published>2019-03-16T06:00:00+09:00</published>
       <updated>2019-03-16T06:00:00+09:00</updated>
-      <id>/android-0x00</id>
-      <content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+      <id>http://localhost:4000/android-0x00</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
 
@@ -54,7 +54,7 @@
 
 &lt;h5 id=&quot;mobile-owasp-top-10&quot;&gt;Mobile OWASP Top 10&lt;/h5&gt;
 &lt;p&gt;OWASP(The Open Web Application Security Project)란 국제 웹 보안 표준기군이며, 웹에 관한 주요 보안 취약점들을 연구하며, 4년 마다 취약점 Top 10 을 발표하고 있습니다. 
-OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어플리케이션을 안전하게 구축하고 유지, 관리하는데 필요한 리소스를 제공하며 앞으로 일어날 수 있는 영향도와 위험성을 줄이기 위해 진행되고 있습니다. 2년 마다 취약점 Top 10을 발표하고 있으며, 현재 가장 최신 자료는 2016년 release된 자료입니다.(아래 그림 참조)
+OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어플리케이션을 안전하게 구축하고 유지, 관리하는데 필요한 리소스를 제공하며 앞으로 일어날 수 있는 영향도와 위험성을 줄이기 위해 진행되고 있습니다. 모바일은 2년 마다 취약점 Top 10을 발표하고 있으며, 현재 가장 최신 자료는 2016년 release된 자료입니다.(아래 그림 참조)
 그럼 Mobile OWASP Top 10의 각 취약점에 대해 리뷰해보도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
@@ -150,7 +150,7 @@ OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어�
 &lt;/figure&gt;
 
 &lt;p&gt;Mobile OWASP Top 10에 대해 간략히 리뷰해봤고, 자세한 내용은 원문에서 확인하실 수 있습니다.
-다음 포스트에서는 IDA를 이용해 정적 분석하는 방법을 알아보도록 하겠습니다.&lt;/p&gt;
+다음 포스팅에서는 안드로이드 정적 분석에 대해 알아보도록 하겠습니다.&lt;/p&gt;
 
 &lt;p&gt;감사합니다.&lt;/p&gt;</content>
 

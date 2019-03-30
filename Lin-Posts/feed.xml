@@ -1,4 +1,66 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-27T21:54:31+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">CVE-2019-5736 (runC Container 취약점)</title><link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" /><published>2019-03-28T02:43:00+09:00</published><updated>2019-03-28T02:43:00+09:00</updated><id>/runC%20Container</id><content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-03-30T00:41:11+09:00</updated><id>http://localhost:4000/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">android-0x01</title><link href="http://localhost:4000/android-0x01" rel="alternate" type="text/html" title="android-0x01" /><published>2019-03-29T14:00:00+09:00</published><updated>2019-03-29T14:00:00+09:00</updated><id>http://localhost:4000/android-0x01</id><content type="html" xml:base="http://localhost:4000/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
+
+&lt;p&gt;지난 포스팅에 이어서 이번에는 Android 정적 분석에 대해 포스팅 하려고 합니다.&lt;/p&gt;
+
+&lt;p&gt;Android 정적 분석은 크게 2가지로 분류할 수 있습니다.&lt;/p&gt;
+
+&lt;h4 id=&quot;-압축-해제-후-분석&quot;&gt;-압축 해제 후 분석&lt;/h4&gt;
+&lt;p&gt;첫째로 Android 앱은 .apk 파일 확장자를 가지며, 압축된 형태이므로 압축을 해제한 후 해당 파일을 분석하는 방법입니다.&lt;/p&gt;
+
+&lt;p&gt;아래 그림과 같이 apk 파일을 압축 해제하면 class.dex 파일이 생성되는 것을 확인할 수 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x01/01.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이 class.dex 파일을 dex -&amp;gt; jar -&amp;gt; java 로 decompile 하면 소스코드를 확인 할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;우선 dex2jar를 이용하여 dex -&amp;gt; jar로 decompile 합니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x01/02.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;jar 파일은 jd-gui를 이용해 decompile하여 소스코드를 확인할 수 있으며, 아래와 같이 난독화가 적용되어 있지 않으면 소스코드 분석을 통해 루팅 탐지 우회 등이 가능합니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x01/03.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;아래와 같이 jadx-gui를 이용하면 apk 파일을 바로 java 소스 코드로 확인할 수 있는 방법도 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x01/04.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;h4 id=&quot;-decompile-후-분석&quot;&gt;-Decompile 후 분석&lt;/h4&gt;
+&lt;p&gt;두번째는 apk파일을 decompile한 후 해당 파일을 분석하는 방법입니다.&lt;/p&gt;
+
+&lt;p&gt;apktool을 이용하면 아래 그림과 같이 apk 파일이 decompile되는 것을 확인할 수 있습니다.
+주요 분석 대상은 AndroidManifest 파일,  smali 코드, lib 폴더 등이 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x01/05.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;AndroidManifest.xml 파일은 해당 앱에 대한 권한 등의 필수적인 정보를 포함하고 있으며, 앱에서 불필요한 권한을 요청하고 있는지 확인해보아야 합니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x01/06.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;smali 코드는 An assembler/disassembler for Android’s dex format의 약자로 코드 분석을 통해 실행 원리를 파악할 수 있습니다. 따라서 코드 수정 후 리패키징을 통해 앱 변조가 가능합니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x01/07.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x01/08.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;lib 폴더 내에는 동적라이브러리인 *.so 파일을 포함하며, 보통 보안 솔루션들이 동적 라이브러리로 존재하고 있습니다. 아래 그림과 같이 IDA를 통해 분석이 가능하며, 보안 솔루션에서 루팅을 탐지하는 로직을 확인할 수 있습니다.&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x01/09.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;지금까지 Android 정적 분석에 대해 알아보았고, 다음 포스팅에서는 Android 동적 분석에 대해 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>chaem</name></author><category term="Posts" /><summary type="html">Android 정적 분석</summary></entry><entry><title type="html">CVE-2019-5736 (runC Container 취약점)</title><link href="http://localhost:4000/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" /><published>2019-03-28T02:43:00+09:00</published><updated>2019-03-28T02:43:00+09:00</updated><id>http://localhost:4000/runC%20Container</id><content type="html" xml:base="http://localhost:4000/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
 
@@ -185,7 +247,7 @@ func main() {
   &lt;li&gt;https://github.com/rancher/runc-cve&lt;/li&gt;
   &lt;li&gt;https://github.com/Frichetten/CVE-2019-5736-PoC&lt;/li&gt;
   &lt;li&gt;https://subicura.com/2017/01/19/docker-guide-for-beginners-1.html&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">CVE-2019-5736 (runC Container 취약점)</summary></entry><entry><title type="html">web-0x03</title><link href="/web-0x03" rel="alternate" type="text/html" title="web-0x03" /><published>2019-03-25T14:00:00+09:00</published><updated>2019-03-25T14:00:00+09:00</updated><id>/web-0x03</id><content type="html" xml:base="/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">CVE-2019-5736 (runC Container 취약점)</summary></entry><entry><title type="html">web-0x03</title><link href="http://localhost:4000/web-0x03" rel="alternate" type="text/html" title="web-0x03" /><published>2019-03-25T14:00:00+09:00</published><updated>2019-03-25T14:00:00+09:00</updated><id>http://localhost:4000/web-0x03</id><content type="html" xml:base="http://localhost:4000/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -283,7 +345,7 @@ https://ppbuz.com/8644&lt;br /&gt;
 https://nvd.nist.gov/vuln/detail/CVE-2018-9034&lt;br /&gt;
 https://pluginarchive.com/wordpress/relevanssi/v/4-0-4&lt;br /&gt;
 https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">CVE-2018-9034 1Day Test</summary></entry><entry><title type="html">windows-0x09</title><link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" /><published>2019-03-24T20:18:00+09:00</published><updated>2019-03-24T20:18:00+09:00</updated><id>/windows-0x09</id><content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>hackyu</name></author><category term="Posts" /><summary type="html">CVE-2018-9034 1Day Test</summary></entry><entry><title type="html">windows-0x09</title><link href="http://localhost:4000/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" /><published>2019-03-24T20:18:00+09:00</published><updated>2019-03-24T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x09</id><content type="html" xml:base="http://localhost:4000/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -406,7 +468,7 @@ https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
 
 &lt;p&gt;지금까지 DEP에 대해서 알아봤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 연재부터는 Heap Exploit으로 찾아뵙도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x09 DEP(3)</summary></entry><entry><title type="html">linux_0x04</title><link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-03-24T15:18:00+09:00</published><updated>2019-03-24T15:18:00+09:00</updated><id>/linux_0x04</id><content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+&lt;p&gt;다음 연재부터는 Heap Exploit으로 찾아뵙도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x09 DEP(3)</summary></entry><entry><title type="html">linux_0x04</title><link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-03-24T15:18:00+09:00</published><updated>2019-03-24T15:18:00+09:00</updated><id>http://localhost:4000/linux_0x04</id><content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
@@ -636,7 +698,7 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 
 &lt;p&gt;다음 포스팅은 Chaining RTL이란 것을 정말…간단히 볼 수 있도록 해보겠습니다.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;뿅!&lt;/strong&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL(Return to Library)</summary></entry><entry><title type="html">windows-0x08</title><link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" /><published>2019-03-19T20:18:00+09:00</published><updated>2019-03-19T20:18:00+09:00</updated><id>/windows-0x08</id><content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;뿅!&lt;/strong&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL(Return to Library)</summary></entry><entry><title type="html">windows-0x08</title><link href="http://localhost:4000/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" /><published>2019-03-19T20:18:00+09:00</published><updated>2019-03-19T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x08</id><content type="html" xml:base="http://localhost:4000/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -739,7 +801,7 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 
 &lt;p&gt;자, 이제 ROP를 하기 위한 기초 준비 작업을 모두 마쳤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 Post에서 ROP를 알아보고 DEP편을 마무리 짓도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x08 DEP(2)</summary></entry><entry><title type="html">windows-0x07</title><link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" /><published>2019-03-19T19:18:00+09:00</published><updated>2019-03-19T19:18:00+09:00</updated><id>/windows-0x07</id><content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+&lt;p&gt;다음 Post에서 ROP를 알아보고 DEP편을 마무리 짓도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x08 DEP(2)</summary></entry><entry><title type="html">windows-0x07</title><link href="http://localhost:4000/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" /><published>2019-03-19T19:18:00+09:00</published><updated>2019-03-19T19:18:00+09:00</updated><id>http://localhost:4000/windows-0x07</id><content type="html" xml:base="http://localhost:4000/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -871,7 +933,7 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 
 &lt;p&gt;그래서 이 기법은 ROP를 위한 기본 개념 정도로만 이해하시기 바랍니다.&lt;/p&gt;
 
-&lt;p&gt;글이 너무 길어졌네요. 이만 줄이고 다음 편에서 ROP를 알아보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x07 DEP(1)</summary></entry><entry><title type="html">windows-0x06</title><link href="/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" /><published>2019-03-18T19:18:00+09:00</published><updated>2019-03-18T19:18:00+09:00</updated><id>/windows-0x06</id><content type="html" xml:base="/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+&lt;p&gt;글이 너무 길어졌네요. 이만 줄이고 다음 편에서 ROP를 알아보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x07 DEP(1)</summary></entry><entry><title type="html">windows-0x06</title><link href="http://localhost:4000/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" /><published>2019-03-18T19:18:00+09:00</published><updated>2019-03-18T19:18:00+09:00</updated><id>http://localhost:4000/windows-0x06</id><content type="html" xml:base="http://localhost:4000/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
 
@@ -909,7 +971,7 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 
 &lt;p&gt;이 중에 SafeSEH가 적용되어 있지 않은 Module을 골라서 우회 공격을 동일하게 진행하면 됩니다.&lt;/p&gt;
 
-&lt;p&gt;이상으로 GS편을 모두 마치겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x06 GS(2)</summary></entry><entry><title type="html">DLL Hijacking &amp;amp; Ghidra</title><link href="/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" /><published>2019-03-17T19:18:00+09:00</published><updated>2019-03-17T19:18:00+09:00</updated><id>/Dll%20Hijacking%20&amp;%20Ghidra</id><content type="html" xml:base="/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+&lt;p&gt;이상으로 GS편을 모두 마치겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x06 GS(2)</summary></entry><entry><title type="html">DLL Hijacking &amp;amp; Ghidra</title><link href="http://localhost:4000/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" /><published>2019-03-17T19:18:00+09:00</published><updated>2019-03-17T19:18:00+09:00</updated><id>http://localhost:4000/Dll%20Hijacking%20&amp;%20Ghidra</id><content type="html" xml:base="http://localhost:4000/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -1026,7 +1088,7 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
 
 &lt;p&gt;계산기가 잘 실행되네요. ^^&lt;/p&gt;
 
-&lt;p&gt;지금까지 DLL Hijacking에 대해서 알아봤습니다. 뿅!&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">DLL Hijacking &amp;amp; Ghidra</summary></entry><entry><title type="html">mobile-0x00</title><link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" /><published>2019-03-16T06:00:00+09:00</published><updated>2019-03-16T06:00:00+09:00</updated><id>/android-0x00</id><content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+&lt;p&gt;지금까지 DLL Hijacking에 대해서 알아봤습니다. 뿅!&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">DLL Hijacking &amp;amp; Ghidra</summary></entry><entry><title type="html">mobile-0x00</title><link href="http://localhost:4000/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" /><published>2019-03-16T06:00:00+09:00</published><updated>2019-03-16T06:00:00+09:00</updated><id>http://localhost:4000/android-0x00</id><content type="html" xml:base="http://localhost:4000/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
 
@@ -1035,7 +1097,7 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
 
 &lt;h5 id=&quot;mobile-owasp-top-10&quot;&gt;Mobile OWASP Top 10&lt;/h5&gt;
 &lt;p&gt;OWASP(The Open Web Application Security Project)란 국제 웹 보안 표준기군이며, 웹에 관한 주요 보안 취약점들을 연구하며, 4년 마다 취약점 Top 10 을 발표하고 있습니다. 
-OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어플리케이션을 안전하게 구축하고 유지, 관리하는데 필요한 리소스를 제공하며 앞으로 일어날 수 있는 영향도와 위험성을 줄이기 위해 진행되고 있습니다. 2년 마다 취약점 Top 10을 발표하고 있으며, 현재 가장 최신 자료는 2016년 release된 자료입니다.(아래 그림 참조)
+OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어플리케이션을 안전하게 구축하고 유지, 관리하는데 필요한 리소스를 제공하며 앞으로 일어날 수 있는 영향도와 위험성을 줄이기 위해 진행되고 있습니다. 모바일은 2년 마다 취약점 Top 10을 발표하고 있으며, 현재 가장 최신 자료는 2016년 release된 자료입니다.(아래 그림 참조)
 그럼 Mobile OWASP Top 10의 각 취약점에 대해 리뷰해보도록 하겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
@@ -1131,138 +1193,6 @@ OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어�
 &lt;/figure&gt;
 
 &lt;p&gt;Mobile OWASP Top 10에 대해 간략히 리뷰해봤고, 자세한 내용은 원문에서 확인하실 수 있습니다.
-다음 포스트에서는 IDA를 이용해 정적 분석하는 방법을 알아보도록 하겠습니다.&lt;/p&gt;
+다음 포스팅에서는 안드로이드 정적 분석에 대해 알아보도록 하겠습니다.&lt;/p&gt;
 
-&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">0x00. Introduction</summary></entry><entry><title type="html">linux_0x03</title><link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" /><published>2019-03-11T19:18:00+09:00</published><updated>2019-03-11T19:18:00+09:00</updated><id>/linux_0x03</id><content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
-
-&lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
-
-&lt;p&gt;이번에는 저번 시간에 이어서 &lt;strong&gt;Basic BOF&lt;/strong&gt; 또는 &lt;strong&gt;Direct EIP overwrite&lt;/strong&gt; 라고 불리는 기본적인 BOF와 메모리 보호 기법에 대해서 알아 보겠습니다.&lt;/p&gt;
-
-&lt;h1 id=&quot;basic-bof-준비&quot;&gt;Basic BOF 준비&lt;/h1&gt;
-
-&lt;p&gt;지난 시간에 &lt;strong&gt;RET&lt;/strong&gt;구역 즉, EIP 값이 저장되는 구역에 “&lt;strong&gt;HACK&lt;/strong&gt; “ 저장됨을 확인했습니다. 이 말은 공격자가 RET 구역에 원래 있어야 할 값을 임의의 값으로 변경이 가능 하다는 말이죠.  초기에 레지스터의 역할을 간략히 설명 드릴때 &lt;strong&gt;EIP&lt;/strong&gt; 레지스터의 역할은 “&lt;strong&gt;다음 명령의 주소를 가리킨다”&lt;/strong&gt;라고 했었죠. 이것을 노려서 공격자는 &lt;strong&gt;EIP&lt;/strong&gt;에 원하는 주소값을 저장해 공격을 이어갑니다. 명령어가 종료 된 후 &lt;strong&gt;EIP&lt;/strong&gt; 주소를 참조해 공격자가 미리 지정한 주소로 이동하여 명령을 이어가죠. 이 때 공격자는 shell을 따 내는것이 최종 목표입니다. 물론 굳이 shell 아니더라도 원하는 행위만 미리 구현해 둔다면 실행이 될 것 입니다.&lt;/p&gt;
-
-&lt;p&gt;말이 주절주절 길어졌는데 간략한 그림으로 표현 해보죠.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-1.png&quot; alt=&quot;[그림 3-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;지난 포스팅에서 다룬 내용과 비슷합니다. &lt;strong&gt;함수 프롤로그&lt;/strong&gt; 과정이 지난 후에 버퍼 크기만큼 공간을 확보 후 함수가 진행되고 함수 종료후 &lt;strong&gt;ret&lt;/strong&gt; 구역에 저장되있는 주소를 참조하여 이동 합니다. 위 그림과 같이 &lt;strong&gt;Shellcode&lt;/strong&gt;가 저장되있는 임의의 주소가 될 것이며 해당 주소 이동 후 &lt;strong&gt;Shellcode&lt;/strong&gt;가 실행 되어 공격자가 원하는 행위를 하게 되는 것이죠!!&lt;/p&gt;
-
-&lt;p&gt;그런데, Shellcode, Shellcode, 쉘코드 하는데 이게 뭐하는 놈일까요? 명칭의 기원은 모르나 역할만은 분명합니다. 이름 그대로 shell을 따내는 code이죠. 위에서도 계속 말했듯이 공격자가 원하는 행위를 수행하도록 하는게 목표라고 했죠. 파일을 생성하든, 삭제하든 passwd, shadow 및 각종 config 파일 과 같은 중요 파일을 대상으로 뭔가를 행위를 하도록 하면 됩니다. 단지 이 모든걸 한방에 할 수 있는건 shell을 따냄으로서 해결됩니다. 물론 권한 문제가 필요하기에 root권한이 필요할겁니다. 쉽게 표현 하자면 감기약, 두통약, 치통약, 변비약 등등 이것저것 챙겨 먹을 필요없이 만병통치약 하나 먹으면 된다는 것이죠. &lt;strong&gt;shellcode&lt;/strong&gt;는 이미 인터넷에 다양하게 생성되있습니다. 해당 코드를 따와서 사용해도 되고, 직접 만들어서 사용해도 됩니다. &lt;strong&gt;shellcode&lt;/strong&gt; 작성 방법에 대해서는 나중에 따로 다뤄보도록 하곘습니다.&lt;/p&gt;
-
-&lt;p&gt;그럼 &lt;strong&gt;Shellcode&lt;/strong&gt;가 뭔지는 알았으니 이놈을 써서 직접 BOF를 해봐야 하는데 문제가 하나 있습니다. 지금까지 설명한 내용처럼 사용자가 메모리의 주소를 알고 있는 상태 즉, 메모리의 주소값이 고정값이라면 공격이 쉬워 지기에 이를 방어하기 위해서 메모리의 주소값을 랜덤으로 부여 합니다.(&lt;strong&gt;ASLR&lt;/strong&gt;) 다음 사진을 보시죠.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-2.png&quot; alt=&quot;[그림 3-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;붉은 박스에서 보여지듯 ESP의 메모리 주소는 계속 바뀝니다.(사실 잘 보시면 완전 랜덤화는 아닙니다….끝에만 바뀌고 있죠…) 즉, 프로그램이 시작 될 때마다 할당받는 메모리의 주소값이 바뀌는 것이죠. 그럼 어찌 해야 할까요?? 가장 간단한 방법은 메모리의 주소가 안바뀐다면?? 메모리의 주소가 항상 고정된 주소를 사용하는 뭔가가 있지 않을까??라는 생각을 하게됩니다. 그런게 뭐가 있을까요?? 고정된 메모리 주소값을 가지며  쉽게 다룰 수 있는???&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;황경변수&lt;/strong&gt;는 항상 고정된 메모리 주소값을 가집니다.&lt;/p&gt;
-
-&lt;h1 id=&quot;환경변수&quot;&gt;환경변수&lt;/h1&gt;
-
-&lt;p&gt;환경변수의 역할은 OS가 필요한 정보들을 미리 메모리에 등록해서 필요할떄 바로바로 해당 내용들을 참조합니다. python, java 또는 서버 구축 후에 환경변수를 등록해서 쉽게 구동시키는 작업을 생각한다면 이해가 되실겁니다.(실행경로를 환경 변수 등록하는 과정….JAVA_HOME이 대표적이죠.)&lt;/p&gt;
-
-&lt;p&gt;미리 등록해서 번거롭게 설치된 위치로 이동해서 실행한는 것이 아니라 간편하게 바로바로 실행할 수 있도록 경로를 환경변수로 등록 하는것이죠. 자연스럽게 아셨겠지만 이 환경변수는 사용자가 직접 등록해서 사용할 수 있다는것도 아실겁니다. 미리 운영체제에 필요한 내용들이 등록되있고 사용자의 필요로 인한 내용을 등록해서 사용도 가능하죠.&lt;/p&gt;
-
-&lt;p&gt;그렇다면 환경변수의 주소를 어떻게 알 수 있을까요? 다음과 같은 코드를 작성해서 우리가 원하는 환경변수의 주소값을 출력 가능합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-3.png&quot; alt=&quot;[그림 3-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;코드는 간단합니다. argv[]로 입력받은 값을 addr에 저장 합니다. 이떄 addr은 char형트로 포인터가 붙어있어서 주소값 형태로 저장 됩니다.
-위 코드를 작성 하고 해당 프로그램을 실행하면 다음과 입력한 환경변수의 주소값을 출력해줍니다. 또한 환경변수의 주소값이 변하지 않는다는것 또한 확인 가능합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-4.png&quot; alt=&quot;[그림 3-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;거의 다 되갑니다…. 이제 공격의 환경을 만들어 볼까 합니다. 우리는 shell을 따내는것이 목표이지만 더 정확히 말하자면 &lt;strong&gt;root 권한&lt;/strong&gt;을 얻는것이 목표입니다. shell을 따도 &lt;strong&gt;root 권한&lt;/strong&gt;이 없을경우 제한적인 권한을 가지게 되죠. 그런데 &lt;strong&gt;setuid&lt;/strong&gt;가 설정 되어있는 경우 이런 문제가 해결 됩니다. 이유는 &lt;strong&gt;setuid&lt;/strong&gt;가 설정된 파일을 실행하는 동안은 해당 파일의 소유권자와 동일한 권한을 부여 받습니다. root 계정이 a파일을 &lt;strong&gt;setuid&lt;/strong&gt; 권한으로 설정헀다면 일반 계정이 해당 파일을 실행하는 동안은 &lt;strong&gt;root 권한&lt;/strong&gt;을 부여 받는것이죠. 실제로 root권한을 부여 받는지 확인을 위해 일반 계정으로 변경 해줍니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-5.png&quot; alt=&quot;[그림 3-5]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;추가로 언어팩도 아래와 같이 변경해 줍니다. 이떄 계정은 일반 계정으로 변경하고 진행 해줍니다. 기본 셋팅은 UTF-8로 설정되어 있는데 영어의 경우 한 글자 당 1바이트를 사용합니다. 추후에 쉘코드 입력시 값이 1바이트를 넘는다면 의도된 값으로 입력되지 않기 때문에 2바이트를 사용하는 한글로 변경 해야하죠. (ASCII (7bit 인식)와 UNICODE(8bit 인식)의 인식 차이입니다.)&lt;/p&gt;
-
-&lt;p&gt;쉽게 말해 공격수행에 문제가 생기기 때문에 바꿔주는 것입니다. 환경변수를 바꾸는 방법은 &lt;strong&gt;export&lt;/strong&gt; 명령어를 사용하며 아래와 같이 진행됩니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-6.png&quot; alt=&quot;[그림 3-6]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;지금부터는 일반계정(sulla)으로 변경하여 진행 합니다. 환경은 준비가 끝났고 이제 본격적으로 일반계정으로 BOF를 시도하여 root 권한의 shell을 따보도록 합시다.&lt;/p&gt;
-
-&lt;h1 id=&quot;basic-bof-진짜-시작&quot;&gt;Basic BOF 진짜 시작&lt;/h1&gt;
-
-&lt;p&gt;시작 전에 정리하자면 아래와 같습니다.&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;고정된 메모리 주소를 사용하는 환경변수를 이용해 &lt;strong&gt;shellcode&lt;/strong&gt;를 환경변수에 저장하고 해당 황경변수의 주소를 알아냅니다.&lt;/li&gt;
-  &lt;li&gt;쉘코드가 저장된 환경변수의 메모리 주소를 취약한 bof1 파일에 삽입합니다.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;즉, 공격 페이로드는 이런 모습으로 구성될 것 입니다 [&lt;strong&gt;44byte 잉여값&lt;/strong&gt;] + [&lt;strong&gt;4byte 환경변수 주소&lt;/strong&gt;]&lt;/p&gt;
-
-&lt;p&gt;그럼 1번 과정 부터 먼저 해보도록 합시다.&lt;/p&gt;
-
-&lt;p&gt;환경변수를 설정해야 하니 &lt;strong&gt;export&lt;/strong&gt; 명령어를 사용해서 환경변수 명과 내용을 채워보도록 하죠. 공격용 쉘코드는 다음과 같습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;\x31\xc0\x89\xc3\xb0\x17\xcd\x80\xeb\x0f\x5e\x31\xc0\x50\x89\xe2\x56\x89\xe1\x89\xf3\xb0\x0b\xcd\x80\xe8\xec\xff\xff\xff\x2f\x62\x69\x6e\x2f\x73\x68
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;이 길다란 코드를 아래와 같이 환경변수로 저장하고 주소까지 확인해줍니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-7.png&quot; alt=&quot;[그림 3-7]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;bof라는 이름으로 환경변수를 만들었습니다. 환경변수 내용은 /bin/sh 를 실행하는 내용이며 해당 환경변수의 주소를 확인하니 &lt;strong&gt;0xbffffee9&lt;/strong&gt;의 주소값을 가지고 있습니다. 이로써 1번 과정을 끝났습니다. 이제 2번 과정을 진행해 봅시다. 그림으로 표현하자면 아래와 같이 보여지겠네요.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-8.png&quot; alt=&quot;[그림 3-8]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;공격 페이로드는 저번 시간에서 작성했던 방식과 동일합니다.&lt;/p&gt;
-
-&lt;p&gt;단, 지난 시간에서는 버퍼 영역에 “&lt;strong&gt;A&lt;/strong&gt;” 40byte와 sfp 영역에 “&lt;strong&gt;B&lt;/strong&gt;” 4byte  마지막으로 ret 영역에 “&lt;strong&gt;HACK&lt;/strong&gt;“를 저장 헀습니다. 즉, 잉여 데이터 44byte를 입력했고 ret에 원하는 4byte를 입력하는 과정이었습니다.&lt;/p&gt;
-
-&lt;p&gt;지금부터는 “&lt;strong&gt;HACK&lt;/strong&gt;“이 아닌 위에서 알아낸 &lt;strong&gt;환경변수의 주소값&lt;/strong&gt;을 입력 할것입니다. 물론 sfp 영역의 “B” 또한 잉여 데이터기에 “A”로 통일해서 입력 합니다.(그동안은 각 영역을 구분하기 위해 A B HACK 로 나눠서 입력했습니다…..) 주의점은 환경변수의 주소값은 &lt;strong&gt;리틀엔디안&lt;/strong&gt; 형식으로 입력해 줍니다. 그럼 아래와 같이 공격 페이로드가 완성 됩니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./bof1 `python -c 'print &quot;A&quot;*11 + &quot;\xe9\xfe\xff\xbf&quot;'`
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;작성된 페이로드를 입력 하게 되면 아래와 같이 shell이 떨어지며 가장 중요한 점은 shell의 &lt;strong&gt;uid&lt;/strong&gt;권한이 &lt;strong&gt;root&lt;/strong&gt;권한임을 확인할 수 있습니다!!!!&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x03/0x03-9.png&quot; alt=&quot;[그림 3-9]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;이렇게해서 드디어 root권한의 shell을 따내는데 성공 헀습니다. 앞에서 설정헀던 &lt;strong&gt;setuid&lt;/strong&gt;를 해체한 상태로 진행하면 &lt;strong&gt;uid&lt;/strong&gt;가 &lt;strong&gt;root&lt;/strong&gt;가 아닌 일반 계정(sulla)으로 설정 됨을 확인하실 수 있습니다.&lt;/p&gt;
-
-&lt;h1 id=&quot;메모리-보호-기법&quot;&gt;메모리 보호 기법&lt;/h1&gt;
-
-&lt;p&gt;위에서 말헀던 메모리의 주소를 랜덤화 하는 메모리 보호기법을 &lt;strong&gt;ASLR(Address Space Layout Randomization)&lt;/strong&gt; 이라고 부릅니다. &lt;strong&gt;ASLR&lt;/strong&gt; 외의 다양한 보호 기법이 있는데 알아보도록 하죠.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;ASLR :&lt;/strong&gt; 프로세스가 실행될 떄마다 메모리의 주소를 랜덤화 합니다.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;DEP/NX bit :&lt;/strong&gt; Stack/Heap등 메모리 영역에 실행 권한을 없애 코드 실행을 막습니다.( 쉽게 말해 Stack/heap 영역에 저장된 Shellcode의 실행을 막는다는 겁니다.)&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;CANARY :&lt;/strong&gt; 메모리에 무결성 확인을 위해 버퍼 영역과 SFP 영역 사이에 특정한 값을 설정 합니다. (네트워크의 패킷 무결성을 위한 패리티 비트와 비슷한 역할이라 생각하면 편합니다.)&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ASCII-Armor :&lt;/strong&gt; 공유 라이브러리 영역 상위에 NULL값을 삽입하여 호출을 막습니다.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;이외에도 더 있습니다. 이러한 메모리 보호 기법이 하나, 둘 적용 되면서 우회기법이 생기고 묻히고 생기고 묻히길 반복합니다. 다들 아시겠지만 많이 보이던 패턴이죠. 
-(취약점 &amp;gt; 대응 &amp;gt; 우회 &amp;gt; 대응 &amp;gt;우회 &amp;gt; 대응 &amp;gt; 우회 &amp;gt; 대응 &amp;gt; 우회 &amp;gt; 대응) * 무한 반복&lt;/p&gt;
-
-&lt;p&gt;앞으로는 Basic BOF를 중심으로 어떤 보호기법이 생겼고 그 우회 방법은 어떤것이 있는지 또 그 우회 방법의 어떤 대응법이 있고 또 다시 대응법의 새로운 우회ㅂ…..후……&lt;/p&gt;
-
-&lt;p&gt;천천히 오늘 했던 방식처럼 하나 하나씩 알아보도록 하겠습니다.
-고생하셨습니다. 다음 포스팅까지 차근차근 준비해서 다시 뵙겠습니다.&lt;/p&gt;
-
-&lt;p&gt;감사합니다!
-&lt;strong&gt;뿅&lt;/strong&gt;!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">0x03 - Basic BOF &amp;amp; 메모리 보호 기법</summary></entry></feed>
+&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">0x00. Introduction</summary></entry></feed>
