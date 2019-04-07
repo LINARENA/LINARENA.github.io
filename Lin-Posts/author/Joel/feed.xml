@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-03-30T15:31:35+09:00</updated>
+  <updated>2019-04-07T14:41:55+09:00</updated>
   <id>/author/Joel/feed.xml</id>
 
   
@@ -38,6 +38,186 @@
   
   
 
+  
+    <entry>
+      <title type="html">Windows-Heap 정의</title>
+      <link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
+      <published>2019-04-02T20:18:00+09:00</published>
+      <updated>2019-04-02T20:18:00+09:00</updated>
+      <id>/windows-0x0a</id>
+      <content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘부터는 Windows Heap에 대해 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;what-is-heap&quot;&gt;What is Heap?&lt;/h5&gt;
+
+&lt;p&gt;Heap은 프로세스가 실행되는 동안 메모리를 필요한만큼 동적으로 할당하여 사용하는 영역입니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 c/c++에서는 malloc, new 함수를 사용하여 Heap 영역을 할당받아 사용합니다.&lt;/p&gt;
+
+&lt;p&gt;윈도우에서는 힙을 이용할 수 있도록 API 함수들을 제공하고 있는데 대표적인 윈도우 힙 함수는 다음과 같습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;HeapCreate : 힙을 생성합니다.&lt;/li&gt;
+  &lt;li&gt;HeapDestroy : 힙을 삭제합니다.&lt;/li&gt;
+  &lt;li&gt;HeapAlloc : 힙 블록을 할당합니다.&lt;/li&gt;
+  &lt;li&gt;HeapFree : 할당된 힙 블록을 해제합니다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;이 정도는 이미 알고 계실거라 생각합니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 조금만 더 상세하게 알아볼게요.&lt;/p&gt;
+
+&lt;h5 id=&quot;process-heap&quot;&gt;Process Heap&lt;/h5&gt;
+
+&lt;p&gt;Process가 시작되면 최소한 하나의 기본 Process Heap(또는 Default Heap)이 생성됩니다.&lt;/p&gt;
+
+&lt;p&gt;이 Process Heap은 Process 시작 시에 생성되고(기본 크기는 1MB) Process가 종료될 때까지 없어지지 않는 특징이 있습니다.&lt;/p&gt;
+
+&lt;p&gt;흔히 사용하는 malloc, new는 Process Heap에서 할당하는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;이 기본 Heap은 프로그램 내에서 명시적으로 사용될 수도 있고 윈도우 내부 함수에 의해 암묵적으로 사용될 수도 있는데 프로그램에서 GetProcessHeap을 이용해 기본 Process Heap을 구할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;요약을 해보자면, Process가 시작되면 기본 Heap이 생성된다는 것과 malloc, new를 이용해서 아래 그림처럼 Heap을 할당받아 사용한다는 것입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;지금까지 기본 Heap에 대한 설명을 했는데요,&lt;/p&gt;
+
+&lt;p&gt;지금부터는 위 그림처럼 하나만 할당받는 것이 아닌 다양한 크기의 Heap 공간을 반복적으로 할당/해제하는 경우를 한 번 생각해보겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;heap-fragmentation&quot;&gt;Heap Fragmentation&lt;/h5&gt;
+
+&lt;p&gt;사용자가 Heap 공간을 쓰기 위해 할당을 요청하면 사용가능한 “연속된” 공간이 할당됩니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 다양한 크기의 Heap 공간을 요청하고 해제한다고 생각해봅시다.&lt;/p&gt;
+
+&lt;p&gt;분명 할당받은 순서대로 해제하지는 않겠죠?&lt;/p&gt;
+
+&lt;p&gt;정해진 순서없이 다양한 크기의 Heap이 할당되고 해제된다면, 아래 그림처럼 특정 순간에는 원하는 크기의 Heap을 할당해줄 수 없는 순간이 올 겁니다.&lt;/p&gt;
+
+&lt;p&gt;이를 Heap Fragmentation(힙 단편화)이라고 합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림에서 보듯, 남은 메모리 용량의 총합은 할당을 원하는 객체의 크기보다 크지만 연속된 공간을 할당해 줄 수 없는 상황이 옵니다.&lt;/p&gt;
+
+&lt;p&gt;윈도우는 이러한 단편화 문제를 해결하기 위해서 특별한 방식들을 사용하고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이 방식들을 살펴보면서 Heap에 대한 이해를 더 높여보겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;free-list&quot;&gt;Free List&lt;/h5&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+&lt;center&gt;http://www.slideshare.net/ffri/mr201312-history-and-current-state-of-heap-exploit-eng&lt;/center&gt;
+
+&lt;p&gt;Free List란 말 그대로 해제된 Heap 메모리들을 담아두는 List입니다.&lt;/p&gt;
+
+&lt;p&gt;어떤 메모리를 할당해서 사용하고 난 뒤, 해제를 하면 그 메모리는 Free List에 들어가게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 다음 메모리를 할당하려고 하면 Heap 공간을 바로 쓰게 해주는 것이 아니라 Free List를 먼저 살펴봅니다.&lt;/p&gt;
+
+&lt;p&gt;Free List에 적합한 크기의 Heap 메모리가 있을 경우는 해당 메모리를 할당해줍니다.&lt;/p&gt;
+
+&lt;p&gt;만약 적절한 크기의 메모리가 없다면 요청한 크기만큼의 Heap을 새로 할당해주는 방식입니다.&lt;/p&gt;
+
+&lt;p&gt;예를 들어, 프로그램이 시작된 후 처음으로 0x20 크기의 Heap을 요청했다고 가정하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;해제된 메모리가 없으니 Free List는 비어있겠죠?&lt;/p&gt;
+
+&lt;p&gt;그럼 Heap의 할당은 다음 그림처럼 이루어집니다.&lt;/p&gt;
+
+&lt;p&gt;(실제로는 0x20 + Heap Header 크기만큼 할당이 이루어집니다.)&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그런 다음 이 메모리를 해제하게 되면 이 메모리는 Free List에 들어가게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;이후 프로그램이 다시 0x30 크기의 Heap을 요청하면 Free List를 먼저 살펴봅니다.&lt;/p&gt;
+
+&lt;p&gt;0x30을 할당할 수 있을 만한 크기가 없기 때문에 새로 0x30만큼의 메모리를 할당해줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이번에는 0x10만큼의 메모리 할당 요청이 들어왔다고 가정하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;이번에도 Heap 관리자는 Free List를 먼저 살펴보겠지요?&lt;/p&gt;
+
+&lt;p&gt;Heap 관리자는 Best-Fit 정책을 사용하고 있기 때문에 최대한 적합한 크기의 Heap을 할당하려고 합니다.&lt;/p&gt;
+
+&lt;p&gt;지금 상황에서는 0x30이 제일 적합한 메모리가 되겠네요.&lt;/p&gt;
+
+&lt;p&gt;이 0x30 메모리를 모두 할당하는 것이 아니라 메모리를 분할하여 0x10만큼만 할당을 해줍니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 이런 방식을 사용하는 환경에서 작은 메모리 요청/해제가 빈번하게 일어나면 어떻게 될까요?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;작은 메모리 조각이 계속해서 발생할 것이고 이를 관리하는 것에 한계가 생길 겁니다.&lt;/p&gt;
+
+&lt;p&gt;이런 현상을 개선하기 위해서 최신 윈도우에서는 Low Fragmentation Heap이라는 정책을 도입했습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;low-fragmentation-heap&quot;&gt;Low Fragmentation Heap&lt;/h5&gt;
+
+&lt;p&gt;Low Fragmentation Heap(저단편화 힙)은 말 그대로 위에서 살펴본 Free List 방식에서 발생하는 단편화 현상을 줄이기 위해 도입되었습니다.&lt;/p&gt;
+
+&lt;p&gt;Free List에서는 Heap을 계속해서 분할하는 방식이기 때문에 단편화 문제가 있다고 했었죠?&lt;/p&gt;
+
+&lt;p&gt;그래서 Low Fragmentation Heap은 Bucket이라는 미리 정의된 서로 다른 크기의 범위를 갖는 블록을 관리함으로써 단편화를 해결합니다.&lt;/p&gt;
+
+&lt;p&gt;쉽게 이야기해서, 미리 여러 크기로 Heap 공간을 분할해놓고 할당 요청이 오면 해당 크기를 포함하는 가장 작은 Bucket을 선택해 할당합니다.&lt;/p&gt;
+
+&lt;p&gt;Bucket은 총 128개인데 첫 번째 Bucket은 1~8바이트, 두 번째는 9~16바이트 식으로 8바이트 단위로 구분되며, 마지막 Bucket은 15873~16384 바이트 크기까지 지원할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;만약 요청된 크기가 16384 바이트보다 크다면 Backend로 요청을 보냅니다.&lt;/p&gt;
+
+&lt;p&gt;Backend로 요청이 이루어지면 Free List 방식으로 Heap 할당을 진행합니다.&lt;/p&gt;
+
+&lt;p&gt;즉, Low Fragmentation Heap 기법은 미리 Bucket으로 나누어서 적합한 메모리를 찾는 속도를 증가시키고, 크기별 Free List들을 Lookaside List에 나누어 관리하는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;지금까지 Windows Heap 대해 알아봤습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 시간부터는 Heap에 대한 공격 기법을 살펴보도록 하겠습니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x0a Windows-Heap</summary>
+      
+
+      
+      
+    </entry>
   
     <entry>
       <title type="html">windows-0x09</title>
@@ -1020,154 +1200,6 @@ JMP ESP의 주소를 찾을 수 있게 됩니다.&lt;/p&gt;
     </entry>
   
     <entry>
-      <title type="html">windows-0x02</title>
-      <link href="/windows-0x02" rel="alternate" type="text/html" title="windows-0x02" />
-      <published>2019-02-18T19:18:00+09:00</published>
-      <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>/windows-0x02</id>
-      <content type="html" xml:base="/windows-0x02">&lt;h1 id=&quot;0x02-stack&quot;&gt;0x02 STACK&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-the-stack&quot;&gt;What is the STACK?&lt;/h5&gt;
-
-&lt;p&gt;STACK은 Main 함수를 포함한 각 함수들이 생성하는 &lt;strong&gt;지역변수&lt;/strong&gt;, &lt;strong&gt;결과값&lt;/strong&gt; 그리고 함수가 필요로 하는 &lt;strong&gt;인자&lt;/strong&gt;들을 저장할 수 있는 메모리 영역입니다.
-이 영역은 LIFO(Last In, First Out)이라는 데이터 구조를 가지고 있으며, CPU에 의해 관리되고 최적화되는 영역이기 때문에 데이터를 읽고 쓰는 속도가 매우 빠릅니다. 또한, 어떤 함수가 변수를 선언하면 그 새로운 변수는 스택에 생성되고(push), 함수가 종료될 때 함수가 생성한 모든 변수, 값등은 자동으로 해제됩니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;how-does-the-stack-work&quot;&gt;How does the STACK work?&lt;/h5&gt;
-
-&lt;p&gt;STACK을 설명할 때 가장 먼저 떠오르는 개념이 바로 LIFO입니다. LIFO는 Last In First Out의 앞 글자를 딴 용어이고 한글로는 후입선출이라고 합니다.
-설명을 하자면 ‘마지막에 들어온 것이 먼저 나간다’이죠. 아래 그림을 보면서 설명을 이어나가겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK은 위 그림처럼 한 쪽이 막혀 있고 입구가 하나인 구조를 가지고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;앞에서 제가 마지막에 들어온 것이 먼저 나간다라고 했는데, 들어오는 동작. 값을 STACK에 저장하는 동작을 &lt;strong&gt;push&lt;/strong&gt;라고 합니다.&lt;/p&gt;
-
-&lt;p&gt;반대로 나가는 동작. 값을 STACK에서 빼내는 동작을 &lt;strong&gt;pop&lt;/strong&gt;이라고 합니다. 이것이 STACK의 기본 구조이며 동작입니다.&lt;/p&gt;
-
-&lt;p&gt;그럼, 다음 코드를 가지고 STACK 동작 및 용어들을 조금 더 살펴보도록 하겠습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
-
-void plus(int input) {
-	int output = input+2;
-	printf(&quot;Result : %d\n&quot;, output);
-}
-
-int main(int argc, char* argv[]) {
-	int a = 4;
-	plus(a);
-
-	return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;위 코드는 입력 값에다 2를 더해서 출력해주는 간단한 내용입니다. 아래 [그림 1-1]은 plus 함수가 동작하고 있는 특정 순간의 STACK 상황을 표현한 내용입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK은 STACK Frame들이 모여서 만들어진다고도 표현합니다. 풀어서 설명을 좀 해보자면, 각 함수들마다 주어진 동작을 위한 공간이 주어지는데 이런 공간 하나 하나를 STACK Frame이라고 할 수 있겠습니다. 이 공간들이 모여 STACK을 구성하는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;위 그림의 오른편을 보면, Main Function STACK Frame이라고 적힌 것을 보실 수 있습니다. 
-그 아래로 Plus Function STACK Frame이라고 적혀 있죠.&lt;/p&gt;
-
-&lt;p&gt;위 그림처럼, 하나의 함수가 동작하는 중에 다른 함수가 동작되어지는 상황에서는 새롭게 실행되는 함수를 위한 공간을 마련합니다. 
-그리고나서 함수가 종료되면 마련해놓았던 공간을 해제합니다.&lt;/p&gt;
-
-&lt;p&gt;STACK은 Heap과는 다르게 여러분들이 직접 할당, 해제할 필요없이 자동으로 진행이 됩니다.&lt;/p&gt;
-
-&lt;p&gt;마지막으로, 함수가 실행되어 동작하는 과정에서 STACK에 값을 저장하거나, STACK의 값을 참조하는 등의 행동을 할 때는 Offset을 가지고 합니다.&lt;/p&gt;
-
-&lt;p&gt;그런데 이 Offset이라는 게 어떤 지점까지의 거리니까 기준점이 있어야겠죠? 그 기준점으로 주로 활용되는 것이 EBP와 ESP입니다.&lt;/p&gt;
-
-&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저하는 동작. 함수의 프롤로그 과정이죠.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;push ebp
-mov ebp,esp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저 프롤로그 과정을 통해 기준점을 생성합니다. 이 기준점을 생성할 때는 아무 값이나 설정하는 것이 아니라
-이전 STACK Frame의 기준점을 가지고 옵니다.&lt;/p&gt;
-
-&lt;p&gt;그래서 STACK에 그림으로 표기할 때, EBP(Extended Base Pointer)라는 용어와 SFP(Saved Frame Pointer)라는 용어도 같이 사용하죠.&lt;/p&gt;
-
-&lt;p&gt;이전 STACK의 기준점을 가지고와서 현재 STACK Frame의 기준으로 쓰다가 함수가 종료되는 시점. 에필로그 과정에서 다시 되돌려 줍니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mov esp, ebp
-pop ebp
-pop eip
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;이 과정을 통해 EBP를 원래대로 돌려줄 뿐만 아니라, 이전 Frame 안의 다음 주소로 이동하게 됩니다.
-Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성하는 행위는 변함없습니다.&lt;/p&gt;
-
-&lt;p&gt;아래는 지금까지 설명한 내용들을 정리한 내용들입니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;SFP&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-Saved Frame Pointer는 현재 STACK Frame의 지역 변수들을 위한 기준점 역할을 합니다.&lt;/p&gt;
-
-    &lt;p&gt;-예전 STACK Frame이 가지고 있던 EBP가 현재 STACK Frame의 EBP(Extended Base Pointer)에 저장됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;함수 호출&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-함수가 호출되면, 새로운 STACK Frame이 생성됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-함수 동작에 필요한 인자들을 STACK에 저장합니다.&lt;/p&gt;
-
-    &lt;p&gt;-현재 EBP와 Return Address가 저장됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-ESP는 새로운 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;함수 종료&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-함수 사용에 필요했던 STACK Frame이 제거됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-EBP가 이전에 저장했뒀던 값으로 되돌려지고, Return Address로 코드의 흐름이 바뀝니다.&lt;/p&gt;
-
-    &lt;p&gt;-ESP는 되돌아온 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;STACK에 대한 이야기는 이쯤해두고, 다음 연재부터는 본격적으로 Stack based overflow를 다루어보겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x02 STACK</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
       <title type="html">windows-0x03</title>
       <link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
       <published>2019-02-18T19:18:00+09:00</published>
@@ -1313,96 +1345,126 @@ int main(int argc, char* argv[]) {
     </entry>
   
     <entry>
-      <title type="html">windows-0x01</title>
-      <link href="/windows-0x01" rel="alternate" type="text/html" title="windows-0x01" />
-      <published>2019-02-07T19:18:00+09:00</published>
-      <updated>2019-02-07T19:18:00+09:00</updated>
-      <id>/windows-0x01</id>
-      <content type="html" xml:base="/windows-0x01">&lt;h1 id=&quot;0x01-윈도우-메모리&quot;&gt;0x01 윈도우 메모리&lt;/h1&gt;
+      <title type="html">windows-0x02</title>
+      <link href="/windows-0x02" rel="alternate" type="text/html" title="windows-0x02" />
+      <published>2019-02-18T19:18:00+09:00</published>
+      <updated>2019-02-18T19:18:00+09:00</updated>
+      <id>/windows-0x02</id>
+      <content type="html" xml:base="/windows-0x02">&lt;h1 id=&quot;0x02-stack&quot;&gt;0x02 STACK&lt;/h1&gt;
 
-&lt;h3 id=&quot;가상-메모리&quot;&gt;가상 메모리&lt;/h3&gt;
+&lt;h5 id=&quot;what-is-the-stack&quot;&gt;What is the STACK?&lt;/h5&gt;
 
-&lt;h5 id=&quot;x86-메모리-구조&quot;&gt;x86 메모리 구조&lt;/h5&gt;
-&lt;p&gt;x86 윈도우의 경우 각 프로세스 별로 최대 4GB를 지원합니다. 이 중 상위 절반(0xFFFFFFFF~0x80000000)은 OS 메모리로 사용하고(커널영역), 나머지 하위 절반(0x7FFFFFFF~0x00000000)은 프로세스가 독립적으로 사용할 수 있도록 제공합니다.(유저영역)
-그림 1-1는 32비트 윈도우에 의해 지원되는 전형적인 가상 주소 공간 배치를 나타냅니다.&lt;/p&gt;
+&lt;p&gt;STACK은 Main 함수를 포함한 각 함수들이 생성하는 &lt;strong&gt;지역변수&lt;/strong&gt;, &lt;strong&gt;결과값&lt;/strong&gt; 그리고 함수가 필요로 하는 &lt;strong&gt;인자&lt;/strong&gt;들을 저장할 수 있는 메모리 영역입니다.
+이 영역은 LIFO(Last In, First Out)이라는 데이터 구조를 가지고 있으며, CPU에 의해 관리되고 최적화되는 영역이기 때문에 데이터를 읽고 쓰는 속도가 매우 빠릅니다. 또한, 어떤 함수가 변수를 선언하면 그 새로운 변수는 스택에 생성되고(push), 함수가 종료될 때 함수가 생성한 모든 변수, 값등은 자동으로 해제됩니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;how-does-the-stack-work&quot;&gt;How does the STACK work?&lt;/h5&gt;
+
+&lt;p&gt;STACK을 설명할 때 가장 먼저 떠오르는 개념이 바로 LIFO입니다. LIFO는 Last In First Out의 앞 글자를 딴 용어이고 한글로는 후입선출이라고 합니다.
+설명을 하자면 ‘마지막에 들어온 것이 먼저 나간다’이죠. 아래 그림을 보면서 설명을 이어나가겠습니다.&lt;/p&gt;
+
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
   &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;그림 1-1에서 확인하였듯이 커널 영역은 다른 프로세스와 공통으로 사용하는 구조로 되어 있습니다. 그리고 이 영역은 OS가 사용하는 아주 중요한 영역입니다. 그래서 윈도우에서는 유저 영역에서 운영체제의 데이터에 접근하거나 수정하는 것을 막기 위해 두 가지 접근 모드(커널모드, 유저모드)를 사용합니다. &lt;strong&gt;유저 모드&lt;/strong&gt;는 커널 영역에 대한 접근을 할 수가 없지만, &lt;strong&gt;커널 모드&lt;/strong&gt;는 모든 시스템 메모리와 모든 CPU 명령어 등에 대해 접근이 허가된 실행모드를 말합니다. 이렇게 함으로써, 윈도우는 운영체제 시스템 커널에 잘못된 사용자 어플리케이션이 오동작을 유발하여, 시스템 전체의 안정성을 해치지 않게 보장하고 있습니다. 표 1-1은 커널모드, 유저모드를 뜻하는 다양한 용어들에 대한 정리입니다.&lt;/p&gt;
+&lt;p&gt;STACK은 위 그림처럼 한 쪽이 막혀 있고 입구가 하나인 구조를 가지고 있습니다.&lt;/p&gt;
 
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;모드&lt;/th&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;용어&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;커널 모드&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;커널 모드, 링 0, 커널 레벨, 슈퍼 바이저 모드&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;유저 모드&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;유저 모드, 링 3, 유저 레벨, 어플리케이션 모드&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;앞에서 제가 마지막에 들어온 것이 먼저 나간다라고 했는데, 들어오는 동작. 값을 STACK에 저장하는 동작을 &lt;strong&gt;push&lt;/strong&gt;라고 합니다.&lt;/p&gt;
 
-&lt;center&gt;[표 1-1] 커널 모드, 유저모드 용어 정리&lt;/center&gt;
+&lt;p&gt;반대로 나가는 동작. 값을 STACK에서 빼내는 동작을 &lt;strong&gt;pop&lt;/strong&gt;이라고 합니다. 이것이 STACK의 기본 구조이며 동작입니다.&lt;/p&gt;
 
-&lt;p&gt;** 윈도우는 4가지의 특권 레벨을 정의하고 있습니다. 하지만, 단지 두 개의 레벨만을 사용하는 이유는 일부 하드웨어 구조(ARM이나 MIPS 등)에서 2가지의 특권 레벨만 구현했기 때문입니다.&lt;/p&gt;
+&lt;p&gt;그럼, 다음 코드를 가지고 STACK 동작 및 용어들을 조금 더 살펴보도록 하겠습니다.&lt;/p&gt;
 
-&lt;h5 id=&quot;x86-유저-영역-주소-공간-배치&quot;&gt;x86 유저 영역 주소 공간 배치&lt;/h5&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+
+void plus(int input) {
+	int output = input+2;
+	printf(&quot;Result : %d\n&quot;, output);
+}
+
+int main(int argc, char* argv[]) {
+	int a = 4;
+	plus(a);
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위 코드는 입력 값에다 2를 더해서 출력해주는 간단한 내용입니다. 아래 [그림 1-1]은 plus 함수가 동작하고 있는 특정 순간의 STACK 상황을 표현한 내용입니다.&lt;/p&gt;
 
 &lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
   &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;그림 1-2는 우리가 중점적으로 알아볼 유저영역의 메모리 배치입니다. 위 그림에서 볼 수 있듯이, 유저 영역은 스택, 힙, 공유라이브러리, PE Image 등으로 구성되어 있습니다. 또한, 각 영역의 주소가 임의로 할당됨을 알 수 있습니다. 메모리 보호기법 중 하나인 ASLR이 적용되어 위 그림과 같이 각 영역의 주소가 임의로 할당되는 것이죠. 그럼 계산기 프로그램을 가지고 실제로 저렇게 할당되는지 살펴보겠습니다.&lt;/p&gt;
+&lt;p&gt;STACK은 STACK Frame들이 모여서 만들어진다고도 표현합니다. 풀어서 설명을 좀 해보자면, 각 함수들마다 주어진 동작을 위한 공간이 주어지는데 이런 공간 하나 하나를 STACK Frame이라고 할 수 있겠습니다. 이 공간들이 모여 STACK을 구성하는 것이죠.&lt;/p&gt;
 
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-3]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
+&lt;p&gt;위 그림의 오른편을 보면, Main Function STACK Frame이라고 적힌 것을 보실 수 있습니다. 
+그 아래로 Plus Function STACK Frame이라고 적혀 있죠.&lt;/p&gt;
 
-&lt;p&gt;그림 1-3은 Sysinternals suites의 vmmap을 통해 살펴 본 계산기의 메모리 구조입니다. 계산기를 종료한 후 다시 실행해보면 위치 값이 이전과 다르다는 것도 확인할 수 있습니다. 또한, vmmap은 각 할당 유형에 따라 다음과 같은 요약된 형태로 보여줍니다.&lt;/p&gt;
+&lt;p&gt;위 그림처럼, 하나의 함수가 동작하는 중에 다른 함수가 동작되어지는 상황에서는 새롭게 실행되는 함수를 위한 공간을 마련합니다. 
+그리고나서 함수가 종료되면 마련해놓았던 공간을 해제합니다.&lt;/p&gt;
+
+&lt;p&gt;STACK은 Heap과는 다르게 여러분들이 직접 할당, 해제할 필요없이 자동으로 진행이 됩니다.&lt;/p&gt;
+
+&lt;p&gt;마지막으로, 함수가 실행되어 동작하는 과정에서 STACK에 값을 저장하거나, STACK의 값을 참조하는 등의 행동을 할 때는 Offset을 가지고 합니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 이 Offset이라는 게 어떤 지점까지의 거리니까 기준점이 있어야겠죠? 그 기준점으로 주로 활용되는 것이 EBP와 ESP입니다.&lt;/p&gt;
+
+&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저하는 동작. 함수의 프롤로그 과정이죠.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;push ebp
+mov ebp,esp
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저 프롤로그 과정을 통해 기준점을 생성합니다. 이 기준점을 생성할 때는 아무 값이나 설정하는 것이 아니라
+이전 STACK Frame의 기준점을 가지고 옵니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 STACK에 그림으로 표기할 때, EBP(Extended Base Pointer)라는 용어와 SFP(Saved Frame Pointer)라는 용어도 같이 사용하죠.&lt;/p&gt;
+
+&lt;p&gt;이전 STACK의 기준점을 가지고와서 현재 STACK Frame의 기준으로 쓰다가 함수가 종료되는 시점. 에필로그 과정에서 다시 되돌려 줍니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mov esp, ebp
+pop ebp
+pop eip
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이 과정을 통해 EBP를 원래대로 돌려줄 뿐만 아니라, 이전 Frame 안의 다음 주소로 이동하게 됩니다.
+Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성하는 행위는 변함없습니다.&lt;/p&gt;
+
+&lt;p&gt;아래는 지금까지 설명한 내용들을 정리한 내용들입니다.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Image&lt;/strong&gt; : 실행 파일과 동적 라이브러리 같은 의존물, PE Image 파일을 매핑하는 데 사용되는 메모리 할당&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Shareable&lt;/strong&gt; : 일반적으로 공유 메모리를 포함해 공유 속성으로 설정된 메모리 할당&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Heap&lt;/strong&gt; : 프로세스가 소유한 힙을 위해 할당된 메모리 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Stack&lt;/strong&gt; : 프로세스 내의 각 스레드를 위한 스택 용도로 할당된 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Private Data&lt;/strong&gt; : 스택이나 힙을 제외한 전용 데이터(내부 데이터 구조체 등)로 표시된 메모리 영역&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;SFP&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;-Saved Frame Pointer는 현재 STACK Frame의 지역 변수들을 위한 기준점 역할을 합니다.&lt;/p&gt;
+
+    &lt;p&gt;-예전 STACK Frame이 가지고 있던 EBP가 현재 STACK Frame의 EBP(Extended Base Pointer)에 저장됩니다.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;함수 호출&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;-함수가 호출되면, 새로운 STACK Frame이 생성됩니다.&lt;/p&gt;
+
+    &lt;p&gt;-함수 동작에 필요한 인자들을 STACK에 저장합니다.&lt;/p&gt;
+
+    &lt;p&gt;-현재 EBP와 Return Address가 저장됩니다.&lt;/p&gt;
+
+    &lt;p&gt;-ESP는 새로운 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;함수 종료&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;-함수 사용에 필요했던 STACK Frame이 제거됩니다.&lt;/p&gt;
+
+    &lt;p&gt;-EBP가 이전에 저장했뒀던 값으로 되돌려지고, Return Address로 코드의 흐름이 바뀝니다.&lt;/p&gt;
+
+    &lt;p&gt;-ESP는 되돌아온 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;지금까지 윈도우 시스템의 가상 메모리 할당에 대한 대략적인 부분을 알아봤습니다. 이 글의 도입부에서 제가 각 프로세스 별로 4GB를 지원한다고 했습니다. 그런데 일반적으로 여러분들이 사용하는 PC의 RAM은 4~16GB 정도인데, 어떻게 실행하는 모든 프로세스마다 4GB를 지원할 수 있을까요?&lt;/p&gt;
-
-&lt;h5 id=&quot;paging&quot;&gt;Paging&lt;/h5&gt;
-
-&lt;p&gt;대부분의 시스템이 프로세스 실행에 사용하는 가상 메모리의 총합보다 작은 물리 메모리를 가지고 있습니다. 그래서 윈도우의 메모리 관리자는 프로세스가 사용하는 메모리 내용의 일부를 디스크로 보냅니다. 데이터를 디스크에 전송하면서 물리 메모리의 공간을 비울 수 있고, 그 자리를 다른 프로세스가 사용할 수 있도록 지원합니다. 만약 디스크에 전송한 내용을 사용하기 위해 가상 주소를 접근할 경우, 동일한 과정을 거쳐 메모리로 정보를 다시 가져옵니다. 이런 방식으로 윈도우에서는 메모리를 관리하고 있고, 디스크로 또는 메모리로 매핑하는 데이터의 단위를 페이지라고 부르고 기본 크기는 4KB입니다. 그림 1-4은 방금 설명한 페이징을 나타냅니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-4]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;h5 id=&quot;공유-메모리&quot;&gt;공유 메모리&lt;/h5&gt;
-
-&lt;p&gt;공유 메모리란, 프로세스와 운영체제 사이의 공통으로 사용하는 메모리를 이야기합니다. 각 프로세스는 개별 데이터를 저장하거나 실행하기 위해 자신만의 메모리 공간을 갖겠지만, 여러 프로세스에서 동일하게 사용하는 부분은 굳이 여러 번 메모리에 할당할 필요가 없습니다. 그래서 윈도우는 그림 1-5과 같이 동일한 dll이나 다른 자원을 물리 메모리로 한 번만 로딩시키고 공유해서 사용하도록 구성되어 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x01_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-5]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;이런 구조를 사용함으로써 메모리를 좀 더 효율적으로 사용할 수가 있게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;윈도우 메모리 구조에 대해 중요한 기본 개념들을 살펴봤습니다.
-다음 연재에서는 본격적으로 Stack의 구조와 Stack에서 일어날 수 있는 취약점들에 대해서 알아보도록 하겠습니다.&lt;/p&gt;</content>
+&lt;p&gt;STACK에 대한 이야기는 이쯤해두고, 다음 연재부터는 본격적으로 Stack based overflow를 다루어보겠습니다.&lt;/p&gt;</content>
 
       
       
@@ -1423,7 +1485,7 @@ int main(int argc, char* argv[]) {
       
 
       
-        <summary type="html">0x01 윈도우 메모리</summary>
+        <summary type="html">0x02 STACK</summary>
       
 
       

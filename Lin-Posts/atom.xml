@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>Windows-Heap 정의</title>
+        
+          <description>&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Tue, 02 Apr 2019 20:18:00 +0900</pubDate>
+        <link>
+        /windows-0x0a</link>
+        <guid isPermaLink="true">/windows-0x0a</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>android-0x01</title>
         
           <description>&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;

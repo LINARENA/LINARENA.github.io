@@ -1,4 +1,150 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-03-30T15:31:35+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">android-0x01</title><link href="/android-0x01" rel="alternate" type="text/html" title="android-0x01" /><published>2019-03-29T14:00:00+09:00</published><updated>2019-03-29T14:00:00+09:00</updated><id>/android-0x01</id><content type="html" xml:base="/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-04-07T14:41:55+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">Windows-Heap 정의</title><link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" /><published>2019-04-02T20:18:00+09:00</published><updated>2019-04-02T20:18:00+09:00</updated><id>/windows-0x0a</id><content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘부터는 Windows Heap에 대해 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;what-is-heap&quot;&gt;What is Heap?&lt;/h5&gt;
+
+&lt;p&gt;Heap은 프로세스가 실행되는 동안 메모리를 필요한만큼 동적으로 할당하여 사용하는 영역입니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 c/c++에서는 malloc, new 함수를 사용하여 Heap 영역을 할당받아 사용합니다.&lt;/p&gt;
+
+&lt;p&gt;윈도우에서는 힙을 이용할 수 있도록 API 함수들을 제공하고 있는데 대표적인 윈도우 힙 함수는 다음과 같습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;HeapCreate : 힙을 생성합니다.&lt;/li&gt;
+  &lt;li&gt;HeapDestroy : 힙을 삭제합니다.&lt;/li&gt;
+  &lt;li&gt;HeapAlloc : 힙 블록을 할당합니다.&lt;/li&gt;
+  &lt;li&gt;HeapFree : 할당된 힙 블록을 해제합니다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;이 정도는 이미 알고 계실거라 생각합니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 조금만 더 상세하게 알아볼게요.&lt;/p&gt;
+
+&lt;h5 id=&quot;process-heap&quot;&gt;Process Heap&lt;/h5&gt;
+
+&lt;p&gt;Process가 시작되면 최소한 하나의 기본 Process Heap(또는 Default Heap)이 생성됩니다.&lt;/p&gt;
+
+&lt;p&gt;이 Process Heap은 Process 시작 시에 생성되고(기본 크기는 1MB) Process가 종료될 때까지 없어지지 않는 특징이 있습니다.&lt;/p&gt;
+
+&lt;p&gt;흔히 사용하는 malloc, new는 Process Heap에서 할당하는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;이 기본 Heap은 프로그램 내에서 명시적으로 사용될 수도 있고 윈도우 내부 함수에 의해 암묵적으로 사용될 수도 있는데 프로그램에서 GetProcessHeap을 이용해 기본 Process Heap을 구할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;요약을 해보자면, Process가 시작되면 기본 Heap이 생성된다는 것과 malloc, new를 이용해서 아래 그림처럼 Heap을 할당받아 사용한다는 것입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;지금까지 기본 Heap에 대한 설명을 했는데요,&lt;/p&gt;
+
+&lt;p&gt;지금부터는 위 그림처럼 하나만 할당받는 것이 아닌 다양한 크기의 Heap 공간을 반복적으로 할당/해제하는 경우를 한 번 생각해보겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;heap-fragmentation&quot;&gt;Heap Fragmentation&lt;/h5&gt;
+
+&lt;p&gt;사용자가 Heap 공간을 쓰기 위해 할당을 요청하면 사용가능한 “연속된” 공간이 할당됩니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 다양한 크기의 Heap 공간을 요청하고 해제한다고 생각해봅시다.&lt;/p&gt;
+
+&lt;p&gt;분명 할당받은 순서대로 해제하지는 않겠죠?&lt;/p&gt;
+
+&lt;p&gt;정해진 순서없이 다양한 크기의 Heap이 할당되고 해제된다면, 아래 그림처럼 특정 순간에는 원하는 크기의 Heap을 할당해줄 수 없는 순간이 올 겁니다.&lt;/p&gt;
+
+&lt;p&gt;이를 Heap Fragmentation(힙 단편화)이라고 합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림에서 보듯, 남은 메모리 용량의 총합은 할당을 원하는 객체의 크기보다 크지만 연속된 공간을 할당해 줄 수 없는 상황이 옵니다.&lt;/p&gt;
+
+&lt;p&gt;윈도우는 이러한 단편화 문제를 해결하기 위해서 특별한 방식들을 사용하고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이 방식들을 살펴보면서 Heap에 대한 이해를 더 높여보겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;free-list&quot;&gt;Free List&lt;/h5&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+&lt;center&gt;http://www.slideshare.net/ffri/mr201312-history-and-current-state-of-heap-exploit-eng&lt;/center&gt;
+
+&lt;p&gt;Free List란 말 그대로 해제된 Heap 메모리들을 담아두는 List입니다.&lt;/p&gt;
+
+&lt;p&gt;어떤 메모리를 할당해서 사용하고 난 뒤, 해제를 하면 그 메모리는 Free List에 들어가게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 다음 메모리를 할당하려고 하면 Heap 공간을 바로 쓰게 해주는 것이 아니라 Free List를 먼저 살펴봅니다.&lt;/p&gt;
+
+&lt;p&gt;Free List에 적합한 크기의 Heap 메모리가 있을 경우는 해당 메모리를 할당해줍니다.&lt;/p&gt;
+
+&lt;p&gt;만약 적절한 크기의 메모리가 없다면 요청한 크기만큼의 Heap을 새로 할당해주는 방식입니다.&lt;/p&gt;
+
+&lt;p&gt;예를 들어, 프로그램이 시작된 후 처음으로 0x20 크기의 Heap을 요청했다고 가정하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;해제된 메모리가 없으니 Free List는 비어있겠죠?&lt;/p&gt;
+
+&lt;p&gt;그럼 Heap의 할당은 다음 그림처럼 이루어집니다.&lt;/p&gt;
+
+&lt;p&gt;(실제로는 0x20 + Heap Header 크기만큼 할당이 이루어집니다.)&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그런 다음 이 메모리를 해제하게 되면 이 메모리는 Free List에 들어가게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;이후 프로그램이 다시 0x30 크기의 Heap을 요청하면 Free List를 먼저 살펴봅니다.&lt;/p&gt;
+
+&lt;p&gt;0x30을 할당할 수 있을 만한 크기가 없기 때문에 새로 0x30만큼의 메모리를 할당해줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이번에는 0x10만큼의 메모리 할당 요청이 들어왔다고 가정하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;이번에도 Heap 관리자는 Free List를 먼저 살펴보겠지요?&lt;/p&gt;
+
+&lt;p&gt;Heap 관리자는 Best-Fit 정책을 사용하고 있기 때문에 최대한 적합한 크기의 Heap을 할당하려고 합니다.&lt;/p&gt;
+
+&lt;p&gt;지금 상황에서는 0x30이 제일 적합한 메모리가 되겠네요.&lt;/p&gt;
+
+&lt;p&gt;이 0x30 메모리를 모두 할당하는 것이 아니라 메모리를 분할하여 0x10만큼만 할당을 해줍니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 이런 방식을 사용하는 환경에서 작은 메모리 요청/해제가 빈번하게 일어나면 어떻게 될까요?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0a_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;작은 메모리 조각이 계속해서 발생할 것이고 이를 관리하는 것에 한계가 생길 겁니다.&lt;/p&gt;
+
+&lt;p&gt;이런 현상을 개선하기 위해서 최신 윈도우에서는 Low Fragmentation Heap이라는 정책을 도입했습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;low-fragmentation-heap&quot;&gt;Low Fragmentation Heap&lt;/h5&gt;
+
+&lt;p&gt;Low Fragmentation Heap(저단편화 힙)은 말 그대로 위에서 살펴본 Free List 방식에서 발생하는 단편화 현상을 줄이기 위해 도입되었습니다.&lt;/p&gt;
+
+&lt;p&gt;Free List에서는 Heap을 계속해서 분할하는 방식이기 때문에 단편화 문제가 있다고 했었죠?&lt;/p&gt;
+
+&lt;p&gt;그래서 Low Fragmentation Heap은 Bucket이라는 미리 정의된 서로 다른 크기의 범위를 갖는 블록을 관리함으로써 단편화를 해결합니다.&lt;/p&gt;
+
+&lt;p&gt;쉽게 이야기해서, 미리 여러 크기로 Heap 공간을 분할해놓고 할당 요청이 오면 해당 크기를 포함하는 가장 작은 Bucket을 선택해 할당합니다.&lt;/p&gt;
+
+&lt;p&gt;Bucket은 총 128개인데 첫 번째 Bucket은 1~8바이트, 두 번째는 9~16바이트 식으로 8바이트 단위로 구분되며, 마지막 Bucket은 15873~16384 바이트 크기까지 지원할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;만약 요청된 크기가 16384 바이트보다 크다면 Backend로 요청을 보냅니다.&lt;/p&gt;
+
+&lt;p&gt;Backend로 요청이 이루어지면 Free List 방식으로 Heap 할당을 진행합니다.&lt;/p&gt;
+
+&lt;p&gt;즉, Low Fragmentation Heap 기법은 미리 Bucket으로 나누어서 적합한 메모리를 찾는 속도를 증가시키고, 크기별 Free List들을 Lookaside List에 나누어 관리하는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;지금까지 Windows Heap 대해 알아봤습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 시간부터는 Heap에 대한 공격 기법을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0a Windows-Heap</summary></entry><entry><title type="html">android-0x01</title><link href="/android-0x01" rel="alternate" type="text/html" title="android-0x01" /><published>2019-03-29T14:00:00+09:00</published><updated>2019-03-29T14:00:00+09:00</updated><id>/android-0x01</id><content type="html" xml:base="/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -1088,111 +1234,4 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
 
 &lt;p&gt;계산기가 잘 실행되네요. ^^&lt;/p&gt;
 
-&lt;p&gt;지금까지 DLL Hijacking에 대해서 알아봤습니다. 뿅!&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">DLL Hijacking &amp;amp; Ghidra</summary></entry><entry><title type="html">mobile-0x00</title><link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" /><published>2019-03-16T06:00:00+09:00</published><updated>2019-03-16T06:00:00+09:00</updated><id>/android-0x00</id><content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
-
-&lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
-
-&lt;p&gt;Mobile Android 해킹을 주제로 포스팅을 시작하려고 합니다.
-우선 Mobile OWASP Top 10에 등록된  주요 취약점을 간단히 리뷰하고 이후 해당 취약점들을 이용한 Android 해킹과 관련된 내용으로 포스팅을 진행하도록 하겠습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;mobile-owasp-top-10&quot;&gt;Mobile OWASP Top 10&lt;/h5&gt;
-&lt;p&gt;OWASP(The Open Web Application Security Project)란 국제 웹 보안 표준기군이며, 웹에 관한 주요 보안 취약점들을 연구하며, 4년 마다 취약점 Top 10 을 발표하고 있습니다. 
-OWASP 모바일 보안 프로젝트는 개발자와 보안팀이 모바일 어플리케이션을 안전하게 구축하고 유지, 관리하는데 필요한 리소스를 제공하며 앞으로 일어날 수 있는 영향도와 위험성을 줄이기 위해 진행되고 있습니다. 모바일은 2년 마다 취약점 Top 10을 발표하고 있으며, 현재 가장 최신 자료는 2016년 release된 자료입니다.(아래 그림 참조)
-그럼 Mobile OWASP Top 10의 각 취약점에 대해 리뷰해보도록 하겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/Mobile%20OWASP%20TOP10.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m1---improper-platform-usage&quot;&gt;M1 - Improper Platform Usage&lt;/h4&gt;
-&lt;p&gt;첫번째 M1은 부적절한 플랫폼 사용에 관한 취약점입니다. 
-이 취약점은 플랫폼 기능의 오용이나 보안 설정이 잘못될 경우 발생하는 문제에 대해 다루고 있습니다.
-주로 개발자들의 실수로 인해 발생하며, 문제는 공격 가능성은 쉬우나 그에 따른 영향도가 심각하다는 점입니다.
-대응방안으로는 시큐어 코딩과 보안 설정을 서버 단에서 진행하는 것입니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M1.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m2---insecure-data-storage&quot;&gt;M2 - Insecure Data Storage&lt;/h4&gt;
-&lt;p&gt;M2는 취약한 데이터 저장소에 관한 취약점입니다. 
-이 취약점은 안전하지 않은 데이터 저장소로 인해 의도하지 않은 데이터 유출로 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며 신분 도용, 개인 정보 침해 등의 위험을 초래합니다.
-대응방안은 아래와 같은 기능을 통해 중요 정보를 내부 저장소에 저장하지 않아야 합니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;URL caching (both request and response)&lt;/li&gt;
-  &lt;li&gt;Keyboard press caching&lt;/li&gt;
-  &lt;li&gt;Copy/Paste buffer caching&lt;/li&gt;
-  &lt;li&gt;Application backgrounding&lt;/li&gt;
-  &lt;li&gt;Intermediate data&lt;/li&gt;
-  &lt;li&gt;Logging&lt;/li&gt;
-  &lt;li&gt;HTML5 data storage&lt;/li&gt;
-  &lt;li&gt;Browser cookie objects&lt;/li&gt;
-  &lt;li&gt;Analytics data sent to 3rd parties&lt;/li&gt;
-&lt;/ul&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m3---insecure-communication&quot;&gt;M3 - Insecure Communication&lt;/h4&gt;
-&lt;p&gt;M3는 취약한 통신에 관한 취약점입니다. 이 취약점은 악의적인 handshaking, 잘못된 SSL 버전, 약한 협상, 민감 정보의 평문 통신으로 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 피싱 및 MITM 공격에 의해 중요 정보가 노출될 수 있습니다.
-대응방안은 SSL/TLS 적용, 강한 cipher suites 사용, 인증서 확인 등이 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M2.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m4---insecure-authentication&quot;&gt;M4 - Insecure Authentication&lt;/h4&gt;
-&lt;p&gt;M4는 취약한 인증에 관한 취약점입니다. 이 취약점은 사용자 인증 또는 잘못된 세션 관리로 인해 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 약한 인증 패턴을 피하고, 인증을 강화하는 방법입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M4.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m5---insufficient-cryptography&quot;&gt;M5 - Insufficient Cryptography&lt;/h4&gt;
-&lt;p&gt;M5는 취약한 암호화에 관한 취약점입니다. 이 취약점은 키관리 문제, 커스텀 암호화 생성, 취약한 암호화 알고리즘 사용 시 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 모바일 기기에 중요한 정보를 저장하지 말아야 하며, 검증된 암호화 표준을 적용하는 방법입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M5.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m6---insecure-authorization&quot;&gt;M6 - Insecure Authorization&lt;/h4&gt;
-&lt;p&gt;M6는 취약한 권한에 관한 취약점입니다. 이 취약점은 안전하지 않은 권한을 부여하여 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 서버 단에서 사용자의 역할 및 권한을 확인해야 하며, 어플리케이션의 필요한 퍼미션만 설정하는 방법입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M6.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m7---client-code-quality&quot;&gt;M7 - Client Code Quality&lt;/h4&gt;
-&lt;p&gt;M7는 클라이언트 코드 품질에 관한 취약점입니다. 이 취약점은 잘못된 코드 구현으로 인해 클라이언트에서 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 어렵고 영향도는 보통이며 버퍼오버플로우, XSS등의 취약점으로 이어질 수 있습니다.
-대응방안은 버퍼 사용 시 입력 버퍼의 길이를 확인하는 등 안전한 구문을 사용하는 방법입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M7.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m8---code-tampering&quot;&gt;M8 - Code Tampering&lt;/h4&gt;
-&lt;p&gt;M8는 코드 변조에 관한 취약점입니다. 이 취약점은 바이너리 패치, 로컬 리소스 수정, 메소드 후킹 및 변경, 동적 메모리 수정등 코드 변조 시 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 무결성 체크, 루팅 탐지등의 방법이 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M8.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m9---reverse-engineering&quot;&gt;M9 - Reverse Engineering&lt;/h4&gt;
-&lt;p&gt;M9는 역공학에 관한 취약점입니다. 이 취약점은 라이브러리, 알고리즘, 핵심 바이너리 등의 분석을 통해 중요 로직을 파악하여 발생되는 문제 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 보통이며,
-대응방안은 바이너리 암호화와, 코드 난독화를 적용하여 리버싱을 방지하는 방법입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M9.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;m10---extraneous-functionality&quot;&gt;M10 - Extraneous Functionality&lt;/h4&gt;
-&lt;p&gt;마지막으로 M10는 불필요한 기능에 관한 취약점입니다. 이 취약점은 개발자가 숨겨놓은 기능이나 운영 환경에 적용하지 않는 개발 환경 기능을 악용하여 발생하는 문제에 대해 다루고 있습니다. 공격 가능성은 쉬우나 영향도는 심각하며, 대응방안은 테스트 코드가 포함되어 있는지 확인하고, 모든 로그를 검사하여 과도한 설명이 포함되어 있는지 확인하는 방법입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/M10.png&quot; alt=&quot;[그림 1-11]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Mobile OWASP Top 10에 대해 간략히 리뷰해봤고, 자세한 내용은 원문에서 확인하실 수 있습니다.
-다음 포스팅에서는 안드로이드 정적 분석에 대해 알아보도록 하겠습니다.&lt;/p&gt;
-
-&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">0x00. Introduction</summary></entry></feed>
+&lt;p&gt;지금까지 DLL Hijacking에 대해서 알아봤습니다. 뿅!&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">DLL Hijacking &amp;amp; Ghidra</summary></entry></feed>
