@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="/author/Chaem/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-04-07T14:41:55+09:00</updated>
-  <id>/author/Chaem/feed.xml</id>
+  <link href="http://localhost:4000/author/Chaem/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
+  <updated>2019-04-15T14:07:51+09:00</updated>
+  <id>http://localhost:4000/author/Chaem/feed.xml</id>
 
   
   
@@ -40,12 +40,162 @@
 
   
     <entry>
+      <title type="html">android-0x02</title>
+      <link href="http://localhost:4000/android-0x02" rel="alternate" type="text/html" title="android-0x02" />
+      <published>2019-04-12T14:00:00+09:00</published>
+      <updated>2019-04-12T14:00:00+09:00</updated>
+      <id>http://localhost:4000/android-0x02</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
+
+&lt;p&gt;지난 포스팅에서 다루었던 Android 정적 분석에 이어서 이번에는 Android 동적 분석에 대해 포스팅 하려고 합니다.&lt;/p&gt;
+
+&lt;p&gt;Android를 동적 분석하는 방법은 다양하지만 이번 포스팅에서는 FRIDA이용하는 방법에 대해 알아보겠습니다.&lt;/p&gt;
+
+&lt;h4 id=&quot;frida&quot;&gt;FRIDA&lt;/h4&gt;
+&lt;p&gt;FRIDA를 이용한 동적 분석은 Android 앱을 후킹하여 분석하는 방법입니다.&lt;/p&gt;
+
+&lt;p&gt;분석 환경은 아래와 같습니다.&lt;/p&gt;
+
+&lt;p&gt;OS : Window7&lt;/p&gt;
+
+&lt;p&gt;Tools : FRIDA, frida-server, nox, adb, python, pip&lt;/p&gt;
+
+&lt;p&gt;FRIDA를 사용하기 위해서는 python 및 pip가 설치되어있어야 하며,&lt;br /&gt;
+아래와 같이 cmd에서 “pip install  frida” 명령어를 입력하여 FRIDA를 쉽게 설치할 수 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/01.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;FRIDA 설치 후 하기 링크에서 Android architecure에 맞는 frida-server를 다운로드합니다.&lt;/p&gt;
+
+&lt;p&gt;https://github.com/frida/frida/releases&lt;/p&gt;
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/02.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+다운로드한 frida-server를 Android 기기에 설치하고 실행 권한 부여 후 실행시켜줍니다.
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/03.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+
+아래 링크의 예제 앱을 이용해서 동적 분석을 진행하겠습니다.&lt;br /&gt;
+https://github.com/OWASP/owasp-mstg/tree/master/Crackmes/Android&lt;br /&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/03-1.png&quot; alt=&quot;[그림 1-3-1]&quot; /&gt;
+&lt;/figure&gt;
+&lt;br /&gt;
+  
+앱을 실행하면 루팅을 탐지하게 되고, ok 버튼을 누르면 앱이 종료되는 것을 확인할 수 있습니다.  
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/04.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+앱이 종료되지 않도록 후킹 포인트를 찾기 위해 MainActivity를 확인해보겠습니다.&lt;br /&gt;
+MainActivity를 살펴보면 ok 버튼을 누르면 System.exit(0)를 호출하는 것을 확인할 수 있습니다.
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/05.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+따라서 System.exit 함수가 호출될 때 해당 함수를 후킹해보도록 하겠습니다.&lt;br /&gt;
+아래 python 코드를 이용해 후킹을 시도하면 ok 버튼을 눌러도 앱이 종료되지 않는 것을 확인할 수 있습니다.
+ 
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/06.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+이후 특정 문자열을 입력하여 인증하는 절차가 나옵니다.
+아래와 같이 잘못된 문자열을 입력할 시 재시도하라는 메시지가 출력되고 있습니다.
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/07.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+특정 문자열 확인을 위해 아래 verify 함수를 확인해보면 인증 로직인 if(a.a(obj))을 확인할 수 있습니다.
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/08.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 복호화한 값과 비교하여 결과를 리턴하는 것을 확인할 수 있습니다.
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/09.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+마지막으로 sg.vantagepoint.a.a class의 a함수를 확인해보면 최종으로 복호화된 문자열을 리턴하는 것을 확인할 수 있습니다.
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/10.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+분석한 결과를 토대로 암호화된 특정 문자열을 복호화하여 출력하는 python 코드를 아래와 같이 작성해보았습니다.
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/11.png&quot; alt=&quot;[그림 1-11]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+코드를 실행한 결과 복호화된 문자열을 확인할 수 있었고, 해당 문자열을 입력한 결과 성공이라는 메시지가 출력되는 것을 확인했습니다.
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/mobile/0x02/12.png&quot; alt=&quot;[그림 1-12]&quot; /&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+
+
+지금까지 Android 동적 분석에 대해 알아보았고, 다음 포스팅에서는 SSL Pinning 우회 방법에 대해 알아보도록 하겠습니다.&lt;br /&gt;
+&lt;br /&gt;
+감사합니다.
+
+&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Chaem</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">Android 동적 분석</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
       <title type="html">android-0x01</title>
-      <link href="/android-0x01" rel="alternate" type="text/html" title="android-0x01" />
+      <link href="http://localhost:4000/android-0x01" rel="alternate" type="text/html" title="android-0x01" />
       <published>2019-03-29T14:00:00+09:00</published>
       <updated>2019-03-29T14:00:00+09:00</updated>
-      <id>/android-0x01</id>
-      <content type="html" xml:base="/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
+      <id>http://localhost:4000/android-0x01</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -137,11 +287,11 @@
   
     <entry>
       <title type="html">mobile-0x00</title>
-      <link href="/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
+      <link href="http://localhost:4000/android-0x00" rel="alternate" type="text/html" title="mobile-0x00" />
       <published>2019-03-16T06:00:00+09:00</published>
       <updated>2019-03-16T06:00:00+09:00</updated>
-      <id>/android-0x00</id>
-      <content type="html" xml:base="/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
+      <id>http://localhost:4000/android-0x00</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x00">&lt;h1 id=&quot;0x00-introduction&quot;&gt;0x00. Introduction&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Chaem 입니다.&lt;/p&gt;
 
