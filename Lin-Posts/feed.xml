@@ -1,4 +1,318 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-04-15T14:07:51+09:00</updated><id>http://localhost:4000/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">android-0x02</title><link href="http://localhost:4000/android-0x02" rel="alternate" type="text/html" title="android-0x02" /><published>2019-04-12T14:00:00+09:00</published><updated>2019-04-12T14:00:00+09:00</updated><id>http://localhost:4000/android-0x02</id><content type="html" xml:base="http://localhost:4000/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-04-21T14:37:44+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">Vtable Overwrite</title><link href="/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" /><published>2019-04-18T20:18:00+09:00</published><updated>2019-04-18T20:18:00+09:00</updated><id>/windows-0x0b</id><content type="html" xml:base="/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘은 Vtable Overwrite에 대해 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;what-is-virtual-method&quot;&gt;What is Virtual Method?&lt;/h5&gt;
+
+&lt;p&gt;Vtable에 대한 이해를 하기 위해서는 먼저, 가상함수가 무엇인지부터 알아야 합니다.&lt;/p&gt;
+
+&lt;p&gt;여기서 상속, 다형성 등 모든 개념들을 다 살펴볼 수는 없습니다.&lt;/p&gt;
+
+&lt;p&gt;간단히 필요 부분만 살펴보고 넘어갈 텐데, 모르는 부분은 직접 찾아서 공부해보시기 바랍니다.&lt;/p&gt;
+
+&lt;p&gt;가상함수는 한마디로 다형성을 위해 씁니다.&lt;/p&gt;
+
+&lt;p&gt;예를 들어 다음과 같은 클래스가 있다고 칩시다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+
+class Unit {
+public:
+	void Sound()
+	{
+		printf(&quot;Unit!\n&quot;);
+	}
+
+};
+
+class Marine : public Unit {
+public:
+	void Sound() {
+		printf(&quot;You wanna piece of me, boy?\n&quot;);
+	}
+
+};
+
+class Firebat : public Unit {
+public:
+	void Sound() {
+		printf(&quot;Need a light?\n&quot;);
+	}
+
+};
+
+int main() {
+
+	Unit * unit = new Unit;
+	Marine * marine = new Marine;
+	Firebat * firebat = new Firebat;
+
+	unit-&amp;gt;Sound();
+
+	unit = marine;
+	unit-&amp;gt;Sound();
+
+	unit = firebat;
+	unit-&amp;gt;Sound();
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위와 같이 코드를 짜고 실행시키면 마린과 파이어뱃은 각자의 대사를 말할 것 같지만, 다음과 같이 출력됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;예상과는 다르죠?&lt;/p&gt;
+
+&lt;p&gt;이번에는 다음과 같이 virtual 키워드를 사용하여 가상함수로 코드를 수정했습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+
+class Unit {
+public:
+	virtual void Sound()
+	{
+		printf(&quot;Unit!\n&quot;);
+	}
+
+};
+
+class Marine : public Unit {
+public:
+	virtual void Sound() {
+		printf(&quot;You wanna piece of me, boy?\n&quot;);
+	}
+
+};
+
+class Firebat : public Unit {
+public:
+	virtual void Sound() {
+		printf(&quot;Need a light?\n&quot;);
+	}
+
+};
+
+int main() {
+
+	Unit * unit = new Unit;
+	Marine * marine = new Marine;
+	Firebat * firebat = new Firebat;
+
+	unit-&amp;gt;Sound();
+
+	unit = marine;
+	unit-&amp;gt;Sound();
+
+	unit = firebat;
+	unit-&amp;gt;Sound();
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이 코드를 실행하면 다음과 같이 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;virtual만 붙였을 뿐인데 처음 예상했던 대로 동작이 되네요.&lt;/p&gt;
+
+&lt;p&gt;즉, 이 가상함수라는 것은 파생 클래스가 안전하게 재정의할 수 있는 것이라고 할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이를 우리가 동적 바인딩이라고도 하는데, 동적 바인딩은 실행할 함수의 주소가 컴파일 시에 결정되는 것이 아니라, 포인터로 호출할 때 그 주소가 결정됩니다.&lt;/p&gt;
+
+&lt;p&gt;좀 더 정확하게는 호출 시에 정해진다라기보다 컴파일 시에 미리 가상함수 테이블을 만들어두고 거기에 호출하고자 하는 함수를 넣어두는 형태입니다.&lt;/p&gt;
+
+&lt;p&gt;이 가상함수 테이블이 바로 vtable입니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 실행이 되면 객체의 vtable을 찾아가서 호출할 함수의 번지를 찾아가는 로직이죠.&lt;/p&gt;
+
+&lt;p&gt;지금까지 설명한 내용을 도식화하면 다음과 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이번엔 아래 코드를 가지고 vtable부터 overwrite를 살펴보도록 하겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;cstring&amp;gt;
+#include &quot;windows.h&quot;
+#include &amp;lt;iostream&amp;gt;
+
+#pragma warning (disable:4996)
+#define _CRT_SECURE_NO_WARNINGS
+using namespace std;
+
+class Book {
+private:
+	char name[100];
+	int page;
+public:
+	Book(const char * _name, int _page) {
+		strcpy(name, _name);
+		page = _page;
+	}
+	virtual void setName(char * input) {
+		char * buf = (char *)malloc(20);
+		strncpy(buf, input, 19);
+		printName(buf);
+		getName();
+	}
+	virtual char * getName() {
+		return name;
+	}
+	virtual void printName(char * buf) {
+		printf(&quot;%s\n&quot;, buf);
+	}
+
+};
+
+int main(int argc, char * argv[]) {
+
+	static char contents[1000] = { 0, };
+	static Book mybook(&quot;Windows_Hacking&quot;, 1);
+	printf(&quot;object addr : 0x%08x\n&quot;, &amp;amp;mybook);
+	printf(&quot;object vtable addr : 0x%08p\n&quot;, mybook);
+	printf(&quot;buf addr : %08x\n&quot;, &amp;amp;contents);
+
+	FILE * f = fopen(argv[1], &quot;r&quot;);
+	fgets(contents, 1500, f);
+	mybook.setName(contents);
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;디버거로 vtable을 따라가 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_4.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;디버거로 쭉 따라가보면 0x004047D0에 객체가 생성된 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 그 객체에는 vtable의 주소가 들어있고 뒤 이어 “Windows_Hacking”이 담겨 있습니다.&lt;/p&gt;
+
+&lt;p&gt;해당 주소에서 빨간색으로 표시해놓은 부분이 vtable의 주소입니다.&lt;/p&gt;
+
+&lt;p&gt;더 따라가 봅시다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;vtable 시작 주소로 찾아간 모습입니다.&lt;/p&gt;
+
+&lt;p&gt;여기에 보면 0x401040, 0x401080, 0x401090 등등 보이시죠? 얘들이 virtual method의 주소입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;[eax+8]이 call되는데 오른쪽에 eax를 보면 vtable을 가리키고 있는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;vtable에서 +8 위치는 0x00401090이 되겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림을 통해 확인해보면 0x00401090은 printfName이고 화면에 buf 값이 출력되겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_8.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;지금까지 vtable에 대해 알아봤고 공격 이야기로 넘어가볼게요.&lt;/p&gt;
+
+&lt;h5 id=&quot;vtable-overwrite&quot;&gt;Vtable Overwrite?&lt;/h5&gt;
+
+&lt;p&gt;이제 대충 vtable이라는 게 무엇인지는 알겠는데 공격은 어떻게 하겠다는 걸까요?&lt;/p&gt;
+
+&lt;p&gt;공격 아이디어는 아까 전 위에서 살펴봤던 이 그림에 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_4.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;객체가 생성되었을 때의 주소와 값입니다.&lt;/p&gt;
+
+&lt;p&gt;여기 첫 4바이트가 vtable의 주소라고 했었죠?&lt;/p&gt;
+
+&lt;p&gt;만약 이 주소를 Shellcode가 있는 곳으로 바꿀 수가 있다면?&lt;/p&gt;
+
+&lt;p&gt;네 맞습니다. 끝났어요. ㅎㅎ&lt;/p&gt;
+
+&lt;p&gt;다만 주의해야 할 점이 객체의 vtable 값을 수정할 때는 shellcode가 들어있는 곳의 주소가 들어가야한다는 거죠.&lt;/p&gt;
+
+&lt;p&gt;method가 실행되기까지의 과정을 생각해보시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;객체에서 vtable 주소 -&amp;gt; vtable에서 함수의 주소 -&amp;gt; 실제 함수&lt;/p&gt;
+
+&lt;p&gt;이런 식으로 따라가는 것이죠?&lt;/p&gt;
+
+&lt;p&gt;그럼 우리는 다음과 같이 구성해야겠네요.&lt;/p&gt;
+
+&lt;p&gt;객체에서 vtable 변조 -&amp;gt; 가짜 vtable (쉘 코드 주소) -&amp;gt; 쉘 코드&lt;/p&gt;
+
+&lt;p&gt;자 그럼 실제로 overwrite를 진행해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저 얼마나 값을 넣어야 덮을 수 있을지 봐야겠네요?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_9.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;fgets로 버퍼에 값을 넣어주는 것을 따라가보면 0x004043E8에 AAAA를 넣고 있는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_10.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그리고 객체의 위치는 0x004047D8이네요.&lt;/p&gt;
+
+&lt;p&gt;그럼 거리는 4047D8 - 4043E8 = 3F0 = 1008이네요.&lt;/p&gt;
+
+&lt;p&gt;vtable 값도 덮어써야 하니까 총 거리는 1012!!&lt;/p&gt;
+
+&lt;p&gt;거리도 알아냈으니 Payload를 작성해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_12.png&quot; alt=&quot;[그림 1-12]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Payload는 이렇게 작성했습니다.&lt;/p&gt;
+
+&lt;p&gt;Payload 마지막 부분은 버퍼 시작 주소로 구성했고, 첫 부분은 fake function들로 구성했습니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 Payload를 보면 fake_vfunc 사이에 AAAA가 들어 있죠?&lt;/p&gt;
+
+&lt;p&gt;이건 다음 코드를 보시면 이해가 가실겁니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_11.png&quot; alt=&quot;[그림 1-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;어셈블리어 코드를 보면 [eax+8] 위치의 함수를 호출하고 있죠?&lt;/p&gt;
+
+&lt;p&gt;여기서 eax의 값은 우리가 변조한 버퍼의 시작주소입니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 버퍼 시작 주소에 +8 위치에 Shellcode 주소를 두었습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_13.png&quot; alt=&quot;[그림 1-13]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;짠! Shell이 잘 떨어지네요.&lt;/p&gt;
+
+&lt;p&gt;지금까지 Vtable 개념과 공격 기법을 알아봤습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 시간에는 UAF와 HeapSpray를 알아볼 것이고, 버전별 IE exploit을 진행해보겟습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0b Vtable Overwirte</summary></entry><entry><title type="html">android-0x02</title><link href="/android-0x02" rel="alternate" type="text/html" title="android-0x02" /><published>2019-04-12T14:00:00+09:00</published><updated>2019-04-12T14:00:00+09:00</updated><id>/android-0x02</id><content type="html" xml:base="/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -114,7 +428,7 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
 &lt;br /&gt;
 감사합니다.
 
-&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">Android 동적 분석</summary></entry><entry><title type="html">Windows-Heap 정의</title><link href="http://localhost:4000/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" /><published>2019-04-02T20:18:00+09:00</published><updated>2019-04-02T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x0a</id><content type="html" xml:base="http://localhost:4000/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">Android 동적 분석</summary></entry><entry><title type="html">Windows-Heap 정의</title><link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" /><published>2019-04-02T20:18:00+09:00</published><updated>2019-04-02T20:18:00+09:00</updated><id>/windows-0x0a</id><content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -260,7 +574,7 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
 
 &lt;p&gt;지금까지 Windows Heap 대해 알아봤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 시간부터는 Heap에 대한 공격 기법을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0a Windows-Heap</summary></entry><entry><title type="html">android-0x01</title><link href="http://localhost:4000/android-0x01" rel="alternate" type="text/html" title="android-0x01" /><published>2019-03-29T14:00:00+09:00</published><updated>2019-03-29T14:00:00+09:00</updated><id>http://localhost:4000/android-0x01</id><content type="html" xml:base="http://localhost:4000/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
+&lt;p&gt;다음 시간부터는 Heap에 대한 공격 기법을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0a Windows-Heap</summary></entry><entry><title type="html">android-0x01</title><link href="/android-0x01" rel="alternate" type="text/html" title="android-0x01" /><published>2019-03-29T14:00:00+09:00</published><updated>2019-03-29T14:00:00+09:00</updated><id>/android-0x01</id><content type="html" xml:base="/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -322,7 +636,7 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
 
 &lt;p&gt;지금까지 Android 정적 분석에 대해 알아보았고, 다음 포스팅에서는 Android 동적 분석에 대해 알아보도록 하겠습니다.&lt;/p&gt;
 
-&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">Android 정적 분석</summary></entry><entry><title type="html">CVE-2019-5736 (runC Container 취약점)</title><link href="http://localhost:4000/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" /><published>2019-03-28T02:43:00+09:00</published><updated>2019-03-28T02:43:00+09:00</updated><id>http://localhost:4000/runC%20Container</id><content type="html" xml:base="http://localhost:4000/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">Android 정적 분석</summary></entry><entry><title type="html">CVE-2019-5736 (runC Container 취약점)</title><link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" /><published>2019-03-28T02:43:00+09:00</published><updated>2019-03-28T02:43:00+09:00</updated><id>/runC%20Container</id><content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
 
@@ -509,7 +823,7 @@ func main() {
   &lt;li&gt;https://github.com/rancher/runc-cve&lt;/li&gt;
   &lt;li&gt;https://github.com/Frichetten/CVE-2019-5736-PoC&lt;/li&gt;
   &lt;li&gt;https://subicura.com/2017/01/19/docker-guide-for-beginners-1.html&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">CVE-2019-5736 (runC Container 취약점)</summary></entry><entry><title type="html">web-0x03</title><link href="http://localhost:4000/web-0x03" rel="alternate" type="text/html" title="web-0x03" /><published>2019-03-25T14:00:00+09:00</published><updated>2019-03-25T14:00:00+09:00</updated><id>http://localhost:4000/web-0x03</id><content type="html" xml:base="http://localhost:4000/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">CVE-2019-5736 (runC Container 취약점)</summary></entry><entry><title type="html">web-0x03</title><link href="/web-0x03" rel="alternate" type="text/html" title="web-0x03" /><published>2019-03-25T14:00:00+09:00</published><updated>2019-03-25T14:00:00+09:00</updated><id>/web-0x03</id><content type="html" xml:base="/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -607,7 +921,7 @@ https://ppbuz.com/8644&lt;br /&gt;
 https://nvd.nist.gov/vuln/detail/CVE-2018-9034&lt;br /&gt;
 https://pluginarchive.com/wordpress/relevanssi/v/4-0-4&lt;br /&gt;
 https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Hackyu</name></author><category term="Posts" /><summary type="html">CVE-2018-9034 1Day Test</summary></entry><entry><title type="html">windows-0x09</title><link href="http://localhost:4000/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" /><published>2019-03-24T20:18:00+09:00</published><updated>2019-03-24T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x09</id><content type="html" xml:base="http://localhost:4000/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>Hackyu</name></author><category term="Posts" /><summary type="html">CVE-2018-9034 1Day Test</summary></entry><entry><title type="html">windows-0x09</title><link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" /><published>2019-03-24T20:18:00+09:00</published><updated>2019-03-24T20:18:00+09:00</updated><id>/windows-0x09</id><content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -730,7 +1044,7 @@ https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
 
 &lt;p&gt;지금까지 DEP에 대해서 알아봤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 연재부터는 Heap Exploit으로 찾아뵙도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x09 DEP(3)</summary></entry><entry><title type="html">linux_0x04</title><link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-03-24T15:18:00+09:00</published><updated>2019-03-24T15:18:00+09:00</updated><id>http://localhost:4000/linux_0x04</id><content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+&lt;p&gt;다음 연재부터는 Heap Exploit으로 찾아뵙도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x09 DEP(3)</summary></entry><entry><title type="html">linux_0x04</title><link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-03-24T15:18:00+09:00</published><updated>2019-03-24T15:18:00+09:00</updated><id>/linux_0x04</id><content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
@@ -960,7 +1274,7 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 
 &lt;p&gt;다음 포스팅은 Chaining RTL이란 것을 정말…간단히 볼 수 있도록 해보겠습니다.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;뿅!&lt;/strong&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL(Return to Library)</summary></entry><entry><title type="html">windows-0x08</title><link href="http://localhost:4000/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" /><published>2019-03-19T20:18:00+09:00</published><updated>2019-03-19T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x08</id><content type="html" xml:base="http://localhost:4000/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;뿅!&lt;/strong&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL(Return to Library)</summary></entry><entry><title type="html">windows-0x08</title><link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" /><published>2019-03-19T20:18:00+09:00</published><updated>2019-03-19T20:18:00+09:00</updated><id>/windows-0x08</id><content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -1063,7 +1377,7 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 
 &lt;p&gt;자, 이제 ROP를 하기 위한 기초 준비 작업을 모두 마쳤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 Post에서 ROP를 알아보고 DEP편을 마무리 짓도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x08 DEP(2)</summary></entry><entry><title type="html">windows-0x07</title><link href="http://localhost:4000/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" /><published>2019-03-19T19:18:00+09:00</published><updated>2019-03-19T19:18:00+09:00</updated><id>http://localhost:4000/windows-0x07</id><content type="html" xml:base="http://localhost:4000/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+&lt;p&gt;다음 Post에서 ROP를 알아보고 DEP편을 마무리 짓도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x08 DEP(2)</summary></entry><entry><title type="html">windows-0x07</title><link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" /><published>2019-03-19T19:18:00+09:00</published><updated>2019-03-19T19:18:00+09:00</updated><id>/windows-0x07</id><content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -1195,42 +1509,4 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 
 &lt;p&gt;그래서 이 기법은 ROP를 위한 기본 개념 정도로만 이해하시기 바랍니다.&lt;/p&gt;
 
-&lt;p&gt;글이 너무 길어졌네요. 이만 줄이고 다음 편에서 ROP를 알아보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x07 DEP(1)</summary></entry><entry><title type="html">windows-0x06</title><link href="http://localhost:4000/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" /><published>2019-03-18T19:18:00+09:00</published><updated>2019-03-18T19:18:00+09:00</updated><id>http://localhost:4000/windows-0x06</id><content type="html" xml:base="http://localhost:4000/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
-
-&lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
-
-&lt;p&gt;SafeSEH는 SEH Overwite를 방어하기 위해 도입된 메모리 보호 기법입니다.&lt;/p&gt;
-
-&lt;p&gt;SafeSEH가 하는 일은 아주 간단합니다.&lt;/p&gt;
-
-&lt;p&gt;Exception Handler가 실행되기 전에 Handler 주소 값에 대한 검증을 수행합니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;1) 등록된 Handler의 주소가 STACK인지 확인해서 STACK이면 호출하지 않음.&lt;/li&gt;
-  &lt;li&gt;2) Handler의 주소가 현재 로드된 모듈의 주소이고, SafeSEH 컴파일이 되어 있다면 적절한 절차로 등록된 것인지 검증.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;까다롭죠??&lt;/p&gt;
-
-&lt;p&gt;그런데 해법이 상당이 간단합니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;1) Handler의 주소가 STACK이 아니면 된다.&lt;/li&gt;
-  &lt;li&gt;2) SafeSEH 컴파일이 되어 있지 않으면 된다.&lt;/li&gt;
-  &lt;li&gt;결론 : SafeSEH가 안걸려 있는 모듈에서 Gadget을 찾아오면 된다!!&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;간단하죠?&lt;/p&gt;
-
-&lt;p&gt;Immunity Debugger에서 mona.py를 이용하면 Module들에 어떤 보호기법들이 적용되어 있는지 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!mona modules
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x06_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;이 중에 SafeSEH가 적용되어 있지 않은 Module을 골라서 우회 공격을 동일하게 진행하면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;이상으로 GS편을 모두 마치겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x06 GS(2)</summary></entry></feed>
+&lt;p&gt;글이 너무 길어졌네요. 이만 줄이고 다음 편에서 ROP를 알아보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x07 DEP(1)</summary></entry></feed>

@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="http://localhost:4000/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-04-15T14:07:51+09:00</updated>
-  <id>http://localhost:4000/author/Joel/feed.xml</id>
+  <link href="/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-04-21T14:37:44+09:00</updated>
+  <id>/author/Joel/feed.xml</id>
 
   
   
@@ -40,12 +40,360 @@
 
   
     <entry>
+      <title type="html">Vtable Overwrite</title>
+      <link href="/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
+      <published>2019-04-18T20:18:00+09:00</published>
+      <updated>2019-04-18T20:18:00+09:00</updated>
+      <id>/windows-0x0b</id>
+      <content type="html" xml:base="/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘은 Vtable Overwrite에 대해 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;what-is-virtual-method&quot;&gt;What is Virtual Method?&lt;/h5&gt;
+
+&lt;p&gt;Vtable에 대한 이해를 하기 위해서는 먼저, 가상함수가 무엇인지부터 알아야 합니다.&lt;/p&gt;
+
+&lt;p&gt;여기서 상속, 다형성 등 모든 개념들을 다 살펴볼 수는 없습니다.&lt;/p&gt;
+
+&lt;p&gt;간단히 필요 부분만 살펴보고 넘어갈 텐데, 모르는 부분은 직접 찾아서 공부해보시기 바랍니다.&lt;/p&gt;
+
+&lt;p&gt;가상함수는 한마디로 다형성을 위해 씁니다.&lt;/p&gt;
+
+&lt;p&gt;예를 들어 다음과 같은 클래스가 있다고 칩시다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+
+class Unit {
+public:
+	void Sound()
+	{
+		printf(&quot;Unit!\n&quot;);
+	}
+
+};
+
+class Marine : public Unit {
+public:
+	void Sound() {
+		printf(&quot;You wanna piece of me, boy?\n&quot;);
+	}
+
+};
+
+class Firebat : public Unit {
+public:
+	void Sound() {
+		printf(&quot;Need a light?\n&quot;);
+	}
+
+};
+
+int main() {
+
+	Unit * unit = new Unit;
+	Marine * marine = new Marine;
+	Firebat * firebat = new Firebat;
+
+	unit-&amp;gt;Sound();
+
+	unit = marine;
+	unit-&amp;gt;Sound();
+
+	unit = firebat;
+	unit-&amp;gt;Sound();
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위와 같이 코드를 짜고 실행시키면 마린과 파이어뱃은 각자의 대사를 말할 것 같지만, 다음과 같이 출력됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;예상과는 다르죠?&lt;/p&gt;
+
+&lt;p&gt;이번에는 다음과 같이 virtual 키워드를 사용하여 가상함수로 코드를 수정했습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+
+class Unit {
+public:
+	virtual void Sound()
+	{
+		printf(&quot;Unit!\n&quot;);
+	}
+
+};
+
+class Marine : public Unit {
+public:
+	virtual void Sound() {
+		printf(&quot;You wanna piece of me, boy?\n&quot;);
+	}
+
+};
+
+class Firebat : public Unit {
+public:
+	virtual void Sound() {
+		printf(&quot;Need a light?\n&quot;);
+	}
+
+};
+
+int main() {
+
+	Unit * unit = new Unit;
+	Marine * marine = new Marine;
+	Firebat * firebat = new Firebat;
+
+	unit-&amp;gt;Sound();
+
+	unit = marine;
+	unit-&amp;gt;Sound();
+
+	unit = firebat;
+	unit-&amp;gt;Sound();
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이 코드를 실행하면 다음과 같이 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;virtual만 붙였을 뿐인데 처음 예상했던 대로 동작이 되네요.&lt;/p&gt;
+
+&lt;p&gt;즉, 이 가상함수라는 것은 파생 클래스가 안전하게 재정의할 수 있는 것이라고 할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이를 우리가 동적 바인딩이라고도 하는데, 동적 바인딩은 실행할 함수의 주소가 컴파일 시에 결정되는 것이 아니라, 포인터로 호출할 때 그 주소가 결정됩니다.&lt;/p&gt;
+
+&lt;p&gt;좀 더 정확하게는 호출 시에 정해진다라기보다 컴파일 시에 미리 가상함수 테이블을 만들어두고 거기에 호출하고자 하는 함수를 넣어두는 형태입니다.&lt;/p&gt;
+
+&lt;p&gt;이 가상함수 테이블이 바로 vtable입니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 실행이 되면 객체의 vtable을 찾아가서 호출할 함수의 번지를 찾아가는 로직이죠.&lt;/p&gt;
+
+&lt;p&gt;지금까지 설명한 내용을 도식화하면 다음과 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이번엔 아래 코드를 가지고 vtable부터 overwrite를 살펴보도록 하겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;cstring&amp;gt;
+#include &quot;windows.h&quot;
+#include &amp;lt;iostream&amp;gt;
+
+#pragma warning (disable:4996)
+#define _CRT_SECURE_NO_WARNINGS
+using namespace std;
+
+class Book {
+private:
+	char name[100];
+	int page;
+public:
+	Book(const char * _name, int _page) {
+		strcpy(name, _name);
+		page = _page;
+	}
+	virtual void setName(char * input) {
+		char * buf = (char *)malloc(20);
+		strncpy(buf, input, 19);
+		printName(buf);
+		getName();
+	}
+	virtual char * getName() {
+		return name;
+	}
+	virtual void printName(char * buf) {
+		printf(&quot;%s\n&quot;, buf);
+	}
+
+};
+
+int main(int argc, char * argv[]) {
+
+	static char contents[1000] = { 0, };
+	static Book mybook(&quot;Windows_Hacking&quot;, 1);
+	printf(&quot;object addr : 0x%08x\n&quot;, &amp;amp;mybook);
+	printf(&quot;object vtable addr : 0x%08p\n&quot;, mybook);
+	printf(&quot;buf addr : %08x\n&quot;, &amp;amp;contents);
+
+	FILE * f = fopen(argv[1], &quot;r&quot;);
+	fgets(contents, 1500, f);
+	mybook.setName(contents);
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;디버거로 vtable을 따라가 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_4.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;디버거로 쭉 따라가보면 0x004047D0에 객체가 생성된 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 그 객체에는 vtable의 주소가 들어있고 뒤 이어 “Windows_Hacking”이 담겨 있습니다.&lt;/p&gt;
+
+&lt;p&gt;해당 주소에서 빨간색으로 표시해놓은 부분이 vtable의 주소입니다.&lt;/p&gt;
+
+&lt;p&gt;더 따라가 봅시다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;vtable 시작 주소로 찾아간 모습입니다.&lt;/p&gt;
+
+&lt;p&gt;여기에 보면 0x401040, 0x401080, 0x401090 등등 보이시죠? 얘들이 virtual method의 주소입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;[eax+8]이 call되는데 오른쪽에 eax를 보면 vtable을 가리키고 있는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;vtable에서 +8 위치는 0x00401090이 되겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림을 통해 확인해보면 0x00401090은 printfName이고 화면에 buf 값이 출력되겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_8.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;지금까지 vtable에 대해 알아봤고 공격 이야기로 넘어가볼게요.&lt;/p&gt;
+
+&lt;h5 id=&quot;vtable-overwrite&quot;&gt;Vtable Overwrite?&lt;/h5&gt;
+
+&lt;p&gt;이제 대충 vtable이라는 게 무엇인지는 알겠는데 공격은 어떻게 하겠다는 걸까요?&lt;/p&gt;
+
+&lt;p&gt;공격 아이디어는 아까 전 위에서 살펴봤던 이 그림에 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_4.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;객체가 생성되었을 때의 주소와 값입니다.&lt;/p&gt;
+
+&lt;p&gt;여기 첫 4바이트가 vtable의 주소라고 했었죠?&lt;/p&gt;
+
+&lt;p&gt;만약 이 주소를 Shellcode가 있는 곳으로 바꿀 수가 있다면?&lt;/p&gt;
+
+&lt;p&gt;네 맞습니다. 끝났어요. ㅎㅎ&lt;/p&gt;
+
+&lt;p&gt;다만 주의해야 할 점이 객체의 vtable 값을 수정할 때는 shellcode가 들어있는 곳의 주소가 들어가야한다는 거죠.&lt;/p&gt;
+
+&lt;p&gt;method가 실행되기까지의 과정을 생각해보시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;객체에서 vtable 주소 -&amp;gt; vtable에서 함수의 주소 -&amp;gt; 실제 함수&lt;/p&gt;
+
+&lt;p&gt;이런 식으로 따라가는 것이죠?&lt;/p&gt;
+
+&lt;p&gt;그럼 우리는 다음과 같이 구성해야겠네요.&lt;/p&gt;
+
+&lt;p&gt;객체에서 vtable 변조 -&amp;gt; 가짜 vtable (쉘 코드 주소) -&amp;gt; 쉘 코드&lt;/p&gt;
+
+&lt;p&gt;자 그럼 실제로 overwrite를 진행해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저 얼마나 값을 넣어야 덮을 수 있을지 봐야겠네요?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_9.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;fgets로 버퍼에 값을 넣어주는 것을 따라가보면 0x004043E8에 AAAA를 넣고 있는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_10.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그리고 객체의 위치는 0x004047D8이네요.&lt;/p&gt;
+
+&lt;p&gt;그럼 거리는 4047D8 - 4043E8 = 3F0 = 1008이네요.&lt;/p&gt;
+
+&lt;p&gt;vtable 값도 덮어써야 하니까 총 거리는 1012!!&lt;/p&gt;
+
+&lt;p&gt;거리도 알아냈으니 Payload를 작성해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_12.png&quot; alt=&quot;[그림 1-12]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Payload는 이렇게 작성했습니다.&lt;/p&gt;
+
+&lt;p&gt;Payload 마지막 부분은 버퍼 시작 주소로 구성했고, 첫 부분은 fake function들로 구성했습니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 Payload를 보면 fake_vfunc 사이에 AAAA가 들어 있죠?&lt;/p&gt;
+
+&lt;p&gt;이건 다음 코드를 보시면 이해가 가실겁니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_11.png&quot; alt=&quot;[그림 1-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;어셈블리어 코드를 보면 [eax+8] 위치의 함수를 호출하고 있죠?&lt;/p&gt;
+
+&lt;p&gt;여기서 eax의 값은 우리가 변조한 버퍼의 시작주소입니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 버퍼 시작 주소에 +8 위치에 Shellcode 주소를 두었습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0b_13.png&quot; alt=&quot;[그림 1-13]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;짠! Shell이 잘 떨어지네요.&lt;/p&gt;
+
+&lt;p&gt;지금까지 Vtable 개념과 공격 기법을 알아봤습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 시간에는 UAF와 HeapSpray를 알아볼 것이고, 버전별 IE exploit을 진행해보겟습니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x0b Vtable Overwirte</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
       <title type="html">Windows-Heap 정의</title>
-      <link href="http://localhost:4000/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
+      <link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
       <published>2019-04-02T20:18:00+09:00</published>
       <updated>2019-04-02T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0a</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+      <id>/windows-0x0a</id>
+      <content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -221,11 +569,11 @@
   
     <entry>
       <title type="html">windows-0x09</title>
-      <link href="http://localhost:4000/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
+      <link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
       <published>2019-03-24T20:18:00+09:00</published>
       <updated>2019-03-24T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x09</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+      <id>/windows-0x09</id>
+      <content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -378,11 +726,11 @@
   
     <entry>
       <title type="html">windows-0x08</title>
-      <link href="http://localhost:4000/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
+      <link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
       <published>2019-03-19T20:18:00+09:00</published>
       <updated>2019-03-19T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x08</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+      <id>/windows-0x08</id>
+      <content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -515,11 +863,11 @@
   
     <entry>
       <title type="html">windows-0x07</title>
-      <link href="http://localhost:4000/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
+      <link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
       <published>2019-03-19T19:18:00+09:00</published>
       <updated>2019-03-19T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x07</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+      <id>/windows-0x07</id>
+      <content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -681,11 +1029,11 @@
   
     <entry>
       <title type="html">windows-0x06</title>
-      <link href="http://localhost:4000/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
+      <link href="/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
       <published>2019-03-18T19:18:00+09:00</published>
       <updated>2019-03-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x06</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+      <id>/windows-0x06</id>
+      <content type="html" xml:base="/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
 
@@ -753,11 +1101,11 @@
   
     <entry>
       <title type="html">DLL Hijacking &amp;amp; Ghidra</title>
-      <link href="http://localhost:4000/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
+      <link href="/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
       <published>2019-03-17T19:18:00+09:00</published>
       <updated>2019-03-17T19:18:00+09:00</updated>
-      <id>http://localhost:4000/Dll%20Hijacking%20&amp;%20Ghidra</id>
-      <content type="html" xml:base="http://localhost:4000/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+      <id>/Dll%20Hijacking%20&amp;%20Ghidra</id>
+      <content type="html" xml:base="/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -904,11 +1252,11 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
   
     <entry>
       <title type="html">windows-0x05</title>
-      <link href="http://localhost:4000/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" />
+      <link href="/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" />
       <published>2019-03-09T19:18:00+09:00</published>
       <updated>2019-03-09T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x05</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
+      <id>/windows-0x05</id>
+      <content type="html" xml:base="/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-gs&quot;&gt;What is GS?&lt;/h5&gt;
 
@@ -1096,11 +1444,11 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
   
     <entry>
       <title type="html">windows-0x04</title>
-      <link href="http://localhost:4000/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" />
+      <link href="/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" />
       <published>2019-03-03T19:18:00+09:00</published>
       <updated>2019-03-03T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x04</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
+      <id>/windows-0x04</id>
+      <content type="html" xml:base="/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-random-stack&quot;&gt;What is Random STACK?&lt;/h5&gt;
 
@@ -1200,160 +1548,12 @@ JMP ESP의 주소를 찾을 수 있게 됩니다.&lt;/p&gt;
     </entry>
   
     <entry>
-      <title type="html">windows-0x02</title>
-      <link href="http://localhost:4000/windows-0x02" rel="alternate" type="text/html" title="windows-0x02" />
-      <published>2019-02-18T19:18:00+09:00</published>
-      <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x02</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x02">&lt;h1 id=&quot;0x02-stack&quot;&gt;0x02 STACK&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-the-stack&quot;&gt;What is the STACK?&lt;/h5&gt;
-
-&lt;p&gt;STACK은 Main 함수를 포함한 각 함수들이 생성하는 &lt;strong&gt;지역변수&lt;/strong&gt;, &lt;strong&gt;결과값&lt;/strong&gt; 그리고 함수가 필요로 하는 &lt;strong&gt;인자&lt;/strong&gt;들을 저장할 수 있는 메모리 영역입니다.
-이 영역은 LIFO(Last In, First Out)이라는 데이터 구조를 가지고 있으며, CPU에 의해 관리되고 최적화되는 영역이기 때문에 데이터를 읽고 쓰는 속도가 매우 빠릅니다. 또한, 어떤 함수가 변수를 선언하면 그 새로운 변수는 스택에 생성되고(push), 함수가 종료될 때 함수가 생성한 모든 변수, 값등은 자동으로 해제됩니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;how-does-the-stack-work&quot;&gt;How does the STACK work?&lt;/h5&gt;
-
-&lt;p&gt;STACK을 설명할 때 가장 먼저 떠오르는 개념이 바로 LIFO입니다. LIFO는 Last In First Out의 앞 글자를 딴 용어이고 한글로는 후입선출이라고 합니다.
-설명을 하자면 ‘마지막에 들어온 것이 먼저 나간다’이죠. 아래 그림을 보면서 설명을 이어나가겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK은 위 그림처럼 한 쪽이 막혀 있고 입구가 하나인 구조를 가지고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;앞에서 제가 마지막에 들어온 것이 먼저 나간다라고 했는데, 들어오는 동작. 값을 STACK에 저장하는 동작을 &lt;strong&gt;push&lt;/strong&gt;라고 합니다.&lt;/p&gt;
-
-&lt;p&gt;반대로 나가는 동작. 값을 STACK에서 빼내는 동작을 &lt;strong&gt;pop&lt;/strong&gt;이라고 합니다. 이것이 STACK의 기본 구조이며 동작입니다.&lt;/p&gt;
-
-&lt;p&gt;그럼, 다음 코드를 가지고 STACK 동작 및 용어들을 조금 더 살펴보도록 하겠습니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
-
-void plus(int input) {
-	int output = input+2;
-	printf(&quot;Result : %d\n&quot;, output);
-}
-
-int main(int argc, char* argv[]) {
-	int a = 4;
-	plus(a);
-
-	return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;위 코드는 입력 값에다 2를 더해서 출력해주는 간단한 내용입니다. 아래 [그림 1-1]은 plus 함수가 동작하고 있는 특정 순간의 STACK 상황을 표현한 내용입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x02_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK은 STACK Frame들이 모여서 만들어진다고도 표현합니다. 풀어서 설명을 좀 해보자면, 각 함수들마다 주어진 동작을 위한 공간이 주어지는데 이런 공간 하나 하나를 STACK Frame이라고 할 수 있겠습니다. 이 공간들이 모여 STACK을 구성하는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;위 그림의 오른편을 보면, Main Function STACK Frame이라고 적힌 것을 보실 수 있습니다. 
-그 아래로 Plus Function STACK Frame이라고 적혀 있죠.&lt;/p&gt;
-
-&lt;p&gt;위 그림처럼, 하나의 함수가 동작하는 중에 다른 함수가 동작되어지는 상황에서는 새롭게 실행되는 함수를 위한 공간을 마련합니다. 
-그리고나서 함수가 종료되면 마련해놓았던 공간을 해제합니다.&lt;/p&gt;
-
-&lt;p&gt;STACK은 Heap과는 다르게 여러분들이 직접 할당, 해제할 필요없이 자동으로 진행이 됩니다.&lt;/p&gt;
-
-&lt;p&gt;마지막으로, 함수가 실행되어 동작하는 과정에서 STACK에 값을 저장하거나, STACK의 값을 참조하는 등의 행동을 할 때는 Offset을 가지고 합니다.&lt;/p&gt;
-
-&lt;p&gt;그런데 이 Offset이라는 게 어떤 지점까지의 거리니까 기준점이 있어야겠죠? 그 기준점으로 주로 활용되는 것이 EBP와 ESP입니다.&lt;/p&gt;
-
-&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저하는 동작. 함수의 프롤로그 과정이죠.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;push ebp
-mov ebp,esp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;새로운 함수를 위해 Frame을 구성하면 제일 먼저 프롤로그 과정을 통해 기준점을 생성합니다. 이 기준점을 생성할 때는 아무 값이나 설정하는 것이 아니라
-이전 STACK Frame의 기준점을 가지고 옵니다.&lt;/p&gt;
-
-&lt;p&gt;그래서 STACK에 그림으로 표기할 때, EBP(Extended Base Pointer)라는 용어와 SFP(Saved Frame Pointer)라는 용어도 같이 사용하죠.&lt;/p&gt;
-
-&lt;p&gt;이전 STACK의 기준점을 가지고와서 현재 STACK Frame의 기준으로 쓰다가 함수가 종료되는 시점. 에필로그 과정에서 다시 되돌려 줍니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mov esp, ebp
-pop ebp
-pop eip
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;이 과정을 통해 EBP를 원래대로 돌려줄 뿐만 아니라, 이전 Frame 안의 다음 주소로 이동하게 됩니다.
-Offset의 기준을 ESP로 잡더라도 EBP를 새로운 STACK Frame에 구성하는 행위는 변함없습니다.&lt;/p&gt;
-
-&lt;p&gt;아래는 지금까지 설명한 내용들을 정리한 내용들입니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;SFP&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-Saved Frame Pointer는 현재 STACK Frame의 지역 변수들을 위한 기준점 역할을 합니다.&lt;/p&gt;
-
-    &lt;p&gt;-예전 STACK Frame이 가지고 있던 EBP가 현재 STACK Frame의 EBP(Extended Base Pointer)에 저장됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;함수 호출&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-함수가 호출되면, 새로운 STACK Frame이 생성됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-함수 동작에 필요한 인자들을 STACK에 저장합니다.&lt;/p&gt;
-
-    &lt;p&gt;-현재 EBP와 Return Address가 저장됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-ESP는 새로운 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;함수 종료&lt;/strong&gt;&lt;/p&gt;
-
-    &lt;p&gt;-함수 사용에 필요했던 STACK Frame이 제거됩니다.&lt;/p&gt;
-
-    &lt;p&gt;-EBP가 이전에 저장했뒀던 값으로 되돌려지고, Return Address로 코드의 흐름이 바뀝니다.&lt;/p&gt;
-
-    &lt;p&gt;-ESP는 되돌아온 STACK Frame에 맞추어 변경됩니다.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;STACK에 대한 이야기는 이쯤해두고, 다음 연재부터는 본격적으로 Stack based overflow를 다루어보겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x02 STACK</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
       <title type="html">windows-0x03</title>
-      <link href="http://localhost:4000/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
+      <link href="/windows-0x03" rel="alternate" type="text/html" title="windows-0x03" />
       <published>2019-02-18T19:18:00+09:00</published>
       <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x03</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
+      <id>/windows-0x03</id>
+      <content type="html" xml:base="/windows-0x03">&lt;h1 id=&quot;0x03-basic-bof&quot;&gt;0x03 Basic Bof&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-the-buffer-overflow&quot;&gt;What is the Buffer Overflow?&lt;/h5&gt;
 
