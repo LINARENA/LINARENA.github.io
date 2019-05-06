@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-04-21T14:37:44+09:00</updated>
-  <id>/tag/posts/feed.xml</id>
+  <link href="http://localhost:4000/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
+  <updated>2019-05-06T20:42:10+09:00</updated>
+  <id>http://localhost:4000/tag/posts/feed.xml</id>
 
   
   
@@ -40,12 +40,192 @@
 
   
     <entry>
+      <title type="html">Use After Free</title>
+      <link href="http://localhost:4000/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" />
+      <published>2019-05-06T20:18:00+09:00</published>
+      <updated>2019-05-06T20:18:00+09:00</updated>
+      <id>http://localhost:4000/windows-0x0c</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘은 Use After Free에 대해 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;what-is-use-after-free&quot;&gt;What is Use After Free?&lt;/h5&gt;
+
+&lt;p&gt;Use After Free는 단어 그대로 Free된 Pointer를 사용했을 때 발생하는 취약점입니다.&lt;/p&gt;
+
+&lt;p&gt;UAF를 설명할 때 주로 다음의 샘플 코드를 많이 이용하는데 UAF를 한 번에 잘 설명하고 있습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Object *obj = (Object *)malloc(sizeof(Object));
+obj-&amp;gt;Method();
+free(obj);		// Free
+...
+obj-&amp;gt;Method();	// Use
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위 코드의 첫 코드를 보면 malloc으로 Object의 크기만큼 Heap을 할당해주고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 세 번째 줄에서 할당했던 객체를 해제해주고 있죠.&lt;/p&gt;
+
+&lt;p&gt;마지막 코드를 보시면, 이미 해제된 Pointer가 다시 사용되고 있는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이처럼, Free된 후 해당 메모리를 가리키던 Pointer가 다시 사용될 때를 UAF 버그라고 이야기합니다.&lt;/p&gt;
+
+&lt;p&gt;그런데..이거 가지고 뭘 할 수가 있지??&lt;/p&gt;
+
+&lt;p&gt;그렇죠.. 아직 이 코드만 가지고는 명확한 이해가 안 될 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 예제를 가지고 조금 더 쉽게 설명해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;uaf-example&quot;&gt;UAF Example&lt;/h5&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+typedef struct uaf {
+
+	void (*vulnfunc)();
+
+}uaf;
+
+void good() {
+	printf(&quot;I'm Joel\n&quot;);
+}
+
+void bad() {
+	printf(&quot;I'm not Joel\n&quot;);
+}
+
+int main(int argc, char* cargv[]) {
+
+	uaf * first = malloc(sizeof(uaf));
+	uaf * second;
+
+	first-&amp;gt;vulnfunc = good;
+	first-&amp;gt;vulnfunc();
+
+	free(first);
+
+	second = malloc(sizeof(uaf));
+	second-&amp;gt;vulnfunc = bad;
+	
+	first-&amp;gt;vulnfunc();
+
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위 코드를 보면 먼저, first라는 객체에 uaf 크기만큼 Heap을 할당해주었습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 vulnfunc에 good 함수의 주소를 넣어주었습니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 first-&amp;gt;vulnfunc();를 실행하게 되면 “I’m Joel”이라는 메시지가 출력되겠네요.&lt;/p&gt;
+
+&lt;p&gt;여기까진 쉽죠??&lt;/p&gt;
+
+&lt;p&gt;이후 first를 free 해줍니다.&lt;/p&gt;
+
+&lt;p&gt;그리곤 second 객체를 생성하고 uaf 크기만큼 Heap을 할당해주었습니다.&lt;/p&gt;
+
+&lt;p&gt;uaf 크기만큼 할당하고 해제한 뒤, 다시 uaf 크기만큼 할당하면 second는 first가 할당받았던 Heap과 동일한 영역을 할당받게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;지난 번 Heap 구조를 설명했던 것.. 기억하시나요?&lt;/p&gt;
+
+&lt;p&gt;할당된 Heap을 해제하게 되면 Kernel로 바로 보내버리는 게 아니라, List에 넣어둔다고 했었죠?&lt;/p&gt;
+
+&lt;p&gt;그런 다음 다시 동일한 크기의 Heap을 할당해달라고 요청하면 방금 해제된 영역을 재할당해줍니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 first가 해제된 다음 second를 요청하니까 second에는 first에 할당되었던 것과 동일한 영역이 할당되겠죠?&lt;/p&gt;
+
+&lt;p&gt;지금까지 설명한 내용을 표현하자면 다음과 같이 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0c_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;다시 코드로 돌아가서, second의 vulnfunc에 bad 함수의 주소를 넣어주고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;마지막으로, 이미 해제된 Pointer를 요청합니다.&lt;/p&gt;
+
+&lt;p&gt;first-&amp;gt;vulnfunc()를 호출하면 어떤 일이 생기게 될까요?&lt;/p&gt;
+
+&lt;p&gt;second에 bad의 함수를 넣어뒀기 때문에 I’m not Joel이 호출되겠죠?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0c_2.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;실제 실행을 해보니 동일하게 구동이 되네요.&lt;/p&gt;
+
+&lt;p&gt;지금까지 설명한 것을 중요 부분만 한 번 더 따라가 볼게요.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;uaf * first = malloc(sizeof(uaf));
+first-&amp;gt;vulnfunc = good;
+first-&amp;gt;vulnfunc();
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;first 객체를 생성하고 uaf만큼 Heap을 할당해줍니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;free(first);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;그런 다음 free로 해제해줍니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;first-&amp;gt;vulnfunc();
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;그리고 개발자의 부주의로 인해 이미 할당 해제된 Pointer가 재사용되고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;뭔가 감이 오시나요?&lt;/p&gt;
+
+&lt;p&gt;해제와 재사용 사이에 second 객체 부분이 있었고, second는 first와 동일한 크기, 위치를 할당받았었죠?&lt;/p&gt;
+
+&lt;p&gt;이 second 부분이 맨 처음 샘플 코드에서 … 부분인데, 이 부분에서 만약 shellcode의 주소로 바꿀 수 있다면 어떻게 될까요?&lt;/p&gt;
+
+&lt;p&gt;first-&amp;gt;vulnfunc();가 구동되는 순간, Pointer가 가리키는 영역엔 shellcode의 주소가 있을 것이고…&lt;/p&gt;
+
+&lt;p&gt;shellcode가 실행되겠죠?&lt;/p&gt;
+
+&lt;p&gt;지금까지 설명한 내용이 UAF의 기본 개념입니다.&lt;/p&gt;
+
+&lt;p&gt;UAF를 이용한 Exploit은 UAF의 절친 HeapSpray을 살펴본 후 진행할 예정이니까 그때까지만 기다려주세요 ㅎㅎ&lt;/p&gt;
+
+&lt;p&gt;다음 글에서 뵙겠습니다!&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x0c Use After Free</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
       <title type="html">Vtable Overwrite</title>
-      <link href="/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
+      <link href="http://localhost:4000/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
       <published>2019-04-18T20:18:00+09:00</published>
       <updated>2019-04-18T20:18:00+09:00</updated>
-      <id>/windows-0x0b</id>
-      <content type="html" xml:base="/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x0b</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -389,11 +569,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">android-0x02</title>
-      <link href="/android-0x02" rel="alternate" type="text/html" title="android-0x02" />
+      <link href="http://localhost:4000/android-0x02" rel="alternate" type="text/html" title="android-0x02" />
       <published>2019-04-12T14:00:00+09:00</published>
       <updated>2019-04-12T14:00:00+09:00</updated>
-      <id>/android-0x02</id>
-      <content type="html" xml:base="/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
+      <id>http://localhost:4000/android-0x02</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -539,11 +719,11 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
   
     <entry>
       <title type="html">Windows-Heap 정의</title>
-      <link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
+      <link href="http://localhost:4000/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
       <published>2019-04-02T20:18:00+09:00</published>
       <updated>2019-04-02T20:18:00+09:00</updated>
-      <id>/windows-0x0a</id>
-      <content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x0a</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -719,11 +899,11 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
   
     <entry>
       <title type="html">android-0x01</title>
-      <link href="/android-0x01" rel="alternate" type="text/html" title="android-0x01" />
+      <link href="http://localhost:4000/android-0x01" rel="alternate" type="text/html" title="android-0x01" />
       <published>2019-03-29T14:00:00+09:00</published>
       <updated>2019-03-29T14:00:00+09:00</updated>
-      <id>/android-0x01</id>
-      <content type="html" xml:base="/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
+      <id>http://localhost:4000/android-0x01</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -815,11 +995,11 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
   
     <entry>
       <title type="html">CVE-2019-5736 (runC Container 취약점)</title>
-      <link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
+      <link href="http://localhost:4000/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
       <published>2019-03-28T02:43:00+09:00</published>
       <updated>2019-03-28T02:43:00+09:00</updated>
-      <id>/runC%20Container</id>
-      <content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+      <id>http://localhost:4000/runC%20Container</id>
+      <content type="html" xml:base="http://localhost:4000/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
 
@@ -1036,11 +1216,11 @@ func main() {
   
     <entry>
       <title type="html">web-0x03</title>
-      <link href="/web-0x03" rel="alternate" type="text/html" title="web-0x03" />
+      <link href="http://localhost:4000/web-0x03" rel="alternate" type="text/html" title="web-0x03" />
       <published>2019-03-25T14:00:00+09:00</published>
       <updated>2019-03-25T14:00:00+09:00</updated>
-      <id>/web-0x03</id>
-      <content type="html" xml:base="/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
+      <id>http://localhost:4000/web-0x03</id>
+      <content type="html" xml:base="http://localhost:4000/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -1168,11 +1348,11 @@ https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
   
     <entry>
       <title type="html">windows-0x09</title>
-      <link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
+      <link href="http://localhost:4000/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
       <published>2019-03-24T20:18:00+09:00</published>
       <updated>2019-03-24T20:18:00+09:00</updated>
-      <id>/windows-0x09</id>
-      <content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x09</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -1325,11 +1505,11 @@ https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
   
     <entry>
       <title type="html">linux_0x04</title>
-      <link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
+      <link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
       <published>2019-03-24T15:18:00+09:00</published>
       <updated>2019-03-24T15:18:00+09:00</updated>
-      <id>/linux_0x04</id>
-      <content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x04</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
@@ -1589,11 +1769,11 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
   
     <entry>
       <title type="html">windows-0x08</title>
-      <link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
+      <link href="http://localhost:4000/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
       <published>2019-03-19T20:18:00+09:00</published>
       <updated>2019-03-19T20:18:00+09:00</updated>
-      <id>/windows-0x08</id>
-      <content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x08</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -1718,172 +1898,6 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 
       
         <summary type="html">0x08 DEP(2)</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">windows-0x07</title>
-      <link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
-      <published>2019-03-19T19:18:00+09:00</published>
-      <updated>2019-03-19T19:18:00+09:00</updated>
-      <id>/windows-0x07</id>
-      <content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
-
-&lt;p&gt;DEP는 특정 메모리의 실행 권한을 제거하여, 메모리에 올라온 Shellcode의 실행을 막는 메모리 보호 기법입니다.&lt;/p&gt;
-
-&lt;p&gt;DEP는 Window XP Service Pack 2에서부터 적용된 기법이며, H/W 기반 DEP와 S/W 기반 DEP로 나눌 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;이 두 가지 방식의 차이는 CPU가 하드웨어적으로 DEP를 지원 가능한가를 기준으로 나뉜다고 생각하시면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;CPU에서 지원 가능한 경우 H/W DEP라 하고, 그렇지 않은 경우 S/W로 그 기능을 지원하는 방식인 것이죠.&lt;/p&gt;
-
-&lt;p&gt;최근 나온 CPU들은 대부분 H/W 기능을 지원하므로 일반적으로 DEP라고 하면 H/W DEP라고 생각하시면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;DEP에는 아래와 같이 4가지 종류의 옵션이 존재합니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;OptIn : 지정된 Binary만 보호&lt;/li&gt;
-  &lt;li&gt;OptOut : 지정된 Binary를 제외하고 보호&lt;/li&gt;
-  &lt;li&gt;AlwaysOn : 모든 Process 항상 보호&lt;/li&gt;
-  &lt;li&gt;AlwaysOff : 모든 Process 보호하지 않음&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;OS를 설치한 후, 직접 변경한 적이 없다면 Default로 OptIn 옵션이 적용되어 있고 다음과 같이 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;DEP가 적용되면 Shellcode를 STACK에 넣어서 실행해왔던 지금까지의 방법으로는 성공할 수가 없게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;하지만 이 기법 역시 우회가 가능하며, DEP를 우회하기 위해 필요한 기법과 개념들은 다음과 같습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Gadget&lt;/li&gt;
-  &lt;li&gt;RTL&lt;/li&gt;
-  &lt;li&gt;Chaining RTL&lt;/li&gt;
-  &lt;li&gt;ROP&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;지금부터 하나씩 살펴보겠습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;gadget&quot;&gt;Gadget&lt;/h5&gt;
-
-&lt;p&gt;Gadget이란 “mov esp, ebp” 등의 명령어 조각을 의미했었습니다.&lt;/p&gt;
-
-&lt;p&gt;하지만 지금 시스템 해킹에서의 Gadget은 RET로 끝나는 명령어 조각을 의미하게 되었습니다.&lt;/p&gt;
-
-&lt;p&gt;이 Gadget이 공격에서 왜 중요한지는 Chaining RTL과 ROP를 다루면서 이야기하겠습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;rtl&quot;&gt;RTL&lt;/h5&gt;
-
-&lt;p&gt;RTL은 Return to Library의 약자로 해석을 하면 Library로 돌아간다는 의미입니다.&lt;/p&gt;
-
-&lt;p&gt;Library로 돌아간다?&lt;/p&gt;
-
-&lt;p&gt;아까 앞에서 DEP가 적용되면 Shellcode를 실행할 수가 없다고 했었던 것 기억나시죠?&lt;/p&gt;
-
-&lt;p&gt;그래서 RET를 Shellcode의 주소로 변조하는 것이 아니라, 실행 권한이 있을 수 밖에 없는 Library의 함수의 주소로 변조하는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;그리고!!!&lt;/p&gt;
-
-&lt;p&gt;RTL에서 가장 중요한 것은 함수의 인자를 직접 생성해야 한다는 것입니다.&lt;/p&gt;
-
-&lt;p&gt;Shellcode를 실행했을 때와는 다르게 이 방법은 RET 주소를 원하는 함수의 주소로 바꿔줬을 뿐이기 때문이죠.&lt;/p&gt;
-
-&lt;p&gt;그 함수가 실행되기 위해서는 함수의 동작에 필요한 인자들이 있어야하겠죠?&lt;/p&gt;
-
-&lt;p&gt;CPU가 알아서 자동으로 만들어 줄리가 없으니,,STACK에 직접 구성해줘야 합니다.&lt;/p&gt;
-
-&lt;p&gt;인자를 1개만 취하는 함수 Func()가 있다고 가정하겠습니다.&lt;/p&gt;
-
-&lt;p&gt;RTL 기법으로 이 함수를 호출하기 위해서는 STACK을 다음과 같이 구성해야 합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 그림에서 중간 STACK 그림을 보면 Func을 호출하기 위해 RET를 Func 함수의 주소로 변조하고, 그 위치에서 +8만큼 떨어진 곳에 함수의 인자를 구성한 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;그런데 왜 인자의 위치를 저렇게 구성해줘야 할까요?&lt;/p&gt;
-
-&lt;p&gt;다음 그림을 보면서 설명해보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;빨간 색으로 표시된 부분은 Main 함수의 에필로그 과정, 파란 색으로 표신된 부분은 Func 함수의 프롤로그 과정을 나타낸 것 입니다.&lt;/p&gt;
-
-&lt;p&gt;먼저, 빨간 색. Main 함수의 에필로그 과정을 봅시다.&lt;/p&gt;
-
-&lt;p&gt;POP EIP, JMP EIP를 코드를 수행했을 때의 위치가 가장 왼쪽 STACK에 표시된 ESP가 가르키는 곳 입니다.&lt;/p&gt;
-
-&lt;p&gt;이후, JMP EIP 코드가 실행되면 새로운 함수가 실행되고 새 함수의 프롤로그 과정이 진행됩니다.&lt;/p&gt;
-
-&lt;p&gt;프롤로그 과정의 일부인 PUSH EBP가 실행되면 새 STACK Frame의 기준점을 만듭니다.&lt;/p&gt;
-
-&lt;p&gt;여기까지 진행된 후, STACK을 살펴봅시다.&lt;/p&gt;
-
-&lt;p&gt;Main 함수의 RET가 뒤이어 실행되는 함수의 SFP 자리로 바뀐다는 것을 알 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;그리고 그 다음에, RET를 만들어주었습니다.&lt;/p&gt;
-
-&lt;p&gt;RTL이 아니라 정상적인 방식인 CALL을 통해 함수가 실행된다면 STACK에 다음에 실행할 곳의 위치를 넣어줍니다.&lt;/p&gt;
-
-&lt;p&gt;그런데 우리는 컴파일러가 만들어주는 것이 아니기 때문에 직접 만들어줘야 합니다.&lt;/p&gt;
-
-&lt;p&gt;그래서 저 위치에 다음에 실행할 곳의 주소 역할을 할 값을 직접 넣어 구성해주는 것 입니다.&lt;/p&gt;
-
-&lt;p&gt;쉽게 생각하면 컴파일러가 만들어주는 구조를 똑같이 흉내낸다고 생각하시면 되겠습니다.&lt;/p&gt;
-
-&lt;p&gt;이것이 RTL의 전부입니다.&lt;/p&gt;
-
-&lt;p&gt;다음은 디버거를 통해 RTL을 진행한 그림입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;잘 실행이 되네요^^&lt;/p&gt;
-
-&lt;p&gt;그런데 이 방식은 실제 환경에서는 거의 불가능한 방법이라는 것도 알아두셔야 합니다.&lt;/p&gt;
-
-&lt;p&gt;실제 환경에서는 ASLR, Safe SEH 등이 기본적으로 적용되어 있기 때문에 내가 원하는 함수의 주소를 찾아내기 힘들기 때문입니다.&lt;/p&gt;
-
-&lt;p&gt;그래서 이 기법은 ROP를 위한 기본 개념 정도로만 이해하시기 바랍니다.&lt;/p&gt;
-
-&lt;p&gt;글이 너무 길어졌네요. 이만 줄이고 다음 편에서 ROP를 알아보도록 하겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x07 DEP(1)</summary>
       
 
       
