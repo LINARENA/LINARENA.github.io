@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-05-06T20:44:24+09:00</updated>
-  <id>/tag/posts/feed.xml</id>
+  <link href="http://localhost:4000/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
+  <updated>2019-05-16T02:17:41+09:00</updated>
+  <id>http://localhost:4000/tag/posts/feed.xml</id>
 
   
   
@@ -40,12 +40,348 @@
 
   
     <entry>
+      <title type="html">linux_0x04</title>
+      <link href="http://localhost:4000/linux_0x05" rel="alternate" type="text/html" title="linux_0x04" />
+      <published>2019-05-16T11:18:00+09:00</published>
+      <updated>2019-05-16T11:18:00+09:00</updated>
+      <id>http://localhost:4000/linux_0x05</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x05">&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
+
+&lt;p&gt;이번 시간부터는 지난 포스팅에서 진행된 환경보다 비교적 최신의 환경에서 진행 해보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;지금까지 알아본 Stack관련 내용은 모두 오늘 포스팅을 위해 알아본것입니다. 그럼 먼저 이번에는 &lt;strong&gt;RTL Chaining&lt;/strong&gt;에 대해 알아 보겠습니다. &lt;strong&gt;RTL Chaining&lt;/strong&gt;은 원하는 라이브러리 함수를 여러번 호출하는 기법입니다. 어떻게 여러번 호출 하느냐 전에 &lt;strong&gt;Gadget&lt;/strong&gt; 이라는 개념을 알아야 합니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Gadget&lt;/strong&gt; 의 사전 의미는 “(작고 유용한) 도구” 의미입니다만, 우리가 다루는 &lt;strong&gt;bof&lt;/strong&gt;에서의 &lt;strong&gt;Gadget&lt;/strong&gt;은 &lt;strong&gt;RET로 끝나는 연속된 함수&lt;/strong&gt;를 지칭 합니다. 대표적으로 &lt;strong&gt;P&lt;/strong&gt;OP &lt;strong&gt;P&lt;/strong&gt;OP &lt;strong&gt;R&lt;/strong&gt;ET&lt;strong&gt;(PPR)&lt;/strong&gt;를 사용합니다.
+&lt;strong&gt;PPR&lt;/strong&gt;의 용도는 “&lt;strong&gt;함수에 사용된 인자들을 정리하기 위해 사용되는 것&lt;/strong&gt;” 으로 알아두시면 됩니다.(POP의 역할을 생각해보시면 쉽습니다!)&lt;/p&gt;
+
+&lt;p&gt;그럼 어떻게 &lt;strong&gt;PPR&lt;/strong&gt;을 사용해서 원하는 행위를 유도하는지 알아 보도록 하죠.
+위에서 &lt;strong&gt;RTL&lt;/strong&gt;을 설명드릴 때 &lt;strong&gt;RET&lt;/strong&gt; 구역에 system()의 주소가 위치하고 바로 이어서 무의미한 값을 채웠습니다. 그 다음 /bin/sh 의 주소를 위치 시켰었죠. 지금은 RET구역 다음에 위치하던 무의미한 값을 채우는것이 아닌 Gadget을 위치시키도록 합니다. 이 때 RET에 위치하는 함수가 사용하는 인자의 갯수에 맞춰 PPR의 모양이 달라집니다.&lt;/p&gt;
+
+&lt;p&gt;함수가 사용하는 인자가 &lt;strong&gt;2&lt;/strong&gt;개라면 &lt;strong&gt;PPR&lt;/strong&gt;, &lt;strong&gt;1&lt;/strong&gt;개라면 &lt;strong&gt;PR&lt;/strong&gt;, &lt;strong&gt;5&lt;/strong&gt;개라면 &lt;strong&gt;PPPPPR&lt;/strong&gt;이 됩니다. 우리는 &lt;strong&gt;system()&lt;/strong&gt; 함수를 사용하며 이 친구는 &lt;strong&gt;1개의 인자를 사용&lt;/strong&gt;합니다. 따라서 &lt;strong&gt;PR&lt;/strong&gt;(POP RET)이 되겠습니다.&lt;/p&gt;
+
+&lt;p&gt;함수가 동작 되면 POP으로 함수의 인자를 정리하고 RET에 원하는 라이브러리 함수를 위치시켜서 원하는 함수로 다시 호출하는 방식입니다. 이것을 반복하면 원하는 함수를 여러번 계속 해서 호출이 가능해 집니다. 조금 쉽게 표현 하자면 &lt;strong&gt;학교&lt;/strong&gt; 끝나고 &lt;strong&gt;집&lt;/strong&gt;에만 갔었는데(&lt;strong&gt;RTL&lt;/strong&gt;) 이제는 &lt;strong&gt;학교&lt;/strong&gt; 끝나고 &lt;strong&gt;편의점&lt;/strong&gt;도 들리고 &lt;strong&gt;PC방&lt;/strong&gt;도 들리고 &lt;strong&gt;데이트&lt;/strong&gt;도 하고나서 &lt;strong&gt;집&lt;/strong&gt;에 도착하는 행위가 가능해진 겁니다.(&lt;strong&gt;RTL Chaining&lt;/strong&gt;)&lt;/p&gt;
+
+&lt;p&gt;즉, 공격자의 입맛대로 공격 페이로드를 디잔인할 수 있는 것이죠. 그림으로 비교 해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-1.png&quot; alt=&quot;[그림 5-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위의 그림이 앞 포스팅에서 함께 봤던 일반적인 RTL입니다. execl()을 실행 시켜서 4byte 뒤에 위치시켜둔 인자를 받아내고 RET 위치위 AAAA로 이동 후 error를 발생 시키고 종료 합니다.(error 발생이 싫으신 분들은 exit() 함수를 위치 시켜주시면 종료 됩니다.) 이 작업을 여러번 chain처럼 연결 시켜 연속적으로 RTL을 사용하는  &lt;strong&gt;RTL Chaining&lt;/strong&gt;이 완성 됩니다. 다음은 &lt;strong&gt;RTL Chaining&lt;/strong&gt;을 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h1 id=&quot;rtl-chaining&quot;&gt;RTL Chaining&lt;/h1&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-2.png&quot; alt=&quot;[그림 5-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;쉬운 이해를 위해서 함수를 단순화 했습니다. func1()함수는 두 개의 인자를, func2()는 한 개의 인자를 사용합니다. 따라서 func1()이 끝나고 func2()로 이어기 위해선 PPR이 필요합니다.&lt;/p&gt;
+
+&lt;p&gt;func1()이 종료되면 RET 위치에 위치한 PPR동작합니다. POP POP 작업으로 두개의 인자가 정리되고  ret가 수행되며 func2()로 넘어갑니다. func2()의 동작이 끝나고 ret가 수행될 것입니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;RTL Chaining&lt;/strong&gt;은 이런식으로 ret 영역에 PPR(함수 인자수에 맞춰서)을 위치 시켜 원하는 함수를 계속적으로 추가 수행 하도록 하는 방식입니다.&lt;/p&gt;
+
+&lt;p&gt;다음으로 &lt;strong&gt;PLT&lt;/strong&gt;와 &lt;strong&gt;GOT&lt;/strong&gt;라는것을 알아보겠습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;plt--got&quot;&gt;PLT &amp;amp; GOT&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;PLT&lt;/strong&gt;는 &lt;strong&gt;Procedure Linkage Table&lt;/strong&gt;의 약자로 외부 프로시저를 연결해주는 테이블 입니다. 이놈을 이용해 다른 라이브러리의 프로시저를 호출합니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;GOT&lt;/strong&gt;는 &lt;strong&gt;Global Offset Table&lt;/strong&gt;의 약자로 PLT가 참조하는 테이블입니다. 프로시저들의 실제 주소가 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-3.png&quot; alt=&quot;[그림 5-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그림에서 보는 과정처럼 &lt;strong&gt;함수를 처음 호출 할 경우&lt;/strong&gt; PLT에서 GOT를 참조하며 GOT는 호출된함수의 실제 주소를 찾기위해 여러 과정을 거칩니다. 최종적으로 &lt;strong&gt;resolve&lt;/strong&gt;에서 호출 함수의 주소 리턴하며 실행 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-4.png&quot; alt=&quot;[그림 5-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림에서 처럼 &lt;strong&gt;함수가 한 번 호출 되고 나면 GOT에 해당 함수의 주소가 저장&lt;/strong&gt; 됩니다. 그 후에 다시 해당 함수를 호출할 경우 첫 함수 호출 때 처럼 복잡한 과정은 생략되고 &lt;strong&gt;바로 GOT에 저장된 주소를 참조하여 호출&lt;/strong&gt; 됩니다.&lt;/p&gt;
+
+&lt;p&gt;네비게이션에서 목적지의 경로를 찾기 위해서 여러 검색 과정을 거치는 과정이 함수의 첫 호출 과정이고 같은 목적지의 경로를 다시 갈 경우 복잡하게 목적지를 등록할 필요 없이 이미 저장되어있는 목적지로 바로 안내가 시작 되는 것을 함수 재호출 과정이라 생각하시면 될 것 같습니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 왜 PLT와 GOT를 알아봤을까요???&lt;/p&gt;
+
+&lt;p&gt;공격자가 GOT에 저장된 주소를 특정 주소로 바꾼다면???GOT에서 호출되는 주소는 호출 함수의 주소가 아닌 지정된 임의의 주소로 호출이 가능하게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;[&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-5.png&quot; alt=&quot;[그림 5-5]&quot; /&gt;
+&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;위 그림처럼 표현 해봤습니다. GOT Overwrite 라는 기법입니다. 그림에서 보이듯 GOT에 공격자가 원하는 함수의 주소를 저장 시켜놓고 해당 함수를 호출하여 동작하게 되는 시나리오가 그려집니다.&lt;/p&gt;
+
+&lt;p&gt;이제는 대충 뭘 어떻게 해야할지 그림이 그려질 것이라 믿고 ROP를 진행 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;(bof.c 의 코드는 변경 없이 그대로 진행됩니다.)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;ropreturn-oriented-programming&quot;&gt;ROP(Return Oriented Programming)&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;buffer 크기 :&lt;/li&gt;
+  &lt;li&gt;strcpy() 주소 :&lt;/li&gt;
+  &lt;li&gt;execve() 주소 :&lt;/li&gt;
+  &lt;li&gt;PPR 주소 :&lt;/li&gt;
+  &lt;li&gt;.BSS 주소 :&lt;/li&gt;
+  &lt;li&gt;puts@plt 주소 :&lt;/li&gt;
+  &lt;li&gt;puts@got 주소 :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;먼저 &lt;strong&gt;ROP&lt;/strong&gt;진행을 위해 위 내용들이 필요 합니다. 그런데 &lt;strong&gt;puts()&lt;/strong&gt;라는 처음 보는 아이가 보이네요. 저 아이는 printf() 함수와 같은 문자열 출력 역할을 합니다. 약간의 차이는 있습니다만 쉽게 생각해 printf()보다 단순화(&lt;strong&gt;한 개의 인자만 처리&lt;/strong&gt;) 및 빠른 처리가 가능한 문자열 출력 함수라 생각하시면 됩니다.
+그런데 왜 puts() 저놈이 보이느냐면 상위 버전의 linux 환경에서는 한 개의 인자만 사용해서 printf()를 사용할 경우 알아서 더 효율적인 puts()함수로 사용 하게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;어찌됫건 우리는 저 puts()의 got 주소를 원하는 함수로 바꿔야 합니다.&lt;/p&gt;
+
+&lt;p&gt;먼저 사용할 함수의 주소를 찾아보도록 하겠습니다. 전 포스트를 참고하셔서 &lt;strong&gt;execve()&lt;/strong&gt;주소를 아래처럼 찾아 주시면 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-6.png&quot; alt=&quot;[그림 5-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그리고 &lt;strong&gt;strcpy()&lt;/strong&gt;와 &lt;strong&gt;puts@plt&lt;/strong&gt;와 &lt;strong&gt;puts@got&lt;/strong&gt;도 다음과 같이 뽑아줍시다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-7.png&quot; alt=&quot;[그림 5-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;다음은 리눅스 기본 툴인 &lt;strong&gt;objdump&lt;/strong&gt;를 사용하여 &lt;strong&gt;PPR 의 주소&lt;/strong&gt;를 찾아보겠습니다.
+명령어는 다음중 아무거나 사용하셔도 상관 없습니다. 결과는 같습니다.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;**objdump -d bof1&lt;/td&gt;
+      &lt;td&gt;grep -B 4 ret**&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;**objdump -d bof&lt;/td&gt;
+      &lt;td&gt;grep “pop” -A3**&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-8.png&quot; alt=&quot;[그림 5-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;strcpy()&lt;/strong&gt;는 두 개의 인자를 사용하니 &lt;strong&gt;PPR&lt;/strong&gt;의 주소를 챙겨 둡니다. 마지막으로 Buffer 크기를 구해주도록 합시다.&lt;/p&gt;
+
+&lt;p&gt;다음은 .bss의 주소를 찾아 보겠습니다.
+.bss는 첫 포스팅에서 메모리 구조를 표현할때 나왔던 녀석입니다. 데이터 세그먼트의 한 부분이며 사용자에게 쓰기 권한이 있고 주소값이 변하지 않는 영역입니다.(&lt;strong&gt;초기화되지 않은 변수들이 저장되는 전역변수 영역&lt;/strong&gt;)
+쉽게 말해 공격자에게 사랑받는 영역입니다.(&lt;strong&gt;쓰기 가능&lt;/strong&gt;/&lt;strong&gt;고정 주소&lt;/strong&gt;)
+.bss는 gdb 내에서 info files 명령어를 사용하여 찾아줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-9.png&quot; alt=&quot;[그림 5-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;.bss의 시작 주소는 0x0804a020입니다만 겹침을 방지하기 위해 16byte 정도 뒤의 주소를 사용합니다. 따라서 16byte를 더한 주소값인 &lt;strong&gt;0x0804a030&lt;/strong&gt;이 되겠습니다.&lt;/p&gt;
+
+&lt;p&gt;이제 마지막으로 Buffer의 사이즈를 확인 해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-10.png&quot; alt=&quot;[그림 5-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이전 포스팅까지는 해당 위치의 EBP+ 값으로 버퍼의 크기를 확인 가능했지만 지금은 ESP가 자리 잡고 있으며 다른 방법으로 버퍼의 크기를 구해야 합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-11.png&quot; alt=&quot;[그림 5-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;먼저 버퍼의 크기가 할당된 다음인 +25 라인에 브레이크를 걸어주고 실행 시키킵니다. 그 후에 EBP에서 EAX의 값을 빼주면 해당 값이 버퍼의 크기가 됩니다. 프로그램을 run 시켜주고 브레이크에 잡혀있는 main+25의 위치에서 EBP와 EAX를 확인후 앞서 말헀듯  EBP - EAX를 해줍시다&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-12.png&quot; alt=&quot;[그림 5-12]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;0xbf96a168 - 0xbf96a14c = 0x1c입니다. 1c는 28이며 Buffer의 크기는 28 + 4하여 32byte가 되겠습니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 지금까지 찾은 정보들을 확인해보겟습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;buffer 크기 : &lt;strong&gt;32byte&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;strcpy() 주소 : &lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;execve() 주소 : &lt;strong&gt;0x43814550&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;PPR 주소 : &lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;.BSS 주소 : &lt;strong&gt;0x0804a030&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;puts@plt 주소 : &lt;strong&gt;0x08048320&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;puts@got 주소 : &lt;strong&gt;0x0804a010&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;/tmp/sh\x00 주소 :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;이제 필요한 정보들을 어느정도 모았습니다. 이 정보들을 활용해서 shell을 따도록 합시다.&lt;/p&gt;
+
+&lt;p&gt;먼저 &lt;strong&gt;data&lt;/strong&gt;영역의 &lt;strong&gt;puts@got&lt;/strong&gt;에 execve() 함수의 주소를 저장해줘야 합니다. execve()의 주소는 &lt;strong&gt;0x43814550&lt;/strong&gt;이지만 그대로 저장시키면 안되며 각 주소의 4byte씩을 나눠서 저장해야 합니다. 즉 &lt;strong&gt;0x 43 81 45 50&lt;/strong&gt;이런식으로 잘라서 각각 4byte의 주소값 별도로 구해야 합니다.&lt;/p&gt;
+
+&lt;p&gt;무슨 개똥같은 말이냐면 \x43이라는 문자열의 주소 \x81이라는 문자열의 주소와 같이 각 자리를 문자열로 취급하여 해단 문자열의 주소값을 찾아야 하는겁니다.
+같은 방식으로 /tmp/sh\x00도 각각의 문자열의 주소를 찾아야 하니 참고하시면 됩니다.(‘/’, ‘t’, ‘m’, ‘p’, ‘s’, ‘h’, ‘\x00’ 과 같이 구해야 합니다……)&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-13.png&quot; alt=&quot;[그림 5-13]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;앞에서 info files 에서 나왔던 첫 주소값부터 .bss 주소값까지를 사용하셔도 되고 /proc/self/maps의 주소값을 찾으셔도 됩니다. 주의 하실점은 위 그림처럼 나오는 주소중에 똑바로 안되는 주소도 있으며 오른쪽에 추가적인 내용이 없는 주소를 사용 하시면 됩니다.(저는 info files로 확인한 주소를 사용했습니다.)&lt;/p&gt;
+
+&lt;p&gt;주의점은 execve()의 주소값의 주소값을 puts@got에 저장하기 위해 페이로드 작성시 기존의 리틀엔디안으로 입력했 듯 이번엔 두 번 뒤집어주면 됩니다. 리틀엔디언의 리틀엔디언으로 입력해주시면 됩니다. 쉽게말해 &lt;strong&gt;execve()&lt;/strong&gt;의 주소값인 &lt;strong&gt;0x43814550&lt;/strong&gt;의 각 &lt;strong&gt;4byte&lt;/strong&gt; 주소값을 입력할때는 다시 역순으로 해주시면 됩니다. 50의 주소를 먼저 다음은 45 81 43 순으로 입력하는것이죠. 다시 말하지만 페이로드 작성할 때를 말씀드리는 겁니다. 계속 해서 각각의 주소값을 구하면 다음과 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-14.png&quot; alt=&quot;[그림 5-14]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;puts@got에 execve()의 주소를 저장하기 위한 준비가 끝났습니다. 실제로 해당 got 위치에 execve()의 주소가 박히는지 확인해 보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-15.png&quot; alt=&quot;[그림 5-15]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;우선 페이로드는 위 그림처럼 구성을 하시면 되겠습니다. 위에서 설명했던 &lt;strong&gt;Chaining&lt;/strong&gt; 을 활용해서 첫 strcpy가 끝나면 두 다음 strcpy로 넘어가고, 두 번째 수행이 끝나면 다음 함수로 쭉쭉 진행하게 됩니다. 진행하면서 puts@got[0]~[3]까지 구역에 execve() 함수의 주소값을 의미하는 문자열의 주소값이 저장됩니다. 다시 조금더 보기 편하게 각 칸에  주소값을 입력해보겠습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;buffer 크기 : &lt;strong&gt;32byte (“AAAA”*8)&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;strcpy() 주소 : &lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;PPR 주소 : &lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;puts@got 주소 : &lt;strong&gt;0x0804a010&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;execve() 주소 : &lt;strong&gt;0x43814550 (0x08048018, 0x08048001, 0x0804805d, 0x08048277)&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-16.png&quot; alt=&quot;[그림 5-16]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;페이로드는 이렇게 구성 되겠습니다. 직접 때려보고 got에 execve()의 주소값 &lt;strong&gt;0x43814550&lt;/strong&gt;이 잘 박혀있나 확인 해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-17.png&quot; alt=&quot;[그림 5-17]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;puts@got&lt;/strong&gt;시작 주소인 [0] 주소를 까보면 &lt;strong&gt;execve()&lt;/strong&gt;의 주소값인 &lt;strong&gt;0x43814550&lt;/strong&gt;이 잘 박혀있는것을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이제 70%정도 끝났습니다. 계속해서 나머지 30% 채워서 root shell까지 함께 따보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;이번엔 .bss영역에 이전 포스팅에서 작성했던 setuid를 세팅해주는 스크립트의 경로와 마지막 null값까지 포함한 ‘/tmp/sh\x00’의 각 문자의 주소를 따보도록 하겠습니다. 주소를 따는 방법은 위에서와 동일 하지만 리틀엔디안의 리틀엔디안같은 똥같은 짓은 안하셔도 됩니다. 기존에 하던 방식처럼 리틀엔디언을 한 번만 생각해주시면 됩니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-18.png&quot; alt=&quot;[그림 5-18]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;각 문자열의 주소값은 위 그림과 같습니다. 다시 말씀드리지만 주소값 찾는 방법은 위에서 찾은 방법과 동일합니다. 다만, 제가 찾은 문자열의 주소와 다를 경우 안되는 경우도 있습니다. 이런 노가다성 작업을 하고서는 최종 페이로드 작성하고 공격했는데 실해하면 상당히 멘붕입니다. 별다른 단서가 없기에 다시 노가다 하는 방법밖에 없죠….(툴이 있긴 합니다. 편하고 편한….)
+저와 같은 삽질은 없으시길 바랍니다.(연속된 삽질로 숙련된 삽퍼가 되긴 합니다. 의도하지 않은 삽질로 이것저것 이해가 되는….비추입니다.)&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-19.png&quot; alt=&quot;[그림 5-19]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;페이로드는 위와 같이 구성되며 마찬가지로 각 주소값을 입력하면 다음과 같습니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;buffer 크기 : &lt;strong&gt;32byte (“AAAA”*8)&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;strcpy() 주소 : &lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;PPR 주소 : &lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;.BSS 주소 : &lt;strong&gt;0x0804a030&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;/tmp/sh\x00 주소 : 0x08048154, 0x080480f6, 0x0804825f, 0x0804824a, 0x08048154, 0x08048162, 0x080480d8, 0x08048007&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-20.png&quot; alt=&quot;[그림 5-20]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;실제 페이로드는 위와 같으며 이것도 마찬가지로 /tmp/sh\x00이 잘 박혀있나 확인 해봅시다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-21.png&quot; alt=&quot;[그림 5-21]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;.bss의 첫 추소를 검색해보면…..나이스ㅠ…..\x00은 null로 인식되어 우리가 원하는 /tmp/sh 문자열이 잘 박혀있습니다.&lt;/p&gt;
+
+&lt;p&gt;이제 99%입니다. 1% 채우고 개…아니 root shell 따고 종료 합시다!!!!&lt;/p&gt;
+
+&lt;p&gt;이제 남은건 puts@plt를 호출하고 execve()의 인자값으로 “/tmp/sh”를 넘겨주면 뙇씌!!!
+바로 하도록 하겠습니다. 위에서 만든 두개의 페이로드를 합쳐 주시고 제일 뒤쪽에 puts@plt 호출 및 인자 전달을 위한 .bss의 첫 주소를 박아주면 되겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-22.png&quot; alt=&quot;[그림 5-22]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;전체적인 페이로드는 이런 모습으로 구성 될 것입니다. 제일 아래쪽 &lt;strong&gt;puts@plt&lt;/strong&gt; 라인을 추가하여 &lt;strong&gt;puts@plt&lt;/strong&gt;를 호출하여 &lt;strong&gt;puts@got&lt;/strong&gt;에 저장된 &lt;strong&gt;execve()&lt;/strong&gt;의 주소값을 호출하며 &lt;strong&gt;execve()&lt;/strong&gt;의 인자값으로 &lt;strong&gt;.bss[0]&lt;/strong&gt;의 주소를 넘겨주어 최종적으로 &lt;strong&gt;/tmp/sh&lt;/strong&gt;가 실행 되도록 하는 구성입니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;buffer 크기 : &lt;strong&gt;32byte (“AAAA”*8)&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;strcpy() 주소 : &lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;PPR 주소 : &lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;puts@got 주소 : &lt;strong&gt;0x0804a010&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;execve() 주소 : &lt;strong&gt;0x43814550 (0x08048018, 0x08048001, 0x0804805d, 0x08048277)&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;.BSS 주소 : &lt;strong&gt;0x0804a030&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;/tmp/sh\x00 주소 : 0x08048154, 0x080480f6, 0x0804825f, 0x0804824a, 0x08048154, 0x08048162, 0x080480d8, 0x08048007&lt;/li&gt;
+  &lt;li&gt;puts@plt 주소 : &lt;strong&gt;0x08048320&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-23.png&quot; alt=&quot;[그림 5-23]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;최종 페이로드 구성입니다. 설명도 위쪽에 이미 전부 했기에 바로 떄리고 확인 해보겠슴돠!&lt;/p&gt;
+
+&lt;p&gt;root 계정이 아닌 일반 계정으로 바꾼 후 위의 페이로드를 떄리겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-24.png&quot; alt=&quot;[그림 5-24]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;짜잔….uid가 개…root로 잡혀있는것을 확인 가능합니다.&lt;/p&gt;
+
+&lt;p&gt;지금까지 진행한 내용은 오늘 포스팅한 ROP를 위해 알아야 하는 사전 지식의 개념이었으며 오늘 해본 ROP는 다른 여러 ROP의 기본 개념이 됩니다. 기회가 된다면 다른 ROP도 포스팅 하겠습니다.(믿지마세요…..) 그리고 지금까지 한 Stack BOF는 Heap 공부하기 위한 준비였습니다…&lt;/p&gt;
+
+&lt;p&gt;다음 포스팅부터는 모두가 좋아하는 &lt;del&gt;Hip&lt;/del&gt;….Heap BOF에 대해 또 천천히 가보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;고생하셨슴돠!!!&lt;/p&gt;
+
+&lt;h2 id=&quot;references-참고-자료&quot;&gt;References 참고 자료&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://shayete.tistory.com/&quot;&gt;https://shayete.tistory.com/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.lazenca.net/display/TEC/02.TechNote&quot;&gt;https://www.lazenca.net/display/TEC/02.TechNote&lt;/a&gt;&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Sulla</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">RTL Chaining &amp;amp; ROP(Return Oriented Programming)</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
       <title type="html">Use After Free</title>
-      <link href="/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" />
+      <link href="http://localhost:4000/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" />
       <published>2019-05-06T20:18:00+09:00</published>
       <updated>2019-05-06T20:18:00+09:00</updated>
-      <id>/windows-0x0c</id>
-      <content type="html" xml:base="/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x0c</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -221,11 +557,11 @@ first-&amp;gt;vulnfunc();
   
     <entry>
       <title type="html">Vtable Overwrite</title>
-      <link href="/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
+      <link href="http://localhost:4000/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
       <published>2019-04-18T20:18:00+09:00</published>
       <updated>2019-04-18T20:18:00+09:00</updated>
-      <id>/windows-0x0b</id>
-      <content type="html" xml:base="/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x0b</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -569,11 +905,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">android-0x02</title>
-      <link href="/android-0x02" rel="alternate" type="text/html" title="android-0x02" />
+      <link href="http://localhost:4000/android-0x02" rel="alternate" type="text/html" title="android-0x02" />
       <published>2019-04-12T14:00:00+09:00</published>
       <updated>2019-04-12T14:00:00+09:00</updated>
-      <id>/android-0x02</id>
-      <content type="html" xml:base="/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
+      <id>http://localhost:4000/android-0x02</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -719,11 +1055,11 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
   
     <entry>
       <title type="html">Windows-Heap 정의</title>
-      <link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
+      <link href="http://localhost:4000/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
       <published>2019-04-02T20:18:00+09:00</published>
       <updated>2019-04-02T20:18:00+09:00</updated>
-      <id>/windows-0x0a</id>
-      <content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x0a</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -899,11 +1235,11 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
   
     <entry>
       <title type="html">android-0x01</title>
-      <link href="/android-0x01" rel="alternate" type="text/html" title="android-0x01" />
+      <link href="http://localhost:4000/android-0x01" rel="alternate" type="text/html" title="android-0x01" />
       <published>2019-03-29T14:00:00+09:00</published>
       <updated>2019-03-29T14:00:00+09:00</updated>
-      <id>/android-0x01</id>
-      <content type="html" xml:base="/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
+      <id>http://localhost:4000/android-0x01</id>
+      <content type="html" xml:base="http://localhost:4000/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -995,11 +1331,11 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
   
     <entry>
       <title type="html">CVE-2019-5736 (runC Container 취약점)</title>
-      <link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
+      <link href="http://localhost:4000/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
       <published>2019-03-28T02:43:00+09:00</published>
       <updated>2019-03-28T02:43:00+09:00</updated>
-      <id>/runC%20Container</id>
-      <content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+      <id>http://localhost:4000/runC%20Container</id>
+      <content type="html" xml:base="http://localhost:4000/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
 
@@ -1216,11 +1552,11 @@ func main() {
   
     <entry>
       <title type="html">web-0x03</title>
-      <link href="/web-0x03" rel="alternate" type="text/html" title="web-0x03" />
+      <link href="http://localhost:4000/web-0x03" rel="alternate" type="text/html" title="web-0x03" />
       <published>2019-03-25T14:00:00+09:00</published>
       <updated>2019-03-25T14:00:00+09:00</updated>
-      <id>/web-0x03</id>
-      <content type="html" xml:base="/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
+      <id>http://localhost:4000/web-0x03</id>
+      <content type="html" xml:base="http://localhost:4000/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -1348,11 +1684,11 @@ https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
   
     <entry>
       <title type="html">windows-0x09</title>
-      <link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
+      <link href="http://localhost:4000/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
       <published>2019-03-24T20:18:00+09:00</published>
       <updated>2019-03-24T20:18:00+09:00</updated>
-      <id>/windows-0x09</id>
-      <content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+      <id>http://localhost:4000/windows-0x09</id>
+      <content type="html" xml:base="http://localhost:4000/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -1505,11 +1841,11 @@ https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
   
     <entry>
       <title type="html">linux_0x04</title>
-      <link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
+      <link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
       <published>2019-03-24T15:18:00+09:00</published>
       <updated>2019-03-24T15:18:00+09:00</updated>
-      <id>/linux_0x04</id>
-      <content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x04</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
@@ -1761,143 +2097,6 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 
       
         <summary type="html">RTL(Return to Library)</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">windows-0x08</title>
-      <link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
-      <published>2019-03-19T20:18:00+09:00</published>
-      <updated>2019-03-19T20:18:00+09:00</updated>
-      <id>/windows-0x08</id>
-      <content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
-
-&lt;p&gt;지난 Post에서 RTL을 다루어 봤습니다.&lt;/p&gt;
-
-&lt;p&gt;이번 시간에는 RTL에 이어 Chaining RTL에 대해 알아보도록 하겠습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;chaining-rtl&quot;&gt;Chaining RTL&lt;/h5&gt;
-
-&lt;p&gt;Chaining RTL은 RTL이 Chain처럼 엮여서 반복되는 것을 말합니다.&lt;/p&gt;
-
-&lt;p&gt;RTL이 뭐였죠? DEP가 적용되어 Shellcode를 실행할 수 없게 되었을 때, 라이브러리 함수로 점프하여&lt;/p&gt;
-
-&lt;p&gt;내가 원하는 함수를 실행하는 것이었죠?&lt;/p&gt;
-
-&lt;p&gt;Chaining RTL은 말 그대로 내가 원하는 함수를 계속해서 실행하는 것을 뜻합니다.&lt;/p&gt;
-
-&lt;p&gt;의미는 알았으니, 본격적으로 알아볼텐데 STACK 구성에 집중해서 보시면 되겠습니다.&lt;/p&gt;
-
-&lt;p&gt;먼저, 지난 시간처럼 몇 가지 가정을 하겠습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;func1(argv1) : 인자를 하나만 필요로 하는 함수&lt;/li&gt;
-  &lt;li&gt;func2(argv1’, argv’2) : 인자를 두 개 필요로 하는 함수&lt;/li&gt;
-  &lt;li&gt;func3(argv’‘1, argv’‘2, argv’‘3) : 인자를 세 개 필요로 하는 함수&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;이 함수들을 차례대로 호출한다고 가정하고 이 때, Payload를 어떻게 구성해야하는 것인지를 살펴보도록 하겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x07_2.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;이 그림 기억나시나요?? 지난 시간에 살펴봤던 함수를 하나만 호출할 때의 STACK 그림입니다.&lt;/p&gt;
-
-&lt;p&gt;Main-ret가 다음 호출할 함수의 SFP로 변경되고 있죠? 그래서 그 다음 4 Byte가 호출된 함수가 종료되고 다음에 갈 곳의 주소인 것도 알고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;그럼 두 번째 함수(인자가 두 개)를 호출할 때 그림이 이렇게 되겠네요?&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x08_1.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Func1() 함수의 RET 자리에 Func2() 함수의 주소를 넣어줬습니다. 그럼 Func1() 함수가 종료된 후, Func2() 함수가 실행됩니다.&lt;/p&gt;
-
-&lt;p&gt;간단하죠?&lt;/p&gt;
-
-&lt;p&gt;그런데 여기엔 문제가 있습니다. 이 방법으로는 내가 원하는 함수를 마음껏 호출할 수가 없습니다.&lt;/p&gt;
-
-&lt;p&gt;그냥 RET에 다른 함수 주소를 덮어주면 되는거 아니야? 라고 생각하실 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;자, 그럼 다음에 Func3() 함수를 호출한다고 생각해봅시다.&lt;/p&gt;
-
-&lt;p&gt;Func3() 함수의 주소는 어디에 넣어줘야 하죠?&lt;/p&gt;
-
-&lt;p&gt;이미 Func1() 함수의 첫 번째 인자가 위치하고 있습니다. 이제 이해가 가시죠??&lt;/p&gt;
-
-&lt;p&gt;이 한계를 해결하기 위해 지금부터는 Gadget을 사용할 겁니다.&lt;/p&gt;
-
-&lt;p&gt;RET로 끝나는 많고 많은 Gadget 중에 시스템 해킹에서 주로 사용되는 Gadget은 다음 3가지 입니다.
-(이것만 쓴다는 게 아닙니다!!)&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;pr : POP RET&lt;/li&gt;
-  &lt;li&gt;ppr : POP POP RET&lt;/li&gt;
-  &lt;li&gt;pppr : POP POP POP RET&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;POP 뒤에 Operand는 생략했습니다.&lt;/p&gt;
-
-&lt;p&gt;이 Gadget을 이용해서 내가 원하는만큼 함수를 호출하려면 STACK을 다음과 같이 구성하면 됩니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x08_2.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;조금 이상하고 복잡한 듯이 느껴질 수 있는데, 에필로그 과정부터 Gadget 순으로 색깔별로 보시면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;먼저 에필로그부터 살펴보겠습니다.&lt;/p&gt;
-
-&lt;p&gt;RETN이 실행되면 POP EIP, JMP EIP를 수행하므로 실행되고 난 후, ESP의 위치는 빨간 ESP 위치가 됩니다.&lt;/p&gt;
-
-&lt;p&gt;JMP EIP가 실행되면 POP RETN이 실행되겠죠?&lt;/p&gt;
-
-&lt;p&gt;처음 POP이 실행되면 STACK 최상단의 값을 꺼내고 ESP가 올라가면서 ESP의 위치는 파란 ESP 위치가 됩니다.&lt;/p&gt;
-
-&lt;p&gt;다시 RETN이 실행되면 POP EIP, JMP EIP가 실행되겠네요.&lt;/p&gt;
-
-&lt;p&gt;그럼 그 때의 ESP는 초록색 위치가 되는데 POP EIP를 했으므로 EIP엔 두 번째 함수 Func2()의 주소가 들어가게 될 것이고&lt;/p&gt;
-
-&lt;p&gt;JMP EIP를 하면서 Func2() 함수가 실행됩니다.&lt;/p&gt;
-
-&lt;p&gt;세 번째 함수까지 모두 호출한다고 가정했을 때, STACK의 구조는 다음과 같이 됩니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x08_3.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;이런 식으로 STACK을 구성해서 내가 원하는 함수를 계속해서 호출하는 기법을 Chaining RTL이라고 부릅니다.&lt;/p&gt;
-
-&lt;p&gt;자, 이제 ROP를 하기 위한 기초 준비 작업을 모두 마쳤습니다.&lt;/p&gt;
-
-&lt;p&gt;다음 Post에서 ROP를 알아보고 DEP편을 마무리 짓도록 하겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x08 DEP(2)</summary>
       
 
       
