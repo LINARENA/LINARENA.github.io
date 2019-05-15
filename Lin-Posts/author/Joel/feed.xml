@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="http://localhost:4000/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-05-16T02:17:41+09:00</updated>
-  <id>http://localhost:4000/author/Joel/feed.xml</id>
+  <link href="/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-05-16T02:19:07+09:00</updated>
+  <id>/author/Joel/feed.xml</id>
 
   
   
@@ -41,11 +41,11 @@
   
     <entry>
       <title type="html">Use After Free</title>
-      <link href="http://localhost:4000/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" />
+      <link href="/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" />
       <published>2019-05-06T20:18:00+09:00</published>
       <updated>2019-05-06T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0c</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
+      <id>/windows-0x0c</id>
+      <content type="html" xml:base="/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -221,11 +221,11 @@ first-&amp;gt;vulnfunc();
   
     <entry>
       <title type="html">Vtable Overwrite</title>
-      <link href="http://localhost:4000/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
+      <link href="/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
       <published>2019-04-18T20:18:00+09:00</published>
       <updated>2019-04-18T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0b</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
+      <id>/windows-0x0b</id>
+      <content type="html" xml:base="/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -569,11 +569,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">Windows-Heap 정의</title>
-      <link href="http://localhost:4000/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
+      <link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
       <published>2019-04-02T20:18:00+09:00</published>
       <updated>2019-04-02T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0a</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+      <id>/windows-0x0a</id>
+      <content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -749,11 +749,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">windows-0x09</title>
-      <link href="http://localhost:4000/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
+      <link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
       <published>2019-03-24T20:18:00+09:00</published>
       <updated>2019-03-24T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x09</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+      <id>/windows-0x09</id>
+      <content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -906,11 +906,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">windows-0x08</title>
-      <link href="http://localhost:4000/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
+      <link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
       <published>2019-03-19T20:18:00+09:00</published>
       <updated>2019-03-19T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x08</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+      <id>/windows-0x08</id>
+      <content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -1043,11 +1043,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">windows-0x07</title>
-      <link href="http://localhost:4000/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
+      <link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
       <published>2019-03-19T19:18:00+09:00</published>
       <updated>2019-03-19T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x07</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+      <id>/windows-0x07</id>
+      <content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -1209,11 +1209,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">windows-0x06</title>
-      <link href="http://localhost:4000/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
+      <link href="/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
       <published>2019-03-18T19:18:00+09:00</published>
       <updated>2019-03-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x06</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+      <id>/windows-0x06</id>
+      <content type="html" xml:base="/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
 
@@ -1281,11 +1281,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">DLL Hijacking &amp;amp; Ghidra</title>
-      <link href="http://localhost:4000/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
+      <link href="/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
       <published>2019-03-17T19:18:00+09:00</published>
       <updated>2019-03-17T19:18:00+09:00</updated>
-      <id>http://localhost:4000/Dll%20Hijacking%20&amp;%20Ghidra</id>
-      <content type="html" xml:base="http://localhost:4000/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+      <id>/Dll%20Hijacking%20&amp;%20Ghidra</id>
+      <content type="html" xml:base="/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -1432,11 +1432,11 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
   
     <entry>
       <title type="html">windows-0x05</title>
-      <link href="http://localhost:4000/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" />
+      <link href="/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" />
       <published>2019-03-09T19:18:00+09:00</published>
       <updated>2019-03-09T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x05</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
+      <id>/windows-0x05</id>
+      <content type="html" xml:base="/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-gs&quot;&gt;What is GS?&lt;/h5&gt;
 
@@ -1624,11 +1624,11 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
   
     <entry>
       <title type="html">windows-0x04</title>
-      <link href="http://localhost:4000/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" />
+      <link href="/windows-0x04" rel="alternate" type="text/html" title="windows-0x04" />
       <published>2019-03-03T19:18:00+09:00</published>
       <updated>2019-03-03T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x04</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
+      <id>/windows-0x04</id>
+      <content type="html" xml:base="/windows-0x04">&lt;h1 id=&quot;0x04-random-stack&quot;&gt;0x04 Random STACK&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-random-stack&quot;&gt;What is Random STACK?&lt;/h5&gt;
 

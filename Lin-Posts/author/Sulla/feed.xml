@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="http://localhost:4000/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-05-16T02:17:41+09:00</updated>
-  <id>http://localhost:4000/author/Sulla/feed.xml</id>
+  <link href="/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-05-16T02:19:07+09:00</updated>
+  <id>/author/Sulla/feed.xml</id>
 
   
   
@@ -41,11 +41,11 @@
   
     <entry>
       <title type="html">linux_0x04</title>
-      <link href="http://localhost:4000/linux_0x05" rel="alternate" type="text/html" title="linux_0x04" />
+      <link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x04" />
       <published>2019-05-16T11:18:00+09:00</published>
       <updated>2019-05-16T11:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x05</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x05">&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
+      <id>/linux_0x05</id>
+      <content type="html" xml:base="/linux_0x05">&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
 
 &lt;p&gt;이번 시간부터는 지난 포스팅에서 진행된 환경보다 비교적 최신의 환경에서 진행 해보겠습니다.&lt;/p&gt;
 
@@ -377,11 +377,11 @@
   
     <entry>
       <title type="html">CVE-2019-5736 (runC Container 취약점)</title>
-      <link href="http://localhost:4000/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
+      <link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
       <published>2019-03-28T02:43:00+09:00</published>
       <updated>2019-03-28T02:43:00+09:00</updated>
-      <id>http://localhost:4000/runC%20Container</id>
-      <content type="html" xml:base="http://localhost:4000/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+      <id>/runC%20Container</id>
+      <content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
 
@@ -598,11 +598,11 @@ func main() {
   
     <entry>
       <title type="html">linux_0x04</title>
-      <link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
+      <link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
       <published>2019-03-24T15:18:00+09:00</published>
       <updated>2019-03-24T15:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x04</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+      <id>/linux_0x04</id>
+      <content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
@@ -862,11 +862,11 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
   
     <entry>
       <title type="html">linux_0x03</title>
-      <link href="http://localhost:4000/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" />
+      <link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" />
       <published>2019-03-11T19:18:00+09:00</published>
       <updated>2019-03-11T19:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x03</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+      <id>/linux_0x03</id>
+      <content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
 
@@ -1028,11 +1028,11 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
   
     <entry>
       <title type="html">linux_0x02</title>
-      <link href="http://localhost:4000/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" />
+      <link href="/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" />
       <published>2019-02-22T19:18:00+09:00</published>
       <updated>2019-02-22T19:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x02</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
+      <id>/linux_0x02</id>
+      <content type="html" xml:base="/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;임돠.&lt;/p&gt;
 
@@ -1279,11 +1279,11 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
   
     <entry>
       <title type="html">linux_0x01</title>
-      <link href="http://localhost:4000/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
+      <link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
       <published>2019-02-18T19:18:00+09:00</published>
       <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x01</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
+      <id>/linux_0x01</id>
+      <content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다. 오늘부터 본격적으로 &lt;strong&gt;BOF&lt;/strong&gt;에 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -1412,11 +1412,11 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
   
     <entry>
       <title type="html">linux_0x01</title>
-      <link href="http://localhost:4000/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
+      <link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
       <published>2019-02-08T19:18:00+09:00</published>
       <updated>2019-02-08T19:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x01</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x01">&lt;h2 id=&quot;buffer-overflow-뭐임뭐임뭐임&quot;&gt;Buffer Overflow 뭐임?뭐임?뭐임?&lt;/h2&gt;
+      <id>/linux_0x01</id>
+      <content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;buffer-overflow-뭐임뭐임뭐임&quot;&gt;Buffer Overflow 뭐임?뭐임?뭐임?&lt;/h2&gt;
 
 &lt;p&gt;BOF란 &lt;strong&gt;메모리&lt;/strong&gt;의 동작 과정중의 오류로 인한 잘못된 동작을 유도하는 취약점입니다. 프로세스가 데이터를 &lt;strong&gt;버퍼&lt;/strong&gt;에 저장 시 입력 값의 크기를 검증하지 않을 경우 주어진 버퍼를 넘어선 즉, 지정된 위치가 아닌 곳에 저장되며 인접한 메모리를 덮어 쓰게 됩니다. 인접 메모리에는 기존의 데이터가 저장되어 있으며 &lt;strong&gt;변수, 프로세스 흐름 제어&lt;/strong&gt; 등의 데이터가 포함됩니다. 따라서 메모리 접근 오류로 인한 이상 동작을 하게되며 결과적으로 취약점으로 동작하게 되는것입니다.&lt;/p&gt;
 
@@ -1543,11 +1543,11 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
   
     <entry>
       <title type="html">linux_0x00</title>
-      <link href="http://localhost:4000/linux_0x00" rel="alternate" type="text/html" title="linux_0x00" />
+      <link href="/linux_0x00" rel="alternate" type="text/html" title="linux_0x00" />
       <published>2019-02-08T19:18:00+09:00</published>
       <updated>2019-02-08T19:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x00</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x00">&lt;h2 id=&quot;0x00---시작에-앞서&quot;&gt;0x00 - 시작에 앞서&lt;/h2&gt;
+      <id>/linux_0x00</id>
+      <content type="html" xml:base="/linux_0x00">&lt;h2 id=&quot;0x00---시작에-앞서&quot;&gt;0x00 - 시작에 앞서&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다.&lt;/p&gt;
 
