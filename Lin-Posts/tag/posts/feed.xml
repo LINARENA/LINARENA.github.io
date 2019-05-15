@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-05-16T02:19:07+09:00</updated>
+  <updated>2019-05-16T02:35:45+09:00</updated>
   <id>/tag/posts/feed.xml</id>
 
   
@@ -40,12 +40,12 @@
 
   
     <entry>
-      <title type="html">linux_0x04</title>
-      <link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x04" />
+      <title type="html">linux_0x05</title>
+      <link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x05" />
       <published>2019-05-16T11:18:00+09:00</published>
       <updated>2019-05-16T11:18:00+09:00</updated>
       <id>/linux_0x05</id>
-      <content type="html" xml:base="/linux_0x05">&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
+      <content type="html" xml:base="/linux_0x05">&lt;h1 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간부터는 지난 포스팅에서 진행된 환경보다 비교적 최신의 환경에서 진행 해보겠습니다.&lt;/p&gt;
 
@@ -69,7 +69,7 @@
 
 &lt;p&gt;위의 그림이 앞 포스팅에서 함께 봤던 일반적인 RTL입니다. execl()을 실행 시켜서 4byte 뒤에 위치시켜둔 인자를 받아내고 RET 위치위 AAAA로 이동 후 error를 발생 시키고 종료 합니다.(error 발생이 싫으신 분들은 exit() 함수를 위치 시켜주시면 종료 됩니다.) 이 작업을 여러번 chain처럼 연결 시켜 연속적으로 RTL을 사용하는  &lt;strong&gt;RTL Chaining&lt;/strong&gt;이 완성 됩니다. 다음은 &lt;strong&gt;RTL Chaining&lt;/strong&gt;을 보도록 하겠습니다.&lt;/p&gt;
 
-&lt;h1 id=&quot;rtl-chaining&quot;&gt;RTL Chaining&lt;/h1&gt;
+&lt;h2 id=&quot;rtl-chaining&quot;&gt;RTL Chaining&lt;/h2&gt;
 
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-2.png&quot; alt=&quot;[그림 5-2]&quot; /&gt;
@@ -117,7 +117,7 @@
 
 &lt;p&gt;&lt;strong&gt;(bof.c 의 코드는 변경 없이 그대로 진행됩니다.)&lt;/strong&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;ropreturn-oriented-programming&quot;&gt;ROP(Return Oriented Programming)&lt;/h1&gt;
+&lt;h2 id=&quot;ropreturn-oriented-programming&quot;&gt;ROP(Return Oriented Programming)&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;buffer 크기 :&lt;/li&gt;
@@ -343,11 +343,10 @@
 
 &lt;p&gt;고생하셨슴돠!!!&lt;/p&gt;
 
-&lt;h2 id=&quot;references-참고-자료&quot;&gt;References 참고 자료&lt;/h2&gt;
+&lt;h3 id=&quot;references-참고-자료&quot;&gt;References 참고 자료&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://shayete.tistory.com/&quot;&gt;https://shayete.tistory.com/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.lazenca.net/display/TEC/02.TechNote&quot;&gt;https://www.lazenca.net/display/TEC/02.TechNote&lt;/a&gt;&lt;/p&gt;</content>
+&lt;p&gt;&lt;a href=&quot;https://shayete.tistory.com/&quot;&gt;https://shayete.tistory.com/&lt;/a&gt;
+&lt;a href=&quot;https://www.lazenca.net/display/TEC/02.TechNote&quot;&gt;https://www.lazenca.net/display/TEC/02.TechNote&lt;/a&gt;&lt;/p&gt;</content>
 
       
       
