@@ -8,6 +8,36 @@
     
       
       <item>
+        <title>Heap Spray</title>
+        
+          <description>&lt;h1 id=&quot;0x0c-heap-spray&quot;&gt;0x0c Heap Spray&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Thu, 27 Jun 2019 20:18:00 +0900</pubDate>
+        <link>
+        /windows-0x0d</link>
+        <guid isPermaLink="true">/windows-0x0d</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>linux_0x04</title>
+        
+          <description>&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
+
+</description>
+        
+        <pubDate>Thu, 16 May 2019 11:18:00 +0900</pubDate>
+        <link>
+        /linux_0x05</link>
+        <guid isPermaLink="true">/linux_0x05</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>Use After Free</title>
         
           <description>&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
