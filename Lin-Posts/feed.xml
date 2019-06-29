@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-06-29T23:09:49+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">Heap Spray</title><link href="/windows-0x0d" rel="alternate" type="text/html" title="Heap Spray" /><published>2019-06-27T20:18:00+09:00</published><updated>2019-06-27T20:18:00+09:00</updated><id>/windows-0x0d</id><content type="html" xml:base="/windows-0x0d">&lt;h1 id=&quot;0x0c-heap-spray&quot;&gt;0x0c Heap Spray&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-06-29T23:12:43+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">Heap Spray</title><link href="/windows-0x0d" rel="alternate" type="text/html" title="Heap Spray" /><published>2019-06-27T20:18:00+09:00</published><updated>2019-06-27T20:18:00+09:00</updated><id>/windows-0x0d</id><content type="html" xml:base="/windows-0x0d">&lt;h1 id=&quot;0x0d-heap-spray&quot;&gt;0x0d Heap Spray&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -317,7 +317,7 @@
 
 &lt;p&gt;지금까지 기본적인 HeapSpray에 대해서 알아봤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 글부터는 지금까지 설명한 취약점들을 종합해서 IE8, IE10, IE11 Exploit을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0c Heap Spray</summary></entry><entry><title type="html">linux_0x04</title><link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-05-16T11:18:00+09:00</published><updated>2019-05-16T11:18:00+09:00</updated><id>/linux_0x05</id><content type="html" xml:base="/linux_0x05">&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
+&lt;p&gt;다음 글부터는 지금까지 설명한 취약점들을 종합해서 IE8, IE10, IE11 Exploit을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0d Heap Spray</summary></entry><entry><title type="html">linux_0x04</title><link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-05-16T11:18:00+09:00</published><updated>2019-05-16T11:18:00+09:00</updated><id>/linux_0x05</id><content type="html" xml:base="/linux_0x05">&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
 
 &lt;p&gt;이번 시간부터는 지난 포스팅에서 진행된 환경보다 비교적 최신의 환경에서 진행 해보겠습니다.&lt;/p&gt;
 
