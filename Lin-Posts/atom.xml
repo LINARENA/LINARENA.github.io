@@ -8,9 +8,30 @@
     
       
       <item>
+<<<<<<< HEAD
         <title>linux_0x05</title>
         
           <description>&lt;h1 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h1&gt;
+=======
+        <title>Heap Spray</title>
+        
+          <description>&lt;h1 id=&quot;0x0d-heap-spray&quot;&gt;0x0d Heap Spray&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Thu, 27 Jun 2019 20:18:00 +0900</pubDate>
+        <link>
+        /windows-0x0d</link>
+        <guid isPermaLink="true">/windows-0x0d</guid>
+      </item>
+      
+    
+      
+      <item>
+        <title>linux_0x04</title>
+        
+          <description>&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
+>>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
 
 </description>
         

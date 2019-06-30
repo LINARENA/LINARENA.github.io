@@ -1,4 +1,327 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-05-16T02:35:45+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x05</title><link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x05" /><published>2019-05-16T11:18:00+09:00</published><updated>2019-05-16T11:18:00+09:00</updated><id>/linux_0x05</id><content type="html" xml:base="/linux_0x05">&lt;h1 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h1&gt;
+=======
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-06-29T23:12:43+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">Heap Spray</title><link href="/windows-0x0d" rel="alternate" type="text/html" title="Heap Spray" /><published>2019-06-27T20:18:00+09:00</published><updated>2019-06-27T20:18:00+09:00</updated><id>/windows-0x0d</id><content type="html" xml:base="/windows-0x0d">&lt;h1 id=&quot;0x0d-heap-spray&quot;&gt;0x0d Heap Spray&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘은 Heap Spray에 대해 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;what-is-heap-spray&quot;&gt;What is Heap Spray?&lt;/h5&gt;
+
+&lt;p&gt;Heap Spray는 단어 그대로 Heap 영역에 (Spray로 약을 뿌리듯) 전체적으로 골고루 Payload를 구성하는 것을 말합니다.&lt;/p&gt;
+
+&lt;p&gt;BOF나 UAF 등의 공격을 할 때 각종 메모리 보호기법이 적용되어 있으면, Shell Code가 위치하는 곳의 주소를 정확하게 지정할 수 없겠죠?&lt;/p&gt;
+
+&lt;p&gt;이때 Heap 전체에 내가 원하는 코드를 골고루 위치시켜서 예측 가능한 공간에 Payload를 구성하기 위한 기법이죠.&lt;/p&gt;
+
+&lt;p&gt;그래서 공격 순서는 주로 Heap Spary를 통해 Payload를 구성하고 버그/취약점을 이용해서 공격을 하고 EIP가 내가 구성해놓은 Payload가 있는 곳을 가르키도록 합니다.&lt;/p&gt;
+
+&lt;p&gt;오늘은 Internet Explorer 6을 가지고 기초 개념을 익힌 다음, 최신 버전으로 조금씩 업그레이드 해볼게요.&lt;/p&gt;
+
+&lt;p&gt;(브라우저를 가지고 진행하는 이유는 자바스크립트나 VB스크립트를 이용해서 메모리에 데이터 삽입을 쉽게 할 수 있다는 이점이 있기 때문입니다.
+하지만, 브라우저에서만 할 수 있는게 아니라는 점도 같이 기억해둡시다.)&lt;/p&gt;
+
+&lt;h5 id=&quot;기본-원리&quot;&gt;기본 원리&lt;/h5&gt;
+
+&lt;h6 id=&quot;문자열-할당&quot;&gt;문자열 할당&lt;/h6&gt;
+
+&lt;p&gt;브라우저 메모리에 특정 데이터를 할당시키는 가장 기본적인 방법은 자바스크립트를 이용해서 변수를 생성하고 값을 할당하는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, 아래와 같이 코드를 구성하고 Heap 메모리에 데이터를 할당해보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;language=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;javascript&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;HACK&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+		
+	&lt;span class=&quot;nx&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Alloc Done!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이 코드를 브라우저에서 실행시킨 다음 Immunity Debugger로 어떻게 할당되는지 살펴보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;Immunity에서 File &amp;gt; Attach &amp;gt; Internet Explorer로 Attach를 한 뒤,&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!mona find -s &quot;HACK&quot; -unicode -x *
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;명령을 사용하면 해당 값을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_2.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 값을 보면 HACK이라는 값이 들어가 있는 것을 확인할 수 있죠?&lt;/p&gt;
+
+&lt;p&gt;그런데 여기에 우리가 좀 더 살펴봐야할 점들이 있습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, “HACK”이라는 값은 들어갔는데 48 00 41 00 43 00 4B 00이네? 값 사이에 Null이 있는데 어떻게 Payload를 구성하지?&lt;/p&gt;
+
+&lt;p&gt;이건 해당 값이 유니코드 형식으로 변환되기 때문인데 이를 이해하려면 먼저 BSTR 문자열 객체를 이해해야 합니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;bstr&quot;&gt;BSTR?&lt;/h6&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;BSTR Header&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;문자열 값&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;Null Terminator&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;4 Byte&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;String * 2 Byte&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2 Byte&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;사실 문자열이 할당되면 이 문자열은 BSTR 문자열 객체로 변환됩니다. 이 객체는 헤더+문자열+종단값 형식으로 구성되어 있습니다.&lt;/p&gt;
+
+&lt;p&gt;문자열이 BSTR 문자열 객체로 변환되게 되면 기존 값이 유니코드 형식의 값으로 변형되어 저장되는 특징이 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 예제에서 넣은 “HACK”이라는 문자열이 “48 00 41 00 43 00 4B 00”로 변환되어 저장되는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;그리고 위에서 헤더와 종단값을 가진다고 했는데 헤더는 변환된 문자열의 길이를 나타내는 4바이트 값입니다.&lt;/p&gt;
+
+&lt;p&gt;종단값은 이 객체의 끝을 나타내기 위해 “00 00” 2바이트 값으로 구성되어 있습니다.&lt;/p&gt;
+
+&lt;p&gt;앞에서 사용한 예제를 BSTR 객체 전체가 보이게 나타낸 그림입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;HACK 문자열이 “48 00 41 00 43 00 4B 00”로 변환되니까 헤더 값이 08 00 00 00(리틀엔디안)인 것도 보입니다.&lt;/p&gt;
+
+&lt;p&gt;이제 BSTR 구조는 이해가 되시죠?&lt;/p&gt;
+
+&lt;p&gt;아 그럼 유니코드 형식으로 바뀌기 때문에 그렇다는건 이해하겠는데 Null은 어떻게 해결할건가요??&lt;/p&gt;
+
+&lt;h6 id=&quot;null&quot;&gt;Null?&lt;/h6&gt;
+
+&lt;p&gt;다행히도 자바스크립트에 unescape 함수를 사용하면 아주 쉽게 해결이 됩니다.&lt;/p&gt;
+
+&lt;p&gt;unescape 함수는 인코딩된 문자를 디코딩하는 역할을 수행합니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 이 함수에게 문자열을 전달할 때 해당 문자열이 원래 유니코드임을 알려주면 이 함수는 해당 내용을 유니코드로 변환하지 않게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;코드는 다음과 같이 변환했습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;language=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;javascript&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+		&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;unescape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'%u4148%u4B43'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+		
+		&lt;span class=&quot;nx&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Alloc Done!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;이 코드를 실행한 뒤 이번에는 Windbg로 메모리 값을 살펴보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;s -a 0x00000000 L?0x7fffffff &quot;HACK&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;먼저, 헤더부분을 보면 08 00 00 00에서 04 00 00 00으로 변환된 것을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 본문을 살펴보면 우리가 걱정했던 NUll이 모두 사라진 것을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이제 Null 문제도 해결되었으니 본격적으로 Spray를 해보도록 하겠습니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;spray&quot;&gt;Spray&lt;/h6&gt;
+
+&lt;p&gt;Heap Spray는 Heap 전체에 내가 원하는 코드를 골고루 위치시켜서 예측 가능한 공간에 Payload를 구성하기 위한 기법이라고 했었죠?&lt;/p&gt;
+
+&lt;p&gt;Payload는 다수의 NOP과 Shell Code의 조합으로 한 덩어리를 구성할 겁니다.&lt;/p&gt;
+
+&lt;p&gt;이 덩어리들을 반복적으로 여러개를 할당해서 힙 메모리 전역에 할당해준다면 어떻게 될까요?&lt;/p&gt;
+
+&lt;p&gt;그럼 EIP를 제어할 때 쉘코드를 담고 있는 덩어리가 있는 곳으로 보낼 수 있겠죠.&lt;/p&gt;
+
+&lt;p&gt;위치가 조금 다르다고 해도 NOP으로만 점프하도록 만들 수 있다면, Shell Code가 실행될 수 있을 겁니다.&lt;/p&gt;
+
+&lt;p&gt;Spray 수행을 위해 다음과 같이 코드를 구성했습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;ShellCode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;unescape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'%u4148%u4B43'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;chunksize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;num_chunk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;chunksize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+
+	&lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;unescape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'%u9090%u9090'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;substring&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;chunksize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ShellCode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;testArr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;num_chunk&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+ &lt;span class=&quot;nx&quot;&gt;testArr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ShellCode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Spray Done!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;한 덩어리의 크기가 0x1000인 덩어리(NOP+Shellcode) 200개를 메모리에 할당하도록 구성된 코드입니다.&lt;/p&gt;
+
+&lt;p&gt;시작 위치를 살펴보기 쉽게 하기 위해서 ShellCode+NOP 형태로 구성하였습니다.&lt;/p&gt;
+
+&lt;p&gt;코드를 실행한 후 Windbg로 살펴보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;“HACK” + NOP 200개가 출력되는 것이 보이네요.&lt;/p&gt;
+
+&lt;p&gt;이번에는 다음 명령어로 전체 힙의 정보를 살펴보도록 할게요.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!heap -stat
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;출력되는 값들 중 맨 위 기본 힙의 사용량(Committed bytes)이 가장 많은 게 보이네요.&lt;/p&gt;
+
+&lt;p&gt;그럼 우리가 입력한 값들이 힙에 얼마정도가 할당되어 뿌려졌는지 확인해보겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!heap -stat -h 0x140000
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_8.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;0x2010 크기로 c1 횟수만큼 무엇인가 할당이 되었고 70.11%를 차지하고 있다는 통계 내용을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;저 값이 내가 할당한 값이 맞는지 확인해봐야겠죠?&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!heap -flt s 0x2010
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위 명령어는 heap에 0x2010 크기로 할당된 힙 chunk들을 찾아서 보여줍니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_9.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;찾아진 힙 chunk 중 하나의 주소값을 덤프해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_10.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;0x001cd370(Heap_Entry) 주소를 출력하니 힙 header(8 bytes) + BSTR 객체 header(4 bytes) + “HACK” + NOP이 보입니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 0x2010만큼 떨어진 곳의 값을 확인하니 전혀 다른 값들이 들어있는 것을 확인할 수 있죠?&lt;/p&gt;
+
+&lt;p&gt;즉, 우리가 원하는 값이 연속적으로 할당된 것이 아니라 사이에 빈 공간이 존재한다는 것입니다.&lt;/p&gt;
+
+&lt;p&gt;우리가 이제 해야할 것은 이 빈 공간을 줄여서 Exploit의 신뢰도를 높여야 합니다.&lt;/p&gt;
+
+&lt;p&gt;이를 위해 코드를 다음과 같이 수정했습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;Shellcode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;unescape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'%u4148%u4B43'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;chunksize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x40000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;num_chunk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;chunksize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+
+	&lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;unescape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'%u9090%u9090'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;substring&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;chunksize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Shellcode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;testArr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;num_chunk&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+ &lt;span class=&quot;nx&quot;&gt;testArr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Shellcode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;chunk&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Spray Done!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;chunk 크기를 0x40000으로 늘리고 chunk의 개수를 500개로 늘렸습니다.&lt;/p&gt;
+
+&lt;p&gt;이를 실행한 후 다시 위 과정을 반복해보면 다음과 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_12.png&quot; alt=&quot;[그림 1-12]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;0x80010 크기로 1f5개가 할당되었고 99.33%만큼 힙에 뿌려진 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;!heap -flt s 0x80010
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위 명령어로 0x80010 크기만큼 할당된 영역을 다시 확인해보면 아래와 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_13.png&quot; alt=&quot;[그림 1-13]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이 중 아무 위치나 선택해서 덤프해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_14.png&quot; alt=&quot;[그림 1-14]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;0x80010만큼 할당되었다고 했기에 0x80000 위치쯤을 확인해보니 chunk 사이에 여전히 빈 공간이 남아있는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;!heap -flt s 0x080010으로 출력되었던 주소 간의 거리를 구해서 다시 출력해보니 아래와 같이 잘 출력이 되는 것이 보이네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_15.png&quot; alt=&quot;[그림 1-15]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;역시나 빈 공간이 생긴다는 것은 어쩔 수 없는 것 같습니다.&lt;/p&gt;
+
+&lt;p&gt;하지만!! 우리가 할당한 각 chunk의 크기가 워낙 크고 많기 때문에 이 정도 수치는 무시하셔도 좋습니다.&lt;/p&gt;
+
+&lt;h6 id=&quot;예측-가능한-주소&quot;&gt;예측 가능한 주소&lt;/h6&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;d 0c0c0c0c
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위 명령어로 0c0c0c0c, 0a0a0a0a 등 예측 가능한 주소를 덤프해봅시다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0d_16.png&quot; alt=&quot;[그림 1-16]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위와 같이 NOP이 위치하는 것을 알 수 있습니다. 이는 한 번 출력되었다고 해서 사용할 수 있는 것은 아니며,&lt;/p&gt;
+
+&lt;p&gt;반복적으로 덤프해본 후, 신뢰할만한 주소인지 확인해야 합니다.&lt;/p&gt;
+
+&lt;p&gt;위 주소에 늘 NOP이 위치한다면 Exploit 때 신뢰할 수 있는 ShellCode의 주소로 사용할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;지금까지 기본적인 HeapSpray에 대해서 알아봤습니다.&lt;/p&gt;
+
+&lt;p&gt;다음 글부터는 지금까지 설명한 취약점들을 종합해서 IE8, IE10, IE11 Exploit을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0d Heap Spray</summary></entry><entry><title type="html">linux_0x04</title><link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-05-16T11:18:00+09:00</published><updated>2019-05-16T11:18:00+09:00</updated><id>/linux_0x05</id><content type="html" xml:base="/linux_0x05">&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
+>>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
 
 &lt;p&gt;이번 시간부터는 지난 포스팅에서 진행된 환경보다 비교적 최신의 환경에서 진행 해보겠습니다.&lt;/p&gt;
 
@@ -22,7 +345,11 @@
 
 &lt;p&gt;위의 그림이 앞 포스팅에서 함께 봤던 일반적인 RTL입니다. execl()을 실행 시켜서 4byte 뒤에 위치시켜둔 인자를 받아내고 RET 위치위 AAAA로 이동 후 error를 발생 시키고 종료 합니다.(error 발생이 싫으신 분들은 exit() 함수를 위치 시켜주시면 종료 됩니다.) 이 작업을 여러번 chain처럼 연결 시켜 연속적으로 RTL을 사용하는  &lt;strong&gt;RTL Chaining&lt;/strong&gt;이 완성 됩니다. 다음은 &lt;strong&gt;RTL Chaining&lt;/strong&gt;을 보도록 하겠습니다.&lt;/p&gt;
 
+<<<<<<< HEAD
 &lt;h2 id=&quot;rtl-chaining&quot;&gt;RTL Chaining&lt;/h2&gt;
+=======
+&lt;h1 id=&quot;rtl-chaining&quot;&gt;RTL Chaining&lt;/h1&gt;
+>>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
 
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-2.png&quot; alt=&quot;[그림 5-2]&quot; /&gt;
@@ -70,7 +397,11 @@
 
 &lt;p&gt;&lt;strong&gt;(bof.c 의 코드는 변경 없이 그대로 진행됩니다.)&lt;/strong&gt;&lt;/p&gt;
 
+<<<<<<< HEAD
 &lt;h2 id=&quot;ropreturn-oriented-programming&quot;&gt;ROP(Return Oriented Programming)&lt;/h2&gt;
+=======
+&lt;h1 id=&quot;ropreturn-oriented-programming&quot;&gt;ROP(Return Oriented Programming)&lt;/h1&gt;
+>>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
 
 &lt;ul&gt;
   &lt;li&gt;buffer 크기 :&lt;/li&gt;
@@ -296,10 +627,18 @@
 
 &lt;p&gt;고생하셨슴돠!!!&lt;/p&gt;
 
+<<<<<<< HEAD
 &lt;h3 id=&quot;references-참고-자료&quot;&gt;References 참고 자료&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://shayete.tistory.com/&quot;&gt;https://shayete.tistory.com/&lt;/a&gt;
 &lt;a href=&quot;https://www.lazenca.net/display/TEC/02.TechNote&quot;&gt;https://www.lazenca.net/display/TEC/02.TechNote&lt;/a&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL Chaining &amp;amp; ROP(Return Oriented Programming)</summary></entry><entry><title type="html">Use After Free</title><link href="/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" /><published>2019-05-06T20:18:00+09:00</published><updated>2019-05-06T20:18:00+09:00</updated><id>/windows-0x0c</id><content type="html" xml:base="/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
+=======
+&lt;h2 id=&quot;references-참고-자료&quot;&gt;References 참고 자료&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://shayete.tistory.com/&quot;&gt;https://shayete.tistory.com/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.lazenca.net/display/TEC/02.TechNote&quot;&gt;https://www.lazenca.net/display/TEC/02.TechNote&lt;/a&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL Chaining &amp;amp; ROP(Return Oriented Programming)</summary></entry><entry><title type="html">Use After Free</title><link href="/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" /><published>2019-05-06T20:18:00+09:00</published><updated>2019-05-06T20:18:00+09:00</updated><id>/windows-0x0c</id><content type="html" xml:base="/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
+>>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -1491,6 +1830,7 @@ https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
 
 &lt;p&gt;지금까지 DEP에 대해서 알아봤습니다.&lt;/p&gt;
 
+<<<<<<< HEAD
 &lt;p&gt;다음 연재부터는 Heap Exploit으로 찾아뵙도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x09 DEP(3)</summary></entry><entry><title type="html">linux_0x04</title><link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" /><published>2019-03-24T15:18:00+09:00</published><updated>2019-03-24T15:18:00+09:00</updated><id>/linux_0x04</id><content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
@@ -1722,3 +2062,6 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
 &lt;p&gt;다음 포스팅은 Chaining RTL이란 것을 정말…간단히 볼 수 있도록 해보겠습니다.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;뿅!&lt;/strong&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL(Return to Library)</summary></entry></feed>
+=======
+&lt;p&gt;다음 연재부터는 Heap Exploit으로 찾아뵙도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x09 DEP(3)</summary></entry></feed>
+>>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
