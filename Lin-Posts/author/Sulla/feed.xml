@@ -2,14 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="/" rel="alternate" type="text/html" />
-<<<<<<< HEAD
-  <updated>2019-05-16T02:35:45+09:00</updated>
-=======
-  <updated>2019-06-29T23:12:43+09:00</updated>
->>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
-  <id>/author/Sulla/feed.xml</id>
+  <link href="http://localhost:4000/author/Sulla/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
+  <updated>2019-06-30T20:08:29+09:00</updated>
+  <id>http://localhost:4000/author/Sulla/feed.xml</id>
 
   
   
@@ -44,21 +40,145 @@
 
   
     <entry>
-<<<<<<< HEAD
-      <title type="html">linux_0x05</title>
-      <link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x05" />
+      <title type="html">linux_0x06 Heap 구조(malloc, free)</title>
+      <link href="http://localhost:4000/linux_0x06" rel="alternate" type="text/html" title="linux_0x06 Heap 구조(malloc, free)" />
+      <published>2019-07-01T04:50:00+09:00</published>
+      <updated>2019-07-01T04:50:00+09:00</updated>
+      <id>http://localhost:4000/linux_0x06</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x06">&lt;h1 id=&quot;heap-구조malloc-free&quot;&gt;Heap 구조(malloc, free)&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Sulla임돠.&lt;/p&gt;
+
+&lt;p&gt;이번 포스팅 부터는 Heap BOF에 대해서 찬찬히 알아가도록 하겠슴돠.&lt;/p&gt;
+
+&lt;p&gt;먼저 지금까지 알아봤던 Stack과 앞으로 알아갈 Heap에 대해서 간단하게 비교 해보도록 합죠.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x06/0x06-1.png&quot; alt=&quot;[그림 6-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 차이 말고도 여러 차이가 있습니다만 이정도만 짚고 넘어가도록 하겠습니다. 위 특징중 몇 가지 짚고 넘어가야할 내용이 있으니 조금더 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저 “동적 메모리”라는 특징이 있습니다. Stack의 경우 메모리 공간이 정적으로 할당 됩니다. 반대로 Heap의 경우는 동적으로 메모리를 할당 받습니다.&lt;/p&gt;
+
+&lt;p&gt;또한 Stack의 경우 함수 종료 시 자동으로 해제되는 반면 Heap의 경우는 사용자가 직접 관리해야 합니다. 이 때 대표적으로 사용되는 함수가 메모리 할당은 malloc(), calloc(), realloc() 함수, 해제는 free() 함수를 대표적으로 사용합니다.&lt;/p&gt;
+
+&lt;p&gt;malloc() 함수를 사용해서 필요한 heap 영역을 할당 해주며, 다 쓰고 더이상 필요 없는 heap 영역은 free() 함수로 해제해야 하는 것이죠. 필요한 만큼 공간을 잡고 다쓰면 뺴야 되는것이죠.&lt;/p&gt;
+
+&lt;p&gt;한마디로 Heap 영역은 사용자가 동적으로 메모리 공간을 할당/해제 하는 영역입니다.&lt;/p&gt;
+
+&lt;p&gt;Heap 보는김이 조금 더 자세하게 보도록 하겠습니다&lt;/p&gt;
+
+&lt;h1 id=&quot;조금-더-자세한-heap&quot;&gt;조금 더 자세한 Heap&lt;/h1&gt;
+
+&lt;p&gt;엉덩…Heap을 자세히 보도록 하겠습니다. (언제나 그랬듯….필요한 내용만 쏙쏙 보도록 하겠습니다.)&lt;/p&gt;
+
+&lt;p&gt;위에서 malloc() 으로 메모리 공간을 동적으로 할당하고 다쓰고 필요없는 공간은 free()로 해제 하다고 했습죠.&lt;/p&gt;
+
+&lt;p&gt;그 내용을 한 번 자세히 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x06/0x06-2.png&quot; alt=&quot;[그림 6-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림은 malloc()을 사용해 할당했을 경우의 모습을 보여줍니다. 그런데 chunk라는 모르는 이름이 보이는데 뭐하는 친구일까요??&lt;/p&gt;
+
+&lt;p&gt;chunk는 Heap에 할당되는 영역을 가리키는 이름입니다. 쉽게 말해 malloc() 함수로 할당하면 메모리의 Heap 영역에는 chunk라는 이름으로 할당 되는 것이지욥.&lt;/p&gt;
+
+&lt;p&gt;그럼 &lt;strong&gt;chunk&lt;/strong&gt;가 어떻게 생겨먹었는지 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x06/0x06-3.png&quot; alt=&quot;[그림 6-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;우선 &lt;strong&gt;malloc()&lt;/strong&gt;으로 heap 영역에 chunk가 할당 되었을때입니다. chunk는 8byte 크기로 할당 받으며(64bit OS는 16byte) 위와 같은 모습을 하고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;prev_size&lt;/strong&gt;는 이전 chunk의 크기를 나타내주며 free() 시에 생성 됩니다. 당연히 첫 chunk는 이전 chunk가 없기에 0이 들어가있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;size&lt;/strong&gt;는 현재 chunk의 크기를 담고 있으며 malloc() 시에 생성 됩니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;AMP&lt;/strong&gt;는 플래그 필드이며 각 플래그는 아래와 같습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;A : NON_MAIN_ARENA&lt;/strong&gt;
+multi thread application에서 각 thread 마다 다른 heap 영역을 사용하는 경우 현재 chunk가 main heap( arena)에 속하는지 여부를 나타냅니다. (main heap = 0 / mmap’d memory = 1)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;M : IS_MMAPPED&lt;/strong&gt;
+chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅 됩니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;P : PREV_INUSE&lt;/strong&gt;
+이전 chunk의 상태를 나타내줍니다. (chunk using = 1 / chunk free = 0)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;data&lt;/strong&gt;는 실제로 데이터가 들어가는 영역입니다. 입력값이 들어간다 생각하면 편하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;다음은 &lt;strong&gt;free()&lt;/strong&gt;로 해제 되었을 때 모습을 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x06/0x06-4.png&quot; alt=&quot;[그림 6-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이전과 조금 달라진 모습이 보입니다. data영역이 &lt;strong&gt;fd&lt;/strong&gt;/&lt;strong&gt;bk&lt;/strong&gt; 라는 생소한 공간이 생겼습니다. 이름을 보고 대충 감이 오시는 분도 있을거라 생각 됩니다. forward / backward이 연상 되시는 분들이 있을거라 생각 되네요.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;fd : (forward pointer)&lt;/strong&gt; free된 다음 chunk를 가리킵니다. (data 영역의 앞 4byte)&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;bk : (backward pointer)&lt;/strong&gt; free된 이전 chunk를 가리킵니다. (data 영역의 뒤 4byte)&lt;/p&gt;
+
+&lt;p&gt;fd/bk를 참조하여 free된 heap 영역을 확인하는 구조입니다. 또한 위에서 언급한 플래그 값도 변할 것입니다. (&lt;strong&gt;PREV_INUSE&lt;/strong&gt;) 이제 fd/bk에 대해서 후에 해볼 공격 기법을 위해 미리 조금더 알아 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x06/0x06-5.png&quot; alt=&quot;[그림 6-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위에서 보았던 내용을 좀금 수정 해봤습니다. A~E 까지 malloc()으로 할당 해주고 A, C, E만 free()로 해제 한 상태입니다. 이때 fd/bk가 어떤 모냥인지 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x06/0x06-6.png&quot; alt=&quot;[그림 6-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;A, C, E 가 free()로 해제 되면서 fd/bk는 위 그림과 같이 링크를 갖게 됩니다. 이것을 &lt;strong&gt;double linked list&lt;/strong&gt; 라고 부르며 이 내용 또한 니중에 다시 다루게 될것입니다. 지금은 시작이기에 이런식으로 구성 되어있다는 정도만 알고 가시면 될 듯 합니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x06/0x06-7.png&quot; alt=&quot;[그림 6-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;지금까지 Heap 영역에 malloc()을 사용하여 할당 받을 경우와 free()를 통한 메모리 해제를 하는 경우 어떤 모습으로 진행 되는지를 알아봤습니다. 다음부터는 free()를 통한 해제를 하지 않을 경우 어떤 일이 생기는지 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;엉덩…Heap도 찬찬히 한 걸음씩 가보도록 하겠습니다.&lt;/p&gt;
+
+&lt;p&gt;고생하셨습니다. 담에 뵙겠숩니다욥!&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Sulla</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">Heap 구조(malloc, free)</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
+      <title type="html">linux_0x05 RTL Chaining &amp;amp; ROP</title>
+      <link href="http://localhost:4000/linux_0x05" rel="alternate" type="text/html" title="linux_0x05 RTL Chaining &amp; ROP" />
       <published>2019-05-16T11:18:00+09:00</published>
       <updated>2019-05-16T11:18:00+09:00</updated>
-      <id>/linux_0x05</id>
-      <content type="html" xml:base="/linux_0x05">&lt;h1 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h1&gt;
-=======
-      <title type="html">linux_0x04</title>
-      <link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x04" />
-      <published>2019-05-16T11:18:00+09:00</published>
-      <updated>2019-05-16T11:18:00+09:00</updated>
-      <id>/linux_0x05</id>
-      <content type="html" xml:base="/linux_0x05">&lt;h2 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h2&gt;
->>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
+      <id>http://localhost:4000/linux_0x05</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x05">&lt;h1 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간부터는 지난 포스팅에서 진행된 환경보다 비교적 최신의 환경에서 진행 해보겠습니다.&lt;/p&gt;
 
@@ -82,11 +202,7 @@
 
 &lt;p&gt;위의 그림이 앞 포스팅에서 함께 봤던 일반적인 RTL입니다. execl()을 실행 시켜서 4byte 뒤에 위치시켜둔 인자를 받아내고 RET 위치위 AAAA로 이동 후 error를 발생 시키고 종료 합니다.(error 발생이 싫으신 분들은 exit() 함수를 위치 시켜주시면 종료 됩니다.) 이 작업을 여러번 chain처럼 연결 시켜 연속적으로 RTL을 사용하는  &lt;strong&gt;RTL Chaining&lt;/strong&gt;이 완성 됩니다. 다음은 &lt;strong&gt;RTL Chaining&lt;/strong&gt;을 보도록 하겠습니다.&lt;/p&gt;
 
-<<<<<<< HEAD
 &lt;h2 id=&quot;rtl-chaining&quot;&gt;RTL Chaining&lt;/h2&gt;
-=======
-&lt;h1 id=&quot;rtl-chaining&quot;&gt;RTL Chaining&lt;/h1&gt;
->>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
 
 &lt;figure&gt;
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-2.png&quot; alt=&quot;[그림 5-2]&quot; /&gt;
@@ -134,11 +250,7 @@
 
 &lt;p&gt;&lt;strong&gt;(bof.c 의 코드는 변경 없이 그대로 진행됩니다.)&lt;/strong&gt;&lt;/p&gt;
 
-<<<<<<< HEAD
 &lt;h2 id=&quot;ropreturn-oriented-programming&quot;&gt;ROP(Return Oriented Programming)&lt;/h2&gt;
-=======
-&lt;h1 id=&quot;ropreturn-oriented-programming&quot;&gt;ROP(Return Oriented Programming)&lt;/h1&gt;
->>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
 
 &lt;ul&gt;
   &lt;li&gt;buffer 크기 :&lt;/li&gt;
@@ -364,18 +476,10 @@
 
 &lt;p&gt;고생하셨슴돠!!!&lt;/p&gt;
 
-<<<<<<< HEAD
 &lt;h3 id=&quot;references-참고-자료&quot;&gt;References 참고 자료&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://shayete.tistory.com/&quot;&gt;https://shayete.tistory.com/&lt;/a&gt;
 &lt;a href=&quot;https://www.lazenca.net/display/TEC/02.TechNote&quot;&gt;https://www.lazenca.net/display/TEC/02.TechNote&lt;/a&gt;&lt;/p&gt;</content>
-=======
-&lt;h2 id=&quot;references-참고-자료&quot;&gt;References 참고 자료&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://shayete.tistory.com/&quot;&gt;https://shayete.tistory.com/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.lazenca.net/display/TEC/02.TechNote&quot;&gt;https://www.lazenca.net/display/TEC/02.TechNote&lt;/a&gt;&lt;/p&gt;</content>
->>>>>>> b08fed5ad3ee58fb0fccb59f8f7f57b57833d859
 
       
       
@@ -405,11 +509,11 @@
   
     <entry>
       <title type="html">CVE-2019-5736 (runC Container 취약점)</title>
-      <link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
+      <link href="http://localhost:4000/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
       <published>2019-03-28T02:43:00+09:00</published>
       <updated>2019-03-28T02:43:00+09:00</updated>
-      <id>/runC%20Container</id>
-      <content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+      <id>http://localhost:4000/runC%20Container</id>
+      <content type="html" xml:base="http://localhost:4000/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
 
@@ -625,12 +729,12 @@ func main() {
     </entry>
   
     <entry>
-      <title type="html">linux_0x04</title>
-      <link href="/linux_0x04" rel="alternate" type="text/html" title="linux_0x04" />
+      <title type="html">linux_0x04 RTL</title>
+      <link href="http://localhost:4000/linux_0x04" rel="alternate" type="text/html" title="linux_0x04 RTL" />
       <published>2019-03-24T15:18:00+09:00</published>
       <updated>2019-03-24T15:18:00+09:00</updated>
-      <id>/linux_0x04</id>
-      <content type="html" xml:base="/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x04</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x04">&lt;h2 id=&quot;rtlreturn-to-library&quot;&gt;RTL(Return to Library)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다!&lt;/p&gt;
 
@@ -889,12 +993,12 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
     </entry>
   
     <entry>
-      <title type="html">linux_0x03</title>
-      <link href="/linux_0x03" rel="alternate" type="text/html" title="linux_0x03" />
+      <title type="html">linux_0x03 Basic BOF</title>
+      <link href="http://localhost:4000/linux_0x03" rel="alternate" type="text/html" title="linux_0x03 Basic BOF" />
       <published>2019-03-11T19:18:00+09:00</published>
       <updated>2019-03-11T19:18:00+09:00</updated>
-      <id>/linux_0x03</id>
-      <content type="html" xml:base="/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x03</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x03">&lt;h2 id=&quot;0x03---basic-bof--메모리-보호-기법&quot;&gt;0x03 - Basic BOF &amp;amp; 메모리 보호 기법&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요! &lt;strong&gt;Sulla&lt;/strong&gt;임돠….&lt;/p&gt;
 
@@ -1055,12 +1159,12 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
     </entry>
   
     <entry>
-      <title type="html">linux_0x02</title>
-      <link href="/linux_0x02" rel="alternate" type="text/html" title="linux_0x02" />
+      <title type="html">linux_0x02 BOF 시작</title>
+      <link href="http://localhost:4000/linux_0x02" rel="alternate" type="text/html" title="linux_0x02 BOF 시작" />
       <published>2019-02-22T19:18:00+09:00</published>
       <updated>2019-02-22T19:18:00+09:00</updated>
-      <id>/linux_0x02</id>
-      <content type="html" xml:base="/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x02</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x02">&lt;h2 id=&quot;0x02---buffer-overflow-맛보기&quot;&gt;0x02 - Buffer Overflow 맛보기&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;임돠.&lt;/p&gt;
 
@@ -1306,12 +1410,12 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
     </entry>
   
     <entry>
-      <title type="html">linux_0x01</title>
-      <link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
+      <title type="html">linux_0x01 BOF 준비2</title>
+      <link href="http://localhost:4000/linux_0x01" rel="alternate" type="text/html" title="linux_0x01 BOF 준비2" />
       <published>2019-02-18T19:18:00+09:00</published>
       <updated>2019-02-18T19:18:00+09:00</updated>
-      <id>/linux_0x01</id>
-      <content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x01</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x01">&lt;h2 id=&quot;0x01---buffer-overflow-준비&quot;&gt;0x01 - Buffer Overflow 준비&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다. 오늘부터 본격적으로 &lt;strong&gt;BOF&lt;/strong&gt;에 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -1439,143 +1543,12 @@ execl(경로, 인자1, 인자2….인자n, null) 이라고 이해하시면 됩�
     </entry>
   
     <entry>
-      <title type="html">linux_0x01</title>
-      <link href="/linux_0x01" rel="alternate" type="text/html" title="linux_0x01" />
+      <title type="html">linux_0x00 소개</title>
+      <link href="http://localhost:4000/linux_0x00" rel="alternate" type="text/html" title="linux_0x00 소개" />
       <published>2019-02-08T19:18:00+09:00</published>
       <updated>2019-02-08T19:18:00+09:00</updated>
-      <id>/linux_0x01</id>
-      <content type="html" xml:base="/linux_0x01">&lt;h2 id=&quot;buffer-overflow-뭐임뭐임뭐임&quot;&gt;Buffer Overflow 뭐임?뭐임?뭐임?&lt;/h2&gt;
-
-&lt;p&gt;BOF란 &lt;strong&gt;메모리&lt;/strong&gt;의 동작 과정중의 오류로 인한 잘못된 동작을 유도하는 취약점입니다. 프로세스가 데이터를 &lt;strong&gt;버퍼&lt;/strong&gt;에 저장 시 입력 값의 크기를 검증하지 않을 경우 주어진 버퍼를 넘어선 즉, 지정된 위치가 아닌 곳에 저장되며 인접한 메모리를 덮어 쓰게 됩니다. 인접 메모리에는 기존의 데이터가 저장되어 있으며 &lt;strong&gt;변수, 프로세스 흐름 제어&lt;/strong&gt; 등의 데이터가 포함됩니다. 따라서 메모리 접근 오류로 인한 이상 동작을 하게되며 결과적으로 취약점으로 동작하게 되는것입니다.&lt;/p&gt;
-
-&lt;p&gt;앞으로 이 BOF 취약점을 천천히 알아보고자 합니다. 먼저 BOF를 알기 위해서는 메모리, 레지스터 등의 구조 및 개념과 앞으로 사용될 gdb의 사용법 등 본격적인 시작에 앞 서 필요한 배경 지식에 대하여 짚고 넘어갈 계획입니다.&lt;/p&gt;
-
-&lt;h2 id=&quot;메모리-구조&quot;&gt;메모리 구조&lt;/h2&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-1]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;먼저 BOF를 알기 위해선 메모리를 알아야 합니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Kernel&lt;/strong&gt; : OS의 중요 코드들이 로드되며 일반 사용자는 접근 불가한 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;off-limit&lt;/strong&gt; : 사용자의 Kernel 접근을 막기 위해 설정한 영역&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Stack&lt;/strong&gt; : 환경변수, 파라미터, 반환되는 주소 및 지역변수 등 임시적인 데이터를 저장하는 공간이며, 높은 메모리 주소에서 낮은 메모리 주소로 저장됨&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;libc&lt;/strong&gt; : 프로그램 내부에서 사용하는 라이브러리 함수들과 관련된 공유 라이버리 파일이 정장되는 공간&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Heap&lt;/strong&gt; : 엉덩…아니 필요에 의해 사용되는 동적 변수의 데이터가 저장되는 공간이며, 낮은 메모리 주소에서 높은 메모리 주소로 저장됨&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;BSS / Data&lt;/strong&gt; : 전역변수, 정적변수, 배열, 구조체 등이 저장되는 구조이며 차이는 아래와 같다
-    &lt;ul&gt;
-      &lt;li&gt;&lt;strong&gt;BSS&lt;/strong&gt; : 초기화 되지 않은, 0으로 초기화, Null로 초기화된 데이터의 경우 저장되는 공간&lt;/li&gt;
-      &lt;li&gt;&lt;strong&gt;Data&lt;/strong&gt; : 초기화 된 데이터가 저장 되는 공간&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Code&lt;/strong&gt; : 실제로 실행되는 hex, bin과 같은 파일내부에 실행되는 코드들이 저장되며 기계어 명령어, 어셈블리 코드가 실행되는 영역&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;이것은 간단하게 정리한 내용입니다. 여기서 Stack과 Heap의 동작 방향이 다르다는 것이 특이한 모습을 보입니다. 왜 그럴까요?&lt;/p&gt;
-
-&lt;p&gt;간단히 말씀 드리자면 효율적인 메모리 관리와 Kernel영역의 보호를 위해 저런 모습으로 설계 되었습니다. Stack은 Kernel의 반대 방향으로 움직이고 Stack과 Heap 사이에 libc를 배치하여 메모리 관리의 효율성을 높인것이죠.&lt;/p&gt;
-
-&lt;p&gt;이제 메모리를 간단히 알아 보았으니 메모리 중 Stack에 관하여 간단히 짚고 넘어가도록 하겠습니다.&lt;/p&gt;
-
-&lt;h2 id=&quot;stack&quot;&gt;Stack?&lt;/h2&gt;
-
-&lt;p&gt;Stack의 역할은 위에서 언급했으니 패스하고 동작 장식에 대하여 알아 보도록 하겠습니다. Stack은 기본적으로 &lt;strong&gt;후입선출&lt;/strong&gt;(LIFO, Last in First out)의 방식으로 동작합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x01/0x01-2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;[그림 1-2]&lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;Stack의 동작은 위와 같습니다. 16byte의 Stack공간에 A(4byte) 데이터를 저장시 PUSH를 통하여 저장합니다. 밀어 넣는다는 거죠. 이 때 ESP -4 즉 스택 포인터의 값을 총값에서 -4값을 저장 해둡니다. 왜일까요?&lt;/p&gt;
-
-&lt;p&gt;Stack은 메모리의 높은 주소값에서 낮은 주소값으로 이동하기 떄문에 16byte 에서 4byte씩 줄이는 것이죠. 높은 곳에서 낮은 곳으로.&lt;/p&gt;
-
-&lt;p&gt;다음으로 B 데이터를 저장시 마찬가지로 PUSH를 통하여 A데이터 위에 밀어 넣게 됩니다. ESP 값 또한 -4의 값을 저장 합니다. C 데이터까지 같은 방식으로 데이터를 저장 합니다. 그런데 다시 A 데이터를 빼고 싶다면?&lt;/p&gt;
-
-&lt;p&gt;앞서 말했던 Stack의 동작 방식인 &lt;strong&gt;후입선출&lt;/strong&gt;에 의해 C 데이터를 POP을 통하여 뽑고 ESP의 값은 -4가 아닌 +4의 값을 저장합니다. 이어서 B데이터를 뽑은 후 A 데이터를 뽑을수 있습니다. 이것이 Stack의 동작 방식이며 후입선출입니다.&lt;/p&gt;
-
-&lt;p&gt;결과적으로 Stack을 정리하자면 &lt;strong&gt;메모리의 높은 주소값에서 낮은 주소값으로  데이터가 저장&lt;/strong&gt;되며 동작 방식은 &lt;strong&gt;후입선출&lt;/strong&gt;의 방식으로 동작 합니다. 위에서 나온 ESP의 경우 레지스터의 한 종류로서 레지스터는 포인터, 산술 연산, 인덱스, 세그먼트, 플래그 등이 있으며  필요한 몇가지의 레지스터만 간단하게 정리하자면 다음과 같습니다.&lt;/p&gt;
-
-&lt;p&gt;포인터 레지스터 : 포인터와 관련된 레지스터&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;EIP&lt;/strong&gt; (Instruction Pointer) : CPU가 실행할 다음 명령어의 주소값을 나타냄&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;EBP&lt;/strong&gt; (Base Pointer) : 현재 스택의 최하단 주속밧을 나타냄, EBP의 다음 주소는 Return값을 나타냄&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ESP&lt;/strong&gt; (Stack Pointer) : 현재 스택의 최상단 주소값을 나타냄&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;산술 연산 레지스터 : 산술 논리 연산에 필요한 레지스터&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;EAX&lt;/strong&gt; (Accumulator Register) : 산술 논리 연산에 필요한 상수 또는 변수값이 저장되며 함수의 리턴값 저장&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ECX&lt;/strong&gt; (Counter Register) : 반복문 동작시 반복문의 반복 횟수를 저장&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;EDX&lt;/strong&gt; (Data Register) : EAX 레지스터를 보조&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;인덱스 레지스터 : 작업에 필요한 데이터의 주소값 저장에 사용되는 레지스터&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;ESI&lt;/strong&gt; (Source Index) : 데이터 복사 및 조작할 때 사용하는 데이터 주소를 저장(ESI &amp;lt;&amp;gt; EDI)&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;EDI&lt;/strong&gt; (Destination Index) : 데이터 복사시 목적지의 주소 저장 (EDI &amp;lt;&amp;gt; ESI)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;레지스터의 사용 이유는 CPU의 빠른 작업 처리를 위해 사용 됩니다. CPU내부에 위치하여 메모리에 접근하는 것보다 더욱 빠른 속도로 접근 가능합니다. 단, 별도의 데이터를 저장 하기엔 용량이 작기에 위에서 알아본 특수한 목적에 맞는 특정 데이터만 저장해두며 CPU의 빠른 동작을 지원 해줍니다.&lt;/p&gt;
-
-&lt;p&gt;레지스터의 종류는 위의 내용 외 더욱 다양한 레지스터가 존재 하지만 현재 필요한 레지스터 및 알아두면 좋을 레지스터를 알아 보았습니다. 급하게 외우기보단 반복적으로 사용하다 보면 필요한 레지그터의 값만 빠르게 살펴보고 자연스럽게 기억이 되실겁니다.&lt;/p&gt;
-
-&lt;p&gt;마지막으로 어셈블리어 명령어에 대하여 알아보도록 하겠습니다. 위에서 Stack의 후입선출의 동작 방식을 알아보는 과정 중 PUSH, POP 그리고 언급은 없었지만 NOP라는 단어가 보였습니다. 이 단어들이 어셈블리어의 명령어이며, 어셈블리어란 컴퓨터 프로그래밍의 저급 언어입니다. 쉽게 말해 컴퓨터가 알아먹기 쉽도록 구성된 언어입니다. 다양한 명령어가 있으며 여기서도 필요한 또는 알아두면 나중에 좋을만한 내용들만 알아보도록 하겠습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;PUSH&lt;/strong&gt; : 데이터를 스택에 쌓음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;POP&lt;/strong&gt; : 스택의 저장된 데이터를 뽑음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;NOP&lt;/strong&gt; : 아무 동작 안함&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;MOV&lt;/strong&gt; : 데이터 이동&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;CALL&lt;/strong&gt; : 특정 주소의 함수를 호출, JMP와 같이 실행의 흐름이 변경되지만 호출된 함수의 동작이 종료되면 돌아갈 리턴 주소를 Stack에 저장해 둔다는 차이점이 있음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;JMP&lt;/strong&gt; : 특정 주소의 함수로 이동하며 JMP 외의 다양한 조건 점프 명령어가 있음&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;ADD&lt;/strong&gt; : 덧셈 명령을 수행&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;SUB&lt;/strong&gt; : 뺄셈 명령을 수행&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;위의 리스트 외에도 곱셈, 나눗셈, AND, OR, XOR 연산 및 조건 분기 등 다양한 기능의 명령어들이 존재 합니다. 이 명령어들 또한 레지스터들과 함께 자연스럽게 익혀 나가시면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;다음 포스트에는 간단한 BOF 공격과 공격에 필요한 내용들을 추가적으로 정리해보도록 하겠습니다.&lt;/p&gt;
-
-&lt;p&gt;천천히 갑시다. 조바심 내지 말고 천천히 탄탄하게.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Sulla</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">Buffer Overflow 뭐임?뭐임?뭐임?</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">linux_0x00</title>
-      <link href="/linux_0x00" rel="alternate" type="text/html" title="linux_0x00" />
-      <published>2019-02-08T19:18:00+09:00</published>
-      <updated>2019-02-08T19:18:00+09:00</updated>
-      <id>/linux_0x00</id>
-      <content type="html" xml:base="/linux_0x00">&lt;h2 id=&quot;0x00---시작에-앞서&quot;&gt;0x00 - 시작에 앞서&lt;/h2&gt;
+      <id>http://localhost:4000/linux_0x00</id>
+      <content type="html" xml:base="http://localhost:4000/linux_0x00">&lt;h2 id=&quot;0x00---시작에-앞서&quot;&gt;0x00 - 시작에 앞서&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. &lt;strong&gt;Sulla&lt;/strong&gt;입니다.&lt;/p&gt;
 
