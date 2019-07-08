@@ -8,21 +8,6 @@
     
       
       <item>
-        <title>web-0x04 Basic SQL Injection</title>
-        
-          <description>&lt;h1 id=&quot;0x04-basic-sql-injection&quot;&gt;0x04 Basic SQL Injection&lt;/h1&gt;
-
-</description>
-        
-        <pubDate>Mon, 08 Jul 2019 19:18:00 +0900</pubDate>
-        <link>
-        http://localhost:4000/web-0x04</link>
-        <guid isPermaLink="true">http://localhost:4000/web-0x04</guid>
-      </item>
-      
-    
-      
-      <item>
         <title>linux_0x06 Heap 구조(malloc, free)</title>
         
           <description>&lt;h1 id=&quot;heap-구조malloc-free&quot;&gt;Heap 구조(malloc, free)&lt;/h1&gt;
