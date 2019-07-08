@@ -4,7 +4,7 @@
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
   <link href="http://localhost:4000/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
   <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-06-30T20:29:10+09:00</updated>
+  <updated>2019-07-09T02:04:34+09:00</updated>
   <id>http://localhost:4000/tag/posts/feed.xml</id>
 
   
@@ -33,11 +33,195 @@
     
       
     
+      
+    
   
 
   
   
 
+  
+    <entry>
+      <title type="html">web-0x04 Basic SQL Injection</title>
+      <link href="http://localhost:4000/web-0x04" rel="alternate" type="text/html" title="web-0x04 Basic SQL Injection" />
+      <published>2019-07-08T19:18:00+09:00</published>
+      <updated>2019-07-08T19:18:00+09:00</updated>
+      <id>http://localhost:4000/web-0x04</id>
+      <content type="html" xml:base="http://localhost:4000/web-0x04">&lt;h1 id=&quot;0x04-basic-sql-injection&quot;&gt;0x04 Basic SQL Injection&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요 Ppeuni입니다.&lt;/p&gt;
+
+&lt;p&gt;저의 첫 포스팅은 Basic SQL Injection으로 시작하겠습니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;what-is-sql-injection&quot;&gt;What is SQL Injection?&lt;/h5&gt;
+
+&lt;p&gt;SQL Injection은 웹 애플리케이션에서 입력된 쿼리의 유효성을 검증하지 않아 발생하는 공격으로 &lt;br /&gt;&lt;br /&gt;
+DB의 데이터 추출이나 인증우회, 시스템 명령 실행 등을 실행할 수 있는 공격입니다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;** 환경 구성 ** &lt;br /&gt;
+  -Nginx 1.10.3&lt;br /&gt;
+  -Python Flask 1.0.3&lt;br /&gt;
+  -Mysql 5.7.26&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h5 id=&quot;what-kind-of-sql-injection-is-there&quot;&gt;What kind of SQL injection is there?&lt;/h5&gt;
+&lt;p&gt;Sql Injection을 수행하는 방법은 인증우회, Union Sql Injection, Blind Sql Injection 방식 등 다양하지만,&lt;br /&gt;
+이번 포스팅에서는 Blind Sql Injecion 방식을 다루도록 하겠습니다.&lt;br /&gt;
+Blind Sql Injecion은 특정 위치의 데이터베이스 내 정보를 하나씩 비교하면서 해당 데이터를 조회하는 쿼리가 참일 때와 거짓일 때 서버의 반응에 따라 데이터를 찾는 방법입니다.&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_1.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-blind sql injection-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Blind SQL Injection을 하기 위해서는 몇 가지 필요한 준비물이 있습니다.&lt;br /&gt;
+특정 위치에 어떤 데이터를 뽑을 때 뭔가 확실한 데이터를 모아 놓은 장소가 있다면 어떨까요? &lt;br /&gt;
+Mysql의 Information_schema는 데이터베이스 안의 모든 데이터를 모은 데이터 사전입니다. &lt;br /&gt;
+이런 데이터 사전을 놓고 하나씩 데이터를 비교한다면 데이터 찾기가 훨~씬 편하지 않을까요?&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;information_schema&lt;br /&gt;&lt;br /&gt; 
+위에서 잠깐 언급한 “데이터 사전”, information_schema는 Mysql 에 존재하는 데이터베이스 입니다.&lt;br /&gt;
+몇 가지 예문을 통해 이 사전이 어떤 데이터를 가지고 있는지 알아봅시다.&lt;br /&gt;
+Mysql은 show databases 라는 명령어로 데이터베이스 목록을 조회할 수 있습니다.&lt;br /&gt;
+데이터 사전도 하나의 데이터베이스로 SELECT 문으로 내용을 조회할 수 있습니다.&lt;br /&gt;
+Select * from information_schema.schemata 는 show databases 와 동일한 결과를 얻을 수 있습니다.&lt;br /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_2.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-information_schema 데이터베이스 조회-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Mysql의 show tables는 어떨까요? 마찬가지로 Select * from information_schema.tables 로 동일한 결과를 얻을 수 있습니다.&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_3.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-information_schema 테이블 조회-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;만약 Sql injection 대상이 되는 데이터의 테이블 이름을 찾는다고 한다면 이곳에 있는 데이터와 비교하면 어떨까요?&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;2.limit,Substr&lt;br /&gt;&lt;br /&gt; 
+본격적으로 데이터 찾기가 어떻게 이루어 지는지 알아봅시다.&lt;br /&gt; 
+Blind Sql injection으로 데이터를 찾을 때 쿼리와 Mysql 내장 함수를 함께 사용하면 드라마틱한 결과를 얻을 수 있습니다.&lt;br /&gt; 
+이번 포스팅에는 가장 유용한 limit, substr 함수에 대해 알아보겠습니다. &lt;br /&gt; 
+limit 함수는 아래와 같이 SELECT 문으로 조회한 결과의 특정 행을 가져옵니다. &lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_4.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-limit 함수를 이용해 특정 행 출력-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;substr 함수는 substr(데이터, 시작 위치, 글자 수) 와 같은 형식으로 두 번째 인자,&lt;br /&gt; 
+세 번째 인자로 데이터의 범위를 줄여줍니다. 이 두 함수를 쿼리와 함께 곁들이면 데이터를 완벽하게 찾을 수 있습니다! YEAH!&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_5.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-substr 함수를 이용해 특정 문자 출력-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;이 때까지 배운 방법으로 참 거짓을 구분해보겠습니다.&lt;br /&gt; 
+boarddb의 데이터베이스에는 board와 member 테이블이 있습니다.&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_6.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-boarddb의 테이블 조회-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;제가 작성한 발퀄의 게시판은 아래와 같이 bbs_no 이라는 값을 Select * from board where bbs_no=%s 쿼리문에 동적으로 집어넣습니다!&lt;br /&gt;
+동적으로 값이 넘어가는 곳에 우리가 원하는 sql문을 붙여 요청하면 개발자가 의도하지 않은 쿼리문을 만들 수 있습니다.&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_9.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-boarddb의 테이블 조회-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;게시물번호에 and 연산자를 붙여 sql문을 요청합니다. &lt;br /&gt;&lt;br /&gt;
+and 연산자는 두개의 조건이 True일 경우만 True를 반환해줍니다.&lt;br /&gt;&lt;br /&gt;
+테이블 목록의 첫번째 행의 첫번째 글자가 a가 맞는지 확인했을 때 서버는 에러(False)를 반환해줍니다. &lt;br /&gt;&lt;br /&gt;
+이것으로 봤을 때 첫번째 테이블의 첫번째 글자가 a가 아닌 것을 확인할 수 있습니다!&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_7.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-boarddb의 테이블 조회-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;이번에는 테이블 목록의 첫번째 행의 첫번째 글자가 b가 맞는지 확인합니다.&lt;br /&gt;&lt;br /&gt;
+서버는 정상페이지(True)를 반환해줍니다! 이것으로 테이블의 첫번째 글자가 b인 것을 확인할 수 있습니다!&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_8.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-boarddb의 테이블 조회-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h5 id=&quot;data-automation&quot;&gt;Data Automation&lt;/h5&gt;
+
+&lt;p&gt;아래는 데이터베이스를 추출하기 위한 테스트 자동화 코드입니다.&lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_10.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-Sql Injection 자동화코드-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;자동화코드를 통해 데이터를 추출한 것을 확인했습니다!! &lt;br /&gt;&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x04_11.png&quot; /&gt;
+  &lt;figcaption&gt;&lt;center&gt;-Sql Injection 자동화 코드 데이터 추출 결과-  
+  &lt;/center&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;대응방안은 다음 포스팅인 Advanced Sql Injection 에서 함께 설명하겠습니다~&lt;br /&gt; 
+감사합니다&lt;br /&gt;&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Ppeuni</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x04 Basic SQL Injection</summary>
+      
+
+      
+      
+    </entry>
   
     <entry>
       <title type="html">linux_0x06 Heap 구조(malloc, free)</title>
@@ -2035,138 +2219,6 @@ func main() {
 
       
         <summary type="html">CVE-2019-5736 (runC Container 취약점)</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">web-0x03</title>
-      <link href="http://localhost:4000/web-0x03" rel="alternate" type="text/html" title="web-0x03" />
-      <published>2019-03-25T14:00:00+09:00</published>
-      <updated>2019-03-25T14:00:00+09:00</updated>
-      <id>http://localhost:4000/web-0x03</id>
-      <content type="html" xml:base="http://localhost:4000/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
-
-&lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
-
-&lt;p&gt;오늘은 Wordpress 환경에서의 검색 기능을 제공하는 Relevanssi Search Plugin 4.0.4 이전버전(Version 4.0.4 포함)에서 발생한 CVE-2018-9034 XSS(Cross Site Scripting - Reflected) 취약점에 대한 포스팅입니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;환경구성&lt;/strong&gt;&lt;br /&gt;
-    &lt;ul&gt;
-      &lt;li&gt;Apache 2.4.18&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;PHP 7.0.30&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;Wordpress 4.9.4&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;Wordpress Relevanssi Search Plugin 4.0.4&lt;br /&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_1.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - CVE-2018-9034 Flow -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;다음은 취약점이 발생한 Relevanssi Search Plugin lib/interface.php를 확인해보면, tab 파라미터에 스크립트를 삽입하여 요청하는 경우 취약점이 발생이 가능한 것을 확인할 수 있습니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_2.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - relevanssi.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_3.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - interface.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-공격-테스트&quot;&gt;취약점 공격 테스트&lt;/h5&gt;
-&lt;p&gt;제일 기본적으로 스크립트가 정상적으로 구동이 되는지
-&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;script&amp;gt;alert('TEST');&amp;lt;/script&amp;gt;&lt;/code&gt;를 tab 파라미터로 요청한 결과로 스크립트가 구동되지 않고, 기본적으로 스크립트에 사용될 수 있는 ‘, “ 등 Escape 문자인 경우 ‘'가 붙어 응답되어 스크립트가 정상적으로 구동되지 않았고, 스크립트 삽입 시 Escape문자를 사용할 수 없는 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_4.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - XSS 구문 삽입 테스트 Escape문자로 인해 실행되지 않음 -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;Escape 문자를 사용할 수 없는 경우 다음과 그림과 같이 Javascript의 substring(), String()를 이용하여 ‘/’(인덱스 start, end)를 제외한 문자열을 다시 변수 x에 대입하여 원하는 문자열을 이용하여 스크립트를 사용할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_5.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - Javascript 테스트 -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;공격 시 사용되는 tab 파라미터를 통한 Payload는 다음과 같습니다.&lt;/p&gt;
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;nx&quot;&gt;Server&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;IP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;wordpress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;wp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;general&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;php&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;relevanssi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;relevanssi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;php&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tab&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'&amp;gt;&amp;lt;script&amp;gt;var x = String(/hackyu CVE-2018-9034 TEST/);x = x.substring(1, x.length-1);alert(x)&amp;lt;/script&amp;gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;위의 Payload를 이용하여 다음과 같이 정상적으로 스크립트가 실행되는 것을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_6.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - XSS 시도 및 결과  -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;패치 및 대응방안&lt;/strong&gt;
-&lt;br /&gt;
--Update to version
-&lt;br /&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_7.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - Relevanssi Version 4.0.4(좌), 4.0.5(우) -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;References&lt;/strong&gt;
-&lt;br /&gt;
-https://www.exploit-db.com/exploits/44366&lt;br /&gt;
-https://ppbuz.com/8644&lt;br /&gt;
-https://nvd.nist.gov/vuln/detail/CVE-2018-9034&lt;br /&gt;
-https://pluginarchive.com/wordpress/relevanssi/v/4-0-4&lt;br /&gt;
-https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
-&lt;/ul&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Hackyu</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">CVE-2018-9034 1Day Test</summary>
       
 
       
