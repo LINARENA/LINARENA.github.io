@@ -1,4 +1,234 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-06-30T20:31:04+09:00</updated><id>http://localhost:4000/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">linux_0x06 Heap 구조(malloc, free)</title><link href="http://localhost:4000/linux_0x06" rel="alternate" type="text/html" title="linux_0x06 Heap 구조(malloc, free)" /><published>2019-07-01T04:50:00+09:00</published><updated>2019-07-01T04:50:00+09:00</updated><id>http://localhost:4000/linux_0x06</id><content type="html" xml:base="http://localhost:4000/linux_0x06">&lt;h1 id=&quot;heap-구조malloc-free&quot;&gt;Heap 구조(malloc, free)&lt;/h1&gt;
+=======
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-07-22T01:18:05+09:00</updated><id>/</id><title type="html">LIN ARENA</title><subtitle>LIN ARENA Technology Blog</subtitle><entry><title type="html">CVE-2012-4782</title><link href="/windows-0x0e" rel="alternate" type="text/html" title="CVE-2012-4782" /><published>2019-07-22T03:00:00+09:00</published><updated>2019-07-22T03:00:00+09:00</updated><id>/windows-0x0e</id><content type="html" xml:base="/windows-0x0e">&lt;h1 id=&quot;0x0e-ie8-exploit&quot;&gt;0x0e IE8 Exploit&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘은 지금까지 알아 본 기법을 토대로 exploit을 다루어 보고자 합니다.&lt;/p&gt;
+
+&lt;p&gt;2019년에 나온 CVE를 바로 다루어 보려고 하다가 차근차근 가보자는 생각으로 IE8부터 설명하기로 했답니다.&lt;/p&gt;
+
+&lt;p&gt;이번 블로그에서 연재하는 CVE-2012-4782는 IE8에서 발생하는 UAF 취약점입니다.&lt;/p&gt;
+
+&lt;p&gt;Exodus 블로그를 많이 참조해서 글이 작성된 점을 먼저 안내 드립니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;환경-구성&quot;&gt;환경 구성&lt;/h5&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;OS&lt;/td&gt;
+      &lt;td&gt;Windows XP Service Pack 3&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;IE&lt;/td&gt;
+      &lt;td&gt;8.0.6001&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Affect Ver.&lt;/td&gt;
+      &lt;td&gt;IE6, IE7, IE8&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h5 id=&quot;poc&quot;&gt;POC&lt;/h5&gt;
+
+&lt;p&gt;분석에 사용할 POC는 아래와 같습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;!doctype html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;helloWorld&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	
+	&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;a&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;	&lt;span class=&quot;c1&quot;&gt;// form&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// dfn&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;q&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// q&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;applyElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'button'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;applyElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;outerText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'body'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;CollectGarbage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;onload=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;eval(helloWorld())&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;form&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;a&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/form&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;dfn&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;b&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/dfn&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위 코드를 실행하기 전에 아래 명령어로 몇 가지 설정을 해두고 분석을 하겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gflag.exe /i iexplore.exe +hpa +ust
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;hpa : 페이지 힙 설정
+ust : 유저 스택 트레이스 설정으로 유저모드의 스택 결과를 데이터베이스화하여 저장해두는 것&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이제 windbg로 실행 결과를 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 실행 결과를 보면 mshtml!CMarkup::OnLoadStatusDone+0x4ef에서 Access Violation Error가 발생하는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;에러 발생 이유를 추측해보면 move eax, dword ptr [edi]에서 edi 값에 문제가 있는 것 같습니다.&lt;/p&gt;
+
+&lt;p&gt;edi에 어떤 문제가 있어서 이런 에러가 발생하는지 살펴보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;첫 번째 빨간 박스에 CButton이라고 적혀 있는 것을 보면 edi는 Button 객체였다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 vector deleting destructor를 보아 free된 객체인 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 아래 CollectGarbage를 보면 더 확실해지네요.&lt;/p&gt;
+
+&lt;p&gt;CollectGarbage 함수에 의해 가장 윗줄 RtlFreeHeap까지 실행되어 오면서 Button 객체가 free된 것이라 생각할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;객체가 해제된 뒤 그 객체에서 에러가 발생한다는 것은??&lt;/p&gt;
+
+&lt;p&gt;해제된 그 객체를 edi를 통해 다시 사용하려고 접근했기 때문이라고 추측할 수 있죠. 즉 여긴 UAF 취약점이 발생하는구나.&lt;/p&gt;
+
+&lt;p&gt;그럼 이제 CButton 객체가 생성되는 과정부터 해제하는 과정을 살펴보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, CButton 생성 과정입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;CButton은 CButton::CreateElement에서 HeapAlloc 함수를 이용해서 할당되는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;생성 시, 58h만큼 크기를 할당받는 것도 알 수 있네요.&lt;/p&gt;
+
+&lt;p&gt;그리고 HeapAlloc 함수가 끝난 뒤, 결과 값을 esi에 넣어주는 것도 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;다음은 CButton 객체를 해제하는 과정을 살펴볼게요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;해제 과정에서는 esi의 값을 push하여 해당 객체를 해제한다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;객체 생성 결과를 담은 esi와 해제 시에 사용한 esi가 같은 값인지는 조금 있다가 windbg로 살펴보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;지금까지 우리는 CButton 객체의 생성과 해제 로직을 살펴봤습니다.&lt;/p&gt;
+
+&lt;p&gt;근데 에러 메시지를 보면 edi에서 에러가 발생하는데 이 edi는 갑자기 어디서 나오는 걸까요??&lt;/p&gt;
+
+&lt;p&gt;edi를 추적해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;에러가 났던 OnLoadStatusDone 함수를 추적해본 결과, CElement::FindDefaultElem 함수에서 그 결과 값을 edi에 넣어준다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 이제 CElement::FindDefaultElem을 살펴봐야겠죠?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;코드를 따라가보면 CElement::Doc라는 함수의 결과를 edi에 넣어주고 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_8.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그리고 [edi+1A8h]를 eax에 넣어주고 난 뒤 CElement::FindDefaultElem가 종료됩니다.&lt;/p&gt;
+
+&lt;p&gt;왜 [edi+1A8h]에 해제된 CButton 객체가 있는지, CElement::Doc가 어떤 것을 반환하는지 알아봐야겠네요.&lt;/p&gt;
+
+&lt;p&gt;CElement::FindDefaultElem 시작 위치에 브레이크 포인트를 설정하고 코드를 따라가봤습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_9.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;코드를 실행시키다보니 아까 위에서 살펴봤던 Doc가 보이고 결과 값이 eax에 들어가 있는 것도 보입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_10.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;우리가 살펴보고자 했던 [edi+1A8h]까지 왔습니다.&lt;/p&gt;
+
+&lt;p&gt;아까 eax에 담겨 있던 값이 edi에 담겨 있고 또 vtable이라는 내용도 확인이 되네요.&lt;/p&gt;
+
+&lt;p&gt;그럼 저 [edi+1A8h]는 해제된 CButton 객체의 vtable 값이라는 것이라는 것도 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이제 [edi+1A8h]에 CButton 객체의 vtable 값이 언제 쓰이는지만 파악하면 되겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_11.png&quot; alt=&quot;[그림 1-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림처럼 mshtml!CDoc::operator new+0x00000013 부분에 브레이크를 설정하고 분석을 했습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_15.png&quot; alt=&quot;[그림 1-15]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;코드를 쭉 따라가보면 위 그림과 같이 객체를 생성하는 부분을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이 결과 값 + 1A8h 위치에 값을 쓸 때 브레이크를 잡도록 설정해야겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_12.png&quot; alt=&quot;[그림 1-12]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;따라가보니 SetDefaultElem에서 eax+1A8h 위치에 값을 적는다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;esi와 edi 값을 확인해보면 아래와 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_13.png&quot; alt=&quot;[그림 1-13]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_14.png&quot; alt=&quot;[그림 1-14]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;esi는 Cdoc이고 edi에 CButton 객체의 주소가 들어가 있는 것을 확인했습니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 도대체 왜 SetDefaultElem에서 해제된 객체의 주소를 적어주는 걸까요??&lt;/p&gt;
+
+&lt;p&gt;Exodus 블로그에서는 SetDefaultElem에서 CDoc 객체에 레퍼런스를 추가하기전에 Addref를 호출하는 것을 잊어버린 것 같다라고 말하고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;객체 참조시 Addref를 통해서 Count를 증가시키고 Release를 통해서 Count를 감소시키는데 0이 아니면 해제하지 않도록 되어 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이런 경우, 균형이 맞지 않게 되어 원치 않게 객체가 해제되는 경우라고 볼 수 있겠습니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 다른 레퍼런스를 제거하는 것으로 인해 객체가 해제되지만 Cdoc 객체에서 DefaultElem을 통해 계속 접근 가능한 것으로 판단됩니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;긴 글 읽으시느라 고생하셨습니다.&lt;/p&gt;
+
+&lt;p&gt;설명이 너무 길어져서 실제 공격은 다음 글로 넘겨서 진행하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0e IE8 Exploit</summary></entry><entry><title type="html">linux_0x06 Heap 구조(malloc, free)</title><link href="/linux_0x06" rel="alternate" type="text/html" title="linux_0x06 Heap 구조(malloc, free)" /><published>2019-07-01T04:50:00+09:00</published><updated>2019-07-01T04:50:00+09:00</updated><id>/linux_0x06</id><content type="html" xml:base="/linux_0x06">&lt;h1 id=&quot;heap-구조malloc-free&quot;&gt;Heap 구조(malloc, free)&lt;/h1&gt;
+>>>>>>> 3821445ebc891b7f6f8c4650c227f2acea9b8228
 
 &lt;p&gt;안녕하세요. Sulla임돠.&lt;/p&gt;
 
@@ -97,7 +327,7 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 
 &lt;p&gt;엉덩…Heap도 찬찬히 한 걸음씩 가보도록 하겠습니다.&lt;/p&gt;
 
-&lt;p&gt;고생하셨습니다. 담에 뵙겠숩니다욥!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">Heap 구조(malloc, free)</summary></entry><entry><title type="html">Heap Spray</title><link href="http://localhost:4000/windows-0x0d" rel="alternate" type="text/html" title="Heap Spray" /><published>2019-06-27T20:18:00+09:00</published><updated>2019-06-27T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x0d</id><content type="html" xml:base="http://localhost:4000/windows-0x0d">&lt;h1 id=&quot;0x0d-heap-spray&quot;&gt;0x0d Heap Spray&lt;/h1&gt;
+&lt;p&gt;고생하셨습니다. 담에 뵙겠숩니다욥!&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">Heap 구조(malloc, free)</summary></entry><entry><title type="html">Heap Spray</title><link href="/windows-0x0d" rel="alternate" type="text/html" title="Heap Spray" /><published>2019-06-27T20:18:00+09:00</published><updated>2019-06-27T20:18:00+09:00</updated><id>/windows-0x0d</id><content type="html" xml:base="/windows-0x0d">&lt;h1 id=&quot;0x0d-heap-spray&quot;&gt;0x0d Heap Spray&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -416,7 +646,7 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 
 &lt;p&gt;지금까지 기본적인 HeapSpray에 대해서 알아봤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 글부터는 지금까지 설명한 취약점들을 종합해서 IE8, IE10, IE11 Exploit을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0d Heap Spray</summary></entry><entry><title type="html">linux_0x05 RTL Chaining &amp;amp; ROP</title><link href="http://localhost:4000/linux_0x05" rel="alternate" type="text/html" title="linux_0x05 RTL Chaining &amp; ROP" /><published>2019-05-16T11:18:00+09:00</published><updated>2019-05-16T11:18:00+09:00</updated><id>http://localhost:4000/linux_0x05</id><content type="html" xml:base="http://localhost:4000/linux_0x05">&lt;h1 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h1&gt;
+&lt;p&gt;다음 글부터는 지금까지 설명한 취약점들을 종합해서 IE8, IE10, IE11 Exploit을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0d Heap Spray</summary></entry><entry><title type="html">linux_0x05 RTL Chaining &amp;amp; ROP</title><link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x05 RTL Chaining &amp; ROP" /><published>2019-05-16T11:18:00+09:00</published><updated>2019-05-16T11:18:00+09:00</updated><id>/linux_0x05</id><content type="html" xml:base="/linux_0x05">&lt;h1 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간부터는 지난 포스팅에서 진행된 환경보다 비교적 최신의 환경에서 진행 해보겠습니다.&lt;/p&gt;
 
@@ -723,7 +953,7 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 
 &lt;p&gt;&lt;a href=&quot;https://shayete.tistory.com/&quot;&gt;https://shayete.tistory.com/&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://www.lazenca.net/display/TEC/02.TechNote&quot;&gt;https://www.lazenca.net/display/TEC/02.TechNote&lt;/a&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL Chaining &amp;amp; ROP(Return Oriented Programming)</summary></entry><entry><title type="html">Use After Free</title><link href="http://localhost:4000/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" /><published>2019-05-06T20:18:00+09:00</published><updated>2019-05-06T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x0c</id><content type="html" xml:base="http://localhost:4000/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.lazenca.net/display/TEC/02.TechNote&quot;&gt;https://www.lazenca.net/display/TEC/02.TechNote&lt;/a&gt;&lt;/p&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">RTL Chaining &amp;amp; ROP(Return Oriented Programming)</summary></entry><entry><title type="html">Use After Free</title><link href="/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" /><published>2019-05-06T20:18:00+09:00</published><updated>2019-05-06T20:18:00+09:00</updated><id>/windows-0x0c</id><content type="html" xml:base="/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -869,7 +1099,7 @@ first-&amp;gt;vulnfunc();
 
 &lt;p&gt;UAF를 이용한 Exploit은 UAF의 절친 HeapSpray을 살펴본 후 진행할 예정이니까 그때까지만 기다려주세요 ㅎㅎ&lt;/p&gt;
 
-&lt;p&gt;다음 글에서 뵙겠습니다!&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0c Use After Free</summary></entry><entry><title type="html">Vtable Overwrite</title><link href="http://localhost:4000/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" /><published>2019-04-18T20:18:00+09:00</published><updated>2019-04-18T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x0b</id><content type="html" xml:base="http://localhost:4000/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
+&lt;p&gt;다음 글에서 뵙겠습니다!&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0c Use After Free</summary></entry><entry><title type="html">Vtable Overwrite</title><link href="/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" /><published>2019-04-18T20:18:00+09:00</published><updated>2019-04-18T20:18:00+09:00</updated><id>/windows-0x0b</id><content type="html" xml:base="/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -1183,7 +1413,7 @@ int main(int argc, char * argv[]) {
 
 &lt;p&gt;지금까지 Vtable 개념과 공격 기법을 알아봤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 시간에는 UAF와 HeapSpray를 알아볼 것이고, 버전별 IE exploit을 진행해보겟습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0b Vtable Overwirte</summary></entry><entry><title type="html">android-0x02</title><link href="http://localhost:4000/android-0x02" rel="alternate" type="text/html" title="android-0x02" /><published>2019-04-12T14:00:00+09:00</published><updated>2019-04-12T14:00:00+09:00</updated><id>http://localhost:4000/android-0x02</id><content type="html" xml:base="http://localhost:4000/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
+&lt;p&gt;다음 시간에는 UAF와 HeapSpray를 알아볼 것이고, 버전별 IE exploit을 진행해보겟습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0b Vtable Overwirte</summary></entry><entry><title type="html">android-0x02</title><link href="/android-0x02" rel="alternate" type="text/html" title="android-0x02" /><published>2019-04-12T14:00:00+09:00</published><updated>2019-04-12T14:00:00+09:00</updated><id>/android-0x02</id><content type="html" xml:base="/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -1299,7 +1529,7 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
 &lt;br /&gt;
 감사합니다.
 
-&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">Android 동적 분석</summary></entry><entry><title type="html">Windows-Heap 정의</title><link href="http://localhost:4000/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" /><published>2019-04-02T20:18:00+09:00</published><updated>2019-04-02T20:18:00+09:00</updated><id>http://localhost:4000/windows-0x0a</id><content type="html" xml:base="http://localhost:4000/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;&lt;/figure&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">Android 동적 분석</summary></entry><entry><title type="html">Windows-Heap 정의</title><link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" /><published>2019-04-02T20:18:00+09:00</published><updated>2019-04-02T20:18:00+09:00</updated><id>/windows-0x0a</id><content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -1445,7 +1675,7 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
 
 &lt;p&gt;지금까지 Windows Heap 대해 알아봤습니다.&lt;/p&gt;
 
-&lt;p&gt;다음 시간부터는 Heap에 대한 공격 기법을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0a Windows-Heap</summary></entry><entry><title type="html">android-0x01</title><link href="http://localhost:4000/android-0x01" rel="alternate" type="text/html" title="android-0x01" /><published>2019-03-29T14:00:00+09:00</published><updated>2019-03-29T14:00:00+09:00</updated><id>http://localhost:4000/android-0x01</id><content type="html" xml:base="http://localhost:4000/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
+&lt;p&gt;다음 시간부터는 Heap에 대한 공격 기법을 살펴보도록 하겠습니다.&lt;/p&gt;</content><author><name>Joel Park</name></author><category term="Posts" /><summary type="html">0x0a Windows-Heap</summary></entry><entry><title type="html">android-0x01</title><link href="/android-0x01" rel="alternate" type="text/html" title="android-0x01" /><published>2019-03-29T14:00:00+09:00</published><updated>2019-03-29T14:00:00+09:00</updated><id>/android-0x01</id><content type="html" xml:base="/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -1507,7 +1737,7 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
 
 &lt;p&gt;지금까지 Android 정적 분석에 대해 알아보았고, 다음 포스팅에서는 Android 동적 분석에 대해 알아보도록 하겠습니다.&lt;/p&gt;
 
-&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">Android 정적 분석</summary></entry><entry><title type="html">CVE-2019-5736 (runC Container 취약점)</title><link href="http://localhost:4000/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" /><published>2019-03-28T02:43:00+09:00</published><updated>2019-03-28T02:43:00+09:00</updated><id>http://localhost:4000/runC%20Container</id><content type="html" xml:base="http://localhost:4000/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
+&lt;p&gt;감사합니다.&lt;/p&gt;</content><author><name>Chaem</name></author><category term="Posts" /><summary type="html">Android 정적 분석</summary></entry><entry><title type="html">CVE-2019-5736 (runC Container 취약점)</title><link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" /><published>2019-03-28T02:43:00+09:00</published><updated>2019-03-28T02:43:00+09:00</updated><id>/runC%20Container</id><content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
 
 &lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
 
@@ -1694,102 +1924,4 @@ func main() {
   &lt;li&gt;https://github.com/rancher/runc-cve&lt;/li&gt;
   &lt;li&gt;https://github.com/Frichetten/CVE-2019-5736-PoC&lt;/li&gt;
   &lt;li&gt;https://subicura.com/2017/01/19/docker-guide-for-beginners-1.html&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">CVE-2019-5736 (runC Container 취약점)</summary></entry><entry><title type="html">web-0x03</title><link href="http://localhost:4000/web-0x03" rel="alternate" type="text/html" title="web-0x03" /><published>2019-03-25T14:00:00+09:00</published><updated>2019-03-25T14:00:00+09:00</updated><id>http://localhost:4000/web-0x03</id><content type="html" xml:base="http://localhost:4000/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
-
-&lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
-
-&lt;p&gt;오늘은 Wordpress 환경에서의 검색 기능을 제공하는 Relevanssi Search Plugin 4.0.4 이전버전(Version 4.0.4 포함)에서 발생한 CVE-2018-9034 XSS(Cross Site Scripting - Reflected) 취약점에 대한 포스팅입니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-분석&quot;&gt;취약점 분석&lt;/h5&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;환경구성&lt;/strong&gt;&lt;br /&gt;
-    &lt;ul&gt;
-      &lt;li&gt;Apache 2.4.18&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;PHP 7.0.30&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;Wordpress 4.9.4&lt;br /&gt;&lt;/li&gt;
-      &lt;li&gt;Wordpress Relevanssi Search Plugin 4.0.4&lt;br /&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_1.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - CVE-2018-9034 Flow -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;다음은 취약점이 발생한 Relevanssi Search Plugin lib/interface.php를 확인해보면, tab 파라미터에 스크립트를 삽입하여 요청하는 경우 취약점이 발생이 가능한 것을 확인할 수 있습니다.&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_2.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - relevanssi.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_3.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - interface.php -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h5 id=&quot;취약점-공격-테스트&quot;&gt;취약점 공격 테스트&lt;/h5&gt;
-&lt;p&gt;제일 기본적으로 스크립트가 정상적으로 구동이 되는지
-&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;script&amp;gt;alert('TEST');&amp;lt;/script&amp;gt;&lt;/code&gt;를 tab 파라미터로 요청한 결과로 스크립트가 구동되지 않고, 기본적으로 스크립트에 사용될 수 있는 ‘, “ 등 Escape 문자인 경우 ‘'가 붙어 응답되어 스크립트가 정상적으로 구동되지 않았고, 스크립트 삽입 시 Escape문자를 사용할 수 없는 것을 확인할 수 있습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_4.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - XSS 구문 삽입 테스트 Escape문자로 인해 실행되지 않음 -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;Escape 문자를 사용할 수 없는 경우 다음과 그림과 같이 Javascript의 substring(), String()를 이용하여 ‘/’(인덱스 start, end)를 제외한 문자열을 다시 변수 x에 대입하여 원하는 문자열을 이용하여 스크립트를 사용할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_5.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - Javascript 테스트 -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;공격 시 사용되는 tab 파라미터를 통한 Payload는 다음과 같습니다.&lt;/p&gt;
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;nx&quot;&gt;Server&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;IP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;wordpress&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;wp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;admin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;general&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;php&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;relevanssi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;relevanssi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;php&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tab&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'&amp;gt;&amp;lt;script&amp;gt;var x = String(/hackyu CVE-2018-9034 TEST/);x = x.substring(1, x.length-1);alert(x)&amp;lt;/script&amp;gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;위의 Payload를 이용하여 다음과 같이 정상적으로 스크립트가 실행되는 것을 확인할 수 있습니다.&lt;/p&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_6.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - XSS 시도 및 결과  -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;패치 및 대응방안&lt;/strong&gt;
-&lt;br /&gt;
--Update to version
-&lt;br /&gt;&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/web/0x03_7.png&quot; /&gt;
-  &lt;figcaption&gt;&lt;center&gt;  
-   - Relevanssi Version 4.0.4(좌), 4.0.5(우) -
-  &lt;/center&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;References&lt;/strong&gt;
-&lt;br /&gt;
-https://www.exploit-db.com/exploits/44366&lt;br /&gt;
-https://ppbuz.com/8644&lt;br /&gt;
-https://nvd.nist.gov/vuln/detail/CVE-2018-9034&lt;br /&gt;
-https://pluginarchive.com/wordpress/relevanssi/v/4-0-4&lt;br /&gt;
-https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Hackyu</name></author><category term="Posts" /><summary type="html">CVE-2018-9034 1Day Test</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Sulla</name></author><category term="Posts" /><summary type="html">CVE-2019-5736 (runC Container 취약점)</summary></entry></feed>

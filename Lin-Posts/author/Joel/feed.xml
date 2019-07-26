@@ -2,10 +2,17 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
+<<<<<<< HEAD
   <link href="http://localhost:4000/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
   <link href="http://localhost:4000/" rel="alternate" type="text/html" />
   <updated>2019-06-30T20:31:04+09:00</updated>
   <id>http://localhost:4000/author/Joel/feed.xml</id>
+=======
+  <link href="/author/Joel/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-07-22T01:18:05+09:00</updated>
+  <id>/author/Joel/feed.xml</id>
+>>>>>>> 3821445ebc891b7f6f8c4650c227f2acea9b8228
 
   
   
@@ -40,12 +47,272 @@
 
   
     <entry>
+      <title type="html">CVE-2012-4782</title>
+      <link href="/windows-0x0e" rel="alternate" type="text/html" title="CVE-2012-4782" />
+      <published>2019-07-22T03:00:00+09:00</published>
+      <updated>2019-07-22T03:00:00+09:00</updated>
+      <id>/windows-0x0e</id>
+      <content type="html" xml:base="/windows-0x0e">&lt;h1 id=&quot;0x0e-ie8-exploit&quot;&gt;0x0e IE8 Exploit&lt;/h1&gt;
+
+&lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
+
+&lt;p&gt;오늘은 지금까지 알아 본 기법을 토대로 exploit을 다루어 보고자 합니다.&lt;/p&gt;
+
+&lt;p&gt;2019년에 나온 CVE를 바로 다루어 보려고 하다가 차근차근 가보자는 생각으로 IE8부터 설명하기로 했답니다.&lt;/p&gt;
+
+&lt;p&gt;이번 블로그에서 연재하는 CVE-2012-4782는 IE8에서 발생하는 UAF 취약점입니다.&lt;/p&gt;
+
+&lt;p&gt;Exodus 블로그를 많이 참조해서 글이 작성된 점을 먼저 안내 드립니다.&lt;/p&gt;
+
+&lt;h5 id=&quot;환경-구성&quot;&gt;환경 구성&lt;/h5&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;OS&lt;/td&gt;
+      &lt;td&gt;Windows XP Service Pack 3&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;IE&lt;/td&gt;
+      &lt;td&gt;8.0.6001&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Affect Ver.&lt;/td&gt;
+      &lt;td&gt;IE6, IE7, IE8&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h5 id=&quot;poc&quot;&gt;POC&lt;/h5&gt;
+
+&lt;p&gt;분석에 사용할 POC는 아래와 같습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;!doctype html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;helloWorld&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	
+	&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;a&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;	&lt;span class=&quot;c1&quot;&gt;// form&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// dfn&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;q&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// q&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;applyElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'button'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;applyElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;outerText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;e2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'body'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;CollectGarbage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;onload=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;eval(helloWorld())&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;form&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;a&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/form&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;dfn&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;b&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/dfn&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;위 코드를 실행하기 전에 아래 명령어로 몇 가지 설정을 해두고 분석을 하겠습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gflag.exe /i iexplore.exe +hpa +ust
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;hpa : 페이지 힙 설정
+ust : 유저 스택 트레이스 설정으로 유저모드의 스택 결과를 데이터베이스화하여 저장해두는 것&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;이제 windbg로 실행 결과를 보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 실행 결과를 보면 mshtml!CMarkup::OnLoadStatusDone+0x4ef에서 Access Violation Error가 발생하는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;에러 발생 이유를 추측해보면 move eax, dword ptr [edi]에서 edi 값에 문제가 있는 것 같습니다.&lt;/p&gt;
+
+&lt;p&gt;edi에 어떤 문제가 있어서 이런 에러가 발생하는지 살펴보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;첫 번째 빨간 박스에 CButton이라고 적혀 있는 것을 보면 edi는 Button 객체였다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 vector deleting destructor를 보아 free된 객체인 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그리고 아래 CollectGarbage를 보면 더 확실해지네요.&lt;/p&gt;
+
+&lt;p&gt;CollectGarbage 함수에 의해 가장 윗줄 RtlFreeHeap까지 실행되어 오면서 Button 객체가 free된 것이라 생각할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;객체가 해제된 뒤 그 객체에서 에러가 발생한다는 것은??&lt;/p&gt;
+
+&lt;p&gt;해제된 그 객체를 edi를 통해 다시 사용하려고 접근했기 때문이라고 추측할 수 있죠. 즉 여긴 UAF 취약점이 발생하는구나.&lt;/p&gt;
+
+&lt;p&gt;그럼 이제 CButton 객체가 생성되는 과정부터 해제하는 과정을 살펴보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;먼저, CButton 생성 과정입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;CButton은 CButton::CreateElement에서 HeapAlloc 함수를 이용해서 할당되는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;생성 시, 58h만큼 크기를 할당받는 것도 알 수 있네요.&lt;/p&gt;
+
+&lt;p&gt;그리고 HeapAlloc 함수가 끝난 뒤, 결과 값을 esi에 넣어주는 것도 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;다음은 CButton 객체를 해제하는 과정을 살펴볼게요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;해제 과정에서는 esi의 값을 push하여 해당 객체를 해제한다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;객체 생성 결과를 담은 esi와 해제 시에 사용한 esi가 같은 값인지는 조금 있다가 windbg로 살펴보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;지금까지 우리는 CButton 객체의 생성과 해제 로직을 살펴봤습니다.&lt;/p&gt;
+
+&lt;p&gt;근데 에러 메시지를 보면 edi에서 에러가 발생하는데 이 edi는 갑자기 어디서 나오는 걸까요??&lt;/p&gt;
+
+&lt;p&gt;edi를 추적해보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;에러가 났던 OnLoadStatusDone 함수를 추적해본 결과, CElement::FindDefaultElem 함수에서 그 결과 값을 edi에 넣어준다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;그럼 이제 CElement::FindDefaultElem을 살펴봐야겠죠?&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;코드를 따라가보면 CElement::Doc라는 함수의 결과를 edi에 넣어주고 있습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_8.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;그리고 [edi+1A8h]를 eax에 넣어주고 난 뒤 CElement::FindDefaultElem가 종료됩니다.&lt;/p&gt;
+
+&lt;p&gt;왜 [edi+1A8h]에 해제된 CButton 객체가 있는지, CElement::Doc가 어떤 것을 반환하는지 알아봐야겠네요.&lt;/p&gt;
+
+&lt;p&gt;CElement::FindDefaultElem 시작 위치에 브레이크 포인트를 설정하고 코드를 따라가봤습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_9.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;코드를 실행시키다보니 아까 위에서 살펴봤던 Doc가 보이고 결과 값이 eax에 들어가 있는 것도 보입니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_10.png&quot; alt=&quot;[그림 1-10]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;우리가 살펴보고자 했던 [edi+1A8h]까지 왔습니다.&lt;/p&gt;
+
+&lt;p&gt;아까 eax에 담겨 있던 값이 edi에 담겨 있고 또 vtable이라는 내용도 확인이 되네요.&lt;/p&gt;
+
+&lt;p&gt;그럼 저 [edi+1A8h]는 해제된 CButton 객체의 vtable 값이라는 것이라는 것도 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이제 [edi+1A8h]에 CButton 객체의 vtable 값이 언제 쓰이는지만 파악하면 되겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_11.png&quot; alt=&quot;[그림 1-11]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림처럼 mshtml!CDoc::operator new+0x00000013 부분에 브레이크를 설정하고 분석을 했습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_15.png&quot; alt=&quot;[그림 1-15]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;코드를 쭉 따라가보면 위 그림과 같이 객체를 생성하는 부분을 확인할 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이 결과 값 + 1A8h 위치에 값을 쓸 때 브레이크를 잡도록 설정해야겠네요.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_12.png&quot; alt=&quot;[그림 1-12]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;따라가보니 SetDefaultElem에서 eax+1A8h 위치에 값을 적는다는 것을 알 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;esi와 edi 값을 확인해보면 아래와 같습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_13.png&quot; alt=&quot;[그림 1-13]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x0e_14.png&quot; alt=&quot;[그림 1-14]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;esi는 Cdoc이고 edi에 CButton 객체의 주소가 들어가 있는 것을 확인했습니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 도대체 왜 SetDefaultElem에서 해제된 객체의 주소를 적어주는 걸까요??&lt;/p&gt;
+
+&lt;p&gt;Exodus 블로그에서는 SetDefaultElem에서 CDoc 객체에 레퍼런스를 추가하기전에 Addref를 호출하는 것을 잊어버린 것 같다라고 말하고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;객체 참조시 Addref를 통해서 Count를 증가시키고 Release를 통해서 Count를 감소시키는데 0이 아니면 해제하지 않도록 되어 있습니다.&lt;/p&gt;
+
+&lt;p&gt;이런 경우, 균형이 맞지 않게 되어 원치 않게 객체가 해제되는 경우라고 볼 수 있겠습니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 다른 레퍼런스를 제거하는 것으로 인해 객체가 해제되지만 Cdoc 객체에서 DefaultElem을 통해 계속 접근 가능한 것으로 판단됩니다.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;긴 글 읽으시느라 고생하셨습니다.&lt;/p&gt;
+
+&lt;p&gt;설명이 너무 길어져서 실제 공격은 다음 글로 넘겨서 진행하겠습니다.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Joel Park</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">0x0e IE8 Exploit</summary>
+      
+
+      
+      
+    </entry>
+  
+    <entry>
       <title type="html">Heap Spray</title>
-      <link href="http://localhost:4000/windows-0x0d" rel="alternate" type="text/html" title="Heap Spray" />
+      <link href="/windows-0x0d" rel="alternate" type="text/html" title="Heap Spray" />
       <published>2019-06-27T20:18:00+09:00</published>
       <updated>2019-06-27T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0d</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0d">&lt;h1 id=&quot;0x0d-heap-spray&quot;&gt;0x0d Heap Spray&lt;/h1&gt;
+      <id>/windows-0x0d</id>
+      <content type="html" xml:base="/windows-0x0d">&lt;h1 id=&quot;0x0d-heap-spray&quot;&gt;0x0d Heap Spray&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -394,11 +661,11 @@
   
     <entry>
       <title type="html">Use After Free</title>
-      <link href="http://localhost:4000/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" />
+      <link href="/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" />
       <published>2019-05-06T20:18:00+09:00</published>
       <updated>2019-05-06T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0c</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
+      <id>/windows-0x0c</id>
+      <content type="html" xml:base="/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -574,11 +841,11 @@ first-&amp;gt;vulnfunc();
   
     <entry>
       <title type="html">Vtable Overwrite</title>
-      <link href="http://localhost:4000/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
+      <link href="/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
       <published>2019-04-18T20:18:00+09:00</published>
       <updated>2019-04-18T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0b</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
+      <id>/windows-0x0b</id>
+      <content type="html" xml:base="/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -922,11 +1189,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">Windows-Heap 정의</title>
-      <link href="http://localhost:4000/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
+      <link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
       <published>2019-04-02T20:18:00+09:00</published>
       <updated>2019-04-02T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0a</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+      <id>/windows-0x0a</id>
+      <content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -1102,11 +1369,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">windows-0x09</title>
-      <link href="http://localhost:4000/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
+      <link href="/windows-0x09" rel="alternate" type="text/html" title="windows-0x09" />
       <published>2019-03-24T20:18:00+09:00</published>
       <updated>2019-03-24T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x09</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
+      <id>/windows-0x09</id>
+      <content type="html" xml:base="/windows-0x09">&lt;h1 id=&quot;0x09-dep3&quot;&gt;0x09 DEP(3)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간에는 DEP의 마지막 주제인 ROP에 대해서 알아보도록 하겠습니다.&lt;/p&gt;
 
@@ -1259,11 +1526,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">windows-0x08</title>
-      <link href="http://localhost:4000/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
+      <link href="/windows-0x08" rel="alternate" type="text/html" title="windows-0x08" />
       <published>2019-03-19T20:18:00+09:00</published>
       <updated>2019-03-19T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x08</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
+      <id>/windows-0x08</id>
+      <content type="html" xml:base="/windows-0x08">&lt;h1 id=&quot;0x08-dep2&quot;&gt;0x08 DEP(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -1396,11 +1663,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">windows-0x07</title>
-      <link href="http://localhost:4000/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
+      <link href="/windows-0x07" rel="alternate" type="text/html" title="windows-0x07" />
       <published>2019-03-19T19:18:00+09:00</published>
       <updated>2019-03-19T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x07</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
+      <id>/windows-0x07</id>
+      <content type="html" xml:base="/windows-0x07">&lt;h1 id=&quot;0x07-dep1&quot;&gt;0x07 DEP(1)&lt;/h1&gt;
 
 &lt;h5 id=&quot;what-is-dep&quot;&gt;What is DEP?&lt;/h5&gt;
 
@@ -1562,11 +1829,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">windows-0x06</title>
-      <link href="http://localhost:4000/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
+      <link href="/windows-0x06" rel="alternate" type="text/html" title="windows-0x06" />
       <published>2019-03-18T19:18:00+09:00</published>
       <updated>2019-03-18T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x06</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
+      <id>/windows-0x06</id>
+      <content type="html" xml:base="/windows-0x06">&lt;h1 id=&quot;0x06-gs2&quot;&gt;0x06 GS(2)&lt;/h1&gt;
 
 &lt;h5 id=&quot;safeseh&quot;&gt;SafeSEH&lt;/h5&gt;
 
@@ -1634,11 +1901,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">DLL Hijacking &amp;amp; Ghidra</title>
-      <link href="http://localhost:4000/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
+      <link href="/Dll-Hijacking-&-Ghidra" rel="alternate" type="text/html" title="DLL Hijacking &amp; Ghidra" />
       <published>2019-03-17T19:18:00+09:00</published>
       <updated>2019-03-17T19:18:00+09:00</updated>
-      <id>http://localhost:4000/Dll%20Hijacking%20&amp;%20Ghidra</id>
-      <content type="html" xml:base="http://localhost:4000/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
+      <id>/Dll%20Hijacking%20&amp;%20Ghidra</id>
+      <content type="html" xml:base="/Dll-Hijacking-&amp;-Ghidra">&lt;h1 id=&quot;dll-hijacking--ghidra&quot;&gt;DLL Hijacking &amp;amp; Ghidra&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -1777,198 +2044,6 @@ extern &quot;C&quot; __declspec(dllexport) void PlaySoundA() {
 
       
         <summary type="html">DLL Hijacking &amp;amp; Ghidra</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">windows-0x05</title>
-      <link href="http://localhost:4000/windows-0x05" rel="alternate" type="text/html" title="windows-0x05" />
-      <published>2019-03-09T19:18:00+09:00</published>
-      <updated>2019-03-09T19:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x05</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x05">&lt;h1 id=&quot;0x05-gs&quot;&gt;0x05 GS&lt;/h1&gt;
-
-&lt;h5 id=&quot;what-is-gs&quot;&gt;What is GS?&lt;/h5&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_1.png&quot; alt=&quot;[그림 1-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;GS는 STACK Cookie, Canary로도 불리는 메모리 보호 기법입니다.&lt;/p&gt;
-
-&lt;p&gt;이 GS는 BOF를 방어하기 위해 나온 기법 중 하나로, 함수가 시작될 때 STACK에 4 byte를 넣어놓고 함수가 종료될 때 이 4 byte가 변조되었는지 확인합니다.&lt;/p&gt;
-
-&lt;p&gt;만약 이 STACK Cookie가 처음과 다르다면, 프로그램은 바로 종료되어 버립니다.&lt;/p&gt;
-
-&lt;p&gt;아래 그림은 STACK Cookie가 적용되고 검사하는 과정을 나타냅니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_2.png&quot; alt=&quot;[그림 1-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;STACK BOF는 반드시 Buffer의 시작 주소부터 덮기 시작하여 RET를 변조하는 것이기 때문에 GS를 정확하게 똑같이 입력하지 않으면 BOF 공격을 성공할 수가 없죠.&lt;/p&gt;
-
-&lt;p&gt;STACK Cookie는 고정된 값으로 넣어줄 수도 있지만, 값을 랜덤하게 넣거나, 첫 바이트를 Null로 넣어주는 방식도 있습니다.&lt;/p&gt;
-
-&lt;p&gt;따라서, BOF 공격을 방어하기 위한 아주 효과적인 방법이라고 볼 수 있습니다.&lt;/p&gt;
-
-&lt;p&gt;그렇다면 이 메모리 기법은 어떻게 우회를 할 수 있을까요??&lt;/p&gt;
-
-&lt;p&gt;이 기법을 우회하기 위해서는 Window의 Error Handlering에 대한 지식이 필요합니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;structured-error-handling&quot;&gt;Structured Error Handling&lt;/h5&gt;
-
-&lt;p&gt;구조적 예외처리(이하 SEH)는 윈도우 운영 체제 특성에 기반한 예외 처리 매커니즘입니다.&lt;/p&gt;
-
-&lt;p&gt;이 SEH는 Thread별로 독립적으로 설치되고 운영되는 특징이 있습니다.&lt;/p&gt;
-
-&lt;p&gt;쉽게 이야기를 해보자면..프로그램이 좀 더 안정적으로 돌아갈 수 있도록 에러가 발생했을 때, 처리를 담당하는 역할을 맡고 있다고 생각하시면 되겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_3.png&quot; alt=&quot;[그림 1-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 그림은 SEH의 구조와 동작을 표현한 내용입니다. 뭔가 좀 복잡해보이죠??&lt;/p&gt;
-
-&lt;p&gt;하나씩 설명해보도록 할게요.&lt;/p&gt;
-
-&lt;p&gt;프로그램이 실행되다가 에러가 발생하면 FS(=Segment Register)의 0번지의 값을 참조해서 TIB의 Exception_Register라는 값을 찾습니다.&lt;/p&gt;
-
-&lt;p&gt;여기에는 컴파일러가 미리 등록해놓은 에러 처리를 위한 Handler의 주소가 담겨있는데 이를 참조해서 Handler를 호출합니다.&lt;/p&gt;
-
-&lt;p&gt;만약 에러가 해결되지 않는다면 다음 Handler를 호출하는 방식으로 구현되어 있습니다.&lt;/p&gt;
-
-&lt;p&gt;만약 이 Handler가 발생한 에러를 위한 Handler가 맞다면 실행되고 아니면 *next SEH Record를 참조하여 다음 Handler를 실행하러 갑니다.&lt;/p&gt;
-
-&lt;p&gt;그런데 이 과정이 무한 반복이 되면 안되겠죠? 이 과정은 *next SEH Record의 값이 0xffffffff가 될 때까지만 진행이 되고&lt;/p&gt;
-
-&lt;p&gt;만약 0xffffffff가 된다면 Default Exception Handler를 호출하게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;간단하쥬?&lt;/p&gt;
-
-&lt;p&gt;다음 그림을 통해 NSEH와 SEH의 구조를 살펴보겠습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_4.png&quot; alt=&quot;[그림 1-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 그림처럼 EXCEPTION_RECORD는 _next와 _handler로 구성되어 있습니다.&lt;/p&gt;
-
-&lt;p&gt;위에서 이미 설명했듯이 _next는 다음 EXCEPTION_RECORD의 위치를 담고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;_handler는 실제로 에러 처리 과정을 실행할 함수이고, 구조는 아래와 같습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_5.png&quot; alt=&quot;[그림 1-5]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 함수 구조와 같이 에러 처리 함수는 4개의 인자를 필요로 하며, 함수 실행 시 실행에 필요한 인자들을 STACK에 구성합니다.&lt;/p&gt;
-
-&lt;p&gt;따라서 에러 처리 함수가 동작되면 STACK 구조는 아래처럼 구성됩니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_6.png&quot; alt=&quot;[그림 1-6]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;이 중 우리가 공격에서 유용하게 사용할 값이 EstablierFrame입니다. EstablierFrame은 이전 Frame의 주소를 가지고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;이게 왜 중요할까요?&lt;/p&gt;
-
-&lt;p&gt;다음에서 우회 기법을 설명하며 EstablierFrame 값이 왜 중요한지 같이 알아보겠습니다.&lt;/p&gt;
-
-&lt;h5 id=&quot;seh-overwrite&quot;&gt;SEH Overwrite&lt;/h5&gt;
-
-&lt;p&gt;우리는 지금까지 GS와 SEH의 개념을 살펴보았습니다.&lt;/p&gt;
-
-&lt;p&gt;STACK Cookie를 우호하는데 왜 SEH의 개념이 필요할까요??&lt;/p&gt;
-
-&lt;p&gt;GS가 적용되면 함수 시작 시, 특정 4Byte를 넣고 함수가 종료될 때 4Byte를 검사한다고 했습니다.&lt;/p&gt;
-
-&lt;p&gt;이를 우회하려면? 반드시 4Byte를 알아내서 동일하게 적어줘야겠죠?&lt;/p&gt;
-
-&lt;p&gt;그런데 이 STACK Cookie를 검사하기 전에 프로그램에 치명적인 에러가 발생한다면 어떻게 될까요?&lt;/p&gt;
-
-&lt;p&gt;윈도우는 이 에러를 먼저 처리하려고 하겠죠???&lt;/p&gt;
-
-&lt;p&gt;이 점을 이용하는 겁니다. 지금부터 이 점을 이용해서 STACK Cookie 검사 과정을 우회할 것 입니다.&lt;/p&gt;
-
-&lt;p&gt;어떻게 할 것이냐? 저는 STACK의 끝까지 더미 값을 넣어서 할당된 STACK 공간 밖에 값을 쓰도록 Payload를 구성할 겁니다.&lt;/p&gt;
-
-&lt;p&gt;그러면? 반드시 에러가 발생하겠죠??&lt;/p&gt;
-
-&lt;p&gt;에러가 발생하면 윈도우의 SEH 과정이 실행됩니다.&lt;/p&gt;
-
-&lt;p&gt;지금까지 이야기한 것을 STACK으로 표현하면 다음과 같습니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_7.png&quot; alt=&quot;[그림 1-7]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 그림을 살펴보면 _next는 Jump to Shellcode, _handler는 &amp;amp; pop pop ret으로 되어 있죠?&lt;/p&gt;
-
-&lt;p&gt;그리고 아래 STACK Frame에 EstablierFrame도 빨간 색으로 표현되어 있네요.&lt;/p&gt;
-
-&lt;p&gt;먼저, EstablierFrame은 이전 Frame의 _next의 주소를 담고 있습니다.&lt;/p&gt;
-
-&lt;p&gt;_handler가 실행되면서 자체적으로 새로운 Frame을 생성하는데 이 함수의 인자 중 하나가 이전 Frame의 주소를 가지고 있으니까&lt;/p&gt;
-
-&lt;p&gt;다시 원래 Frame으로 돌아가서 Shellcode를 실행하도록 만들자는 것이죠.&lt;/p&gt;
-
-&lt;p&gt;그래서 _handler에는 &amp;amp; pop pop ret를 넣어줬습니다.&lt;/p&gt;
-
-&lt;p&gt;함수의 프롤로그 과정을 잘 떠올려보세요. 그럼 _handler가 실행될 때의 ESP는 그림에서 가장 아래에 있을 것이고&lt;/p&gt;
-
-&lt;p&gt;+8 위치에 EstablierFrame가 있죠? 그래서 &amp;amp; pop pop ret을 넣어주는 것입니다.&lt;/p&gt;
-
-&lt;p&gt;&amp;amp; pop pop ret이 실행되면?? _next로 오겠죠?&lt;/p&gt;
-
-&lt;p&gt;그럼 이제 남은 것은 _next에서 Shellcode가 얼마나 떨어져있는지 계산해서 jump code를 구성해주면 됩니다.&lt;/p&gt;
-
-&lt;p&gt;해당 그림에서는 바로 뒤에 Shellcode를 위치시켰습니다.&lt;/p&gt;
-
-&lt;p&gt;그래서 뛰어 넘을 거리는 6Byte!&lt;/p&gt;
-
-&lt;p&gt;4Byte가 아니냐구요? jump 0x06을 기계어로 바꾸면 06 eb가 됩니다. 2 byte짜리 명령어에요.&lt;/p&gt;
-
-&lt;p&gt;그래서 90 90 06 eb로 구성합니다. 그럼 90 90과 &amp;amp; pop pop ret을 뛰어넘어야 하니까 6byte 맞죠?&lt;/p&gt;
-
-&lt;p&gt;아래 그림은 Immunity Debugger를 이용해서 우회 과정을 살펴본 것입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_8.png&quot; alt=&quot;[그림 1-8]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/windows/0x05_9.png&quot; alt=&quot;[그림 1-9]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;우회가 잘 되죠??&lt;/p&gt;
-
-&lt;p&gt;지금까지 GS에 대한 설명을 했습니다. 다음 연재에서는 Safe SEH 기법에 대해 설명하겠습니다.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Joel Park</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">0x05 GS</summary>
       
 
       
