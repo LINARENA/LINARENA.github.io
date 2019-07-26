@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="http://localhost:4000/author/Hackyu/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-07-26T22:43:29+09:00</updated>
-  <id>http://localhost:4000/author/Hackyu/feed.xml</id>
+  <link href="/author/Hackyu/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-07-26T22:46:04+09:00</updated>
+  <id>/author/Hackyu/feed.xml</id>
 
   
   
@@ -41,11 +41,11 @@
   
     <entry>
       <title type="html">web-0x03</title>
-      <link href="http://localhost:4000/web-0x03" rel="alternate" type="text/html" title="web-0x03" />
+      <link href="/web-0x03" rel="alternate" type="text/html" title="web-0x03" />
       <published>2019-03-25T14:00:00+09:00</published>
       <updated>2019-03-25T14:00:00+09:00</updated>
-      <id>http://localhost:4000/web-0x03</id>
-      <content type="html" xml:base="http://localhost:4000/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
+      <id>/web-0x03</id>
+      <content type="html" xml:base="/web-0x03">&lt;h1 id=&quot;cve-2018-9034-1day-test&quot;&gt;CVE-2018-9034 1Day Test&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -173,11 +173,11 @@ https://downloads.wordpress.org/plugin/relevanssi.4.0.4.zip&lt;/li&gt;
   
     <entry>
       <title type="html">web-0x02</title>
-      <link href="http://localhost:4000/web-0x02" rel="alternate" type="text/html" title="web-0x02" />
+      <link href="/web-0x02" rel="alternate" type="text/html" title="web-0x02" />
       <published>2019-03-11T04:00:00+09:00</published>
       <updated>2019-03-11T04:00:00+09:00</updated>
-      <id>http://localhost:4000/web-0x02</id>
-      <content type="html" xml:base="http://localhost:4000/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
+      <id>/web-0x02</id>
+      <content type="html" xml:base="/web-0x02">&lt;h1 id=&quot;lfi-to-rce-on-phpmyadmin-480--481&quot;&gt;LFI to RCE on PHPMyAdmin 4.8.0 ~ 4.8.1&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 
@@ -475,11 +475,11 @@ https://www.youtube.com/watch?v=bT-00ZUTq0o&lt;/li&gt;
   
     <entry>
       <title type="html">web-0x01</title>
-      <link href="http://localhost:4000/web-0x01" rel="alternate" type="text/html" title="web-0x01" />
+      <link href="/web-0x01" rel="alternate" type="text/html" title="web-0x01" />
       <published>2019-02-25T10:20:00+09:00</published>
       <updated>2019-02-25T10:20:00+09:00</updated>
-      <id>http://localhost:4000/web-0x01</id>
-      <content type="html" xml:base="http://localhost:4000/web-0x01">&lt;h1 id=&quot;privilege-escalation--content-injection-on-wordpress-470--471&quot;&gt;Privilege Escalation / Content Injection On Wordpress 4.7.0 ~ 4.7.1&lt;/h1&gt;
+      <id>/web-0x01</id>
+      <content type="html" xml:base="/web-0x01">&lt;h1 id=&quot;privilege-escalation--content-injection-on-wordpress-470--471&quot;&gt;Privilege Escalation / Content Injection On Wordpress 4.7.0 ~ 4.7.1&lt;/h1&gt;
 
 &lt;h5 id=&quot;privilege-escalation--content-injection&quot;&gt;Privilege Escalation / Content Injection?&lt;/h5&gt;
 
@@ -849,11 +849,11 @@ https://blog.sucuri.net/2017/02/content-injection-vulnerability-wordpress-rest-a
   
     <entry>
       <title type="html">web-0x00</title>
-      <link href="http://localhost:4000/web-0x00" rel="alternate" type="text/html" title="web-0x00" />
+      <link href="/web-0x00" rel="alternate" type="text/html" title="web-0x00" />
       <published>2019-02-24T07:22:00+09:00</published>
       <updated>2019-02-24T07:22:00+09:00</updated>
-      <id>http://localhost:4000/web-0x00</id>
-      <content type="html" xml:base="http://localhost:4000/web-0x00">&lt;p&gt;0x00. 서문&lt;/p&gt;
+      <id>/web-0x00</id>
+      <content type="html" xml:base="/web-0x00">&lt;p&gt;0x00. 서문&lt;/p&gt;
 
 &lt;p&gt;안녕하세요 hackyu입니다.&lt;/p&gt;
 

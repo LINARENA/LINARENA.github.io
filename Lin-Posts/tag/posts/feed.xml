@@ -2,10 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-  <link href="http://localhost:4000/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-07-26T22:43:29+09:00</updated>
-  <id>http://localhost:4000/tag/posts/feed.xml</id>
+  <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="/" rel="alternate" type="text/html" />
+  <updated>2019-07-26T22:46:04+09:00</updated>
+  <id>/tag/posts/feed.xml</id>
 
   
   
@@ -41,11 +41,11 @@
   
     <entry>
       <title type="html">linux_0x07 UAF(Use After Free) - 1부</title>
-      <link href="http://localhost:4000/linux_0x07" rel="alternate" type="text/html" title="linux_0x07 UAF(Use After Free) - 1부" />
+      <link href="/linux_0x07" rel="alternate" type="text/html" title="linux_0x07 UAF(Use After Free) - 1부" />
       <published>2019-07-27T06:10:00+09:00</published>
       <updated>2019-07-27T06:10:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x07</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x07">&lt;h1 id=&quot;uafuse-after-free---1부&quot;&gt;UAF(Use After Free) - 1부&lt;/h1&gt;
+      <id>/linux_0x07</id>
+      <content type="html" xml:base="/linux_0x07">&lt;h1 id=&quot;uafuse-after-free---1부&quot;&gt;UAF(Use After Free) - 1부&lt;/h1&gt;
 
 &lt;p&gt;안녕하심꽈 Sulla임돠.&lt;/p&gt;
 
@@ -189,11 +189,11 @@ int main(void)
   
     <entry>
       <title type="html">CVE-2012-4782</title>
-      <link href="http://localhost:4000/windows-0x0e" rel="alternate" type="text/html" title="CVE-2012-4782" />
+      <link href="/windows-0x0e" rel="alternate" type="text/html" title="CVE-2012-4782" />
       <published>2019-07-22T03:00:00+09:00</published>
       <updated>2019-07-22T03:00:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0e</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0e">&lt;h1 id=&quot;0x0e-ie8-exploit&quot;&gt;0x0e IE8 Exploit&lt;/h1&gt;
+      <id>/windows-0x0e</id>
+      <content type="html" xml:base="/windows-0x0e">&lt;h1 id=&quot;0x0e-ie8-exploit&quot;&gt;0x0e IE8 Exploit&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -449,11 +449,11 @@ ust : 유저 스택 트레이스 설정으로 유저모드의 스택 결과를 �
   
     <entry>
       <title type="html">linux_0x06 Heap 구조(malloc, free)</title>
-      <link href="http://localhost:4000/linux_0x06" rel="alternate" type="text/html" title="linux_0x06 Heap 구조(malloc, free)" />
+      <link href="/linux_0x06" rel="alternate" type="text/html" title="linux_0x06 Heap 구조(malloc, free)" />
       <published>2019-07-01T04:50:00+09:00</published>
       <updated>2019-07-01T04:50:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x06</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x06">&lt;h1 id=&quot;heap-구조malloc-free&quot;&gt;Heap 구조(malloc, free)&lt;/h1&gt;
+      <id>/linux_0x06</id>
+      <content type="html" xml:base="/linux_0x06">&lt;h1 id=&quot;heap-구조malloc-free&quot;&gt;Heap 구조(malloc, free)&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Sulla임돠.&lt;/p&gt;
 
@@ -582,11 +582,11 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
   
     <entry>
       <title type="html">Heap Spray</title>
-      <link href="http://localhost:4000/windows-0x0d" rel="alternate" type="text/html" title="Heap Spray" />
+      <link href="/windows-0x0d" rel="alternate" type="text/html" title="Heap Spray" />
       <published>2019-06-27T20:18:00+09:00</published>
       <updated>2019-06-27T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0d</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0d">&lt;h1 id=&quot;0x0d-heap-spray&quot;&gt;0x0d Heap Spray&lt;/h1&gt;
+      <id>/windows-0x0d</id>
+      <content type="html" xml:base="/windows-0x0d">&lt;h1 id=&quot;0x0d-heap-spray&quot;&gt;0x0d Heap Spray&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -935,11 +935,11 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
   
     <entry>
       <title type="html">linux_0x05 RTL Chaining &amp;amp; ROP</title>
-      <link href="http://localhost:4000/linux_0x05" rel="alternate" type="text/html" title="linux_0x05 RTL Chaining &amp; ROP" />
+      <link href="/linux_0x05" rel="alternate" type="text/html" title="linux_0x05 RTL Chaining &amp; ROP" />
       <published>2019-05-16T11:18:00+09:00</published>
       <updated>2019-05-16T11:18:00+09:00</updated>
-      <id>http://localhost:4000/linux_0x05</id>
-      <content type="html" xml:base="http://localhost:4000/linux_0x05">&lt;h1 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h1&gt;
+      <id>/linux_0x05</id>
+      <content type="html" xml:base="/linux_0x05">&lt;h1 id=&quot;rtl-chaining--ropreturn-oriented-programming&quot;&gt;RTL Chaining &amp;amp; ROP(Return Oriented Programming)&lt;/h1&gt;
 
 &lt;p&gt;이번 시간부터는 지난 포스팅에서 진행된 환경보다 비교적 최신의 환경에서 진행 해보겠습니다.&lt;/p&gt;
 
@@ -1403,11 +1403,11 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
   
     <entry>
       <title type="html">Use After Free</title>
-      <link href="http://localhost:4000/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" />
+      <link href="/windows-0x0c" rel="alternate" type="text/html" title="Use After Free" />
       <published>2019-05-06T20:18:00+09:00</published>
       <updated>2019-05-06T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0c</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
+      <id>/windows-0x0c</id>
+      <content type="html" xml:base="/windows-0x0c">&lt;h1 id=&quot;0x0c-use-after-free&quot;&gt;0x0c Use After Free&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -1583,11 +1583,11 @@ first-&amp;gt;vulnfunc();
   
     <entry>
       <title type="html">Vtable Overwrite</title>
-      <link href="http://localhost:4000/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
+      <link href="/windows-0x0b" rel="alternate" type="text/html" title="Vtable Overwrite" />
       <published>2019-04-18T20:18:00+09:00</published>
       <updated>2019-04-18T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0b</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
+      <id>/windows-0x0b</id>
+      <content type="html" xml:base="/windows-0x0b">&lt;h1 id=&quot;0x0b-vtable-overwirte&quot;&gt;0x0b Vtable Overwirte&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -1931,11 +1931,11 @@ int main(int argc, char * argv[]) {
   
     <entry>
       <title type="html">android-0x02</title>
-      <link href="http://localhost:4000/android-0x02" rel="alternate" type="text/html" title="android-0x02" />
+      <link href="/android-0x02" rel="alternate" type="text/html" title="android-0x02" />
       <published>2019-04-12T14:00:00+09:00</published>
       <updated>2019-04-12T14:00:00+09:00</updated>
-      <id>http://localhost:4000/android-0x02</id>
-      <content type="html" xml:base="http://localhost:4000/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
+      <id>/android-0x02</id>
+      <content type="html" xml:base="/android-0x02">&lt;h1 id=&quot;android-동적-분석&quot;&gt;Android 동적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
@@ -2081,11 +2081,11 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
   
     <entry>
       <title type="html">Windows-Heap 정의</title>
-      <link href="http://localhost:4000/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
+      <link href="/windows-0x0a" rel="alternate" type="text/html" title="Windows-Heap 정의" />
       <published>2019-04-02T20:18:00+09:00</published>
       <updated>2019-04-02T20:18:00+09:00</updated>
-      <id>http://localhost:4000/windows-0x0a</id>
-      <content type="html" xml:base="http://localhost:4000/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
+      <id>/windows-0x0a</id>
+      <content type="html" xml:base="/windows-0x0a">&lt;h1 id=&quot;0x0a-windows-heap&quot;&gt;0x0a Windows-Heap&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요. Joel입니다.&lt;/p&gt;
 
@@ -2261,11 +2261,11 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
   
     <entry>
       <title type="html">android-0x01</title>
-      <link href="http://localhost:4000/android-0x01" rel="alternate" type="text/html" title="android-0x01" />
+      <link href="/android-0x01" rel="alternate" type="text/html" title="android-0x01" />
       <published>2019-03-29T14:00:00+09:00</published>
       <updated>2019-03-29T14:00:00+09:00</updated>
-      <id>http://localhost:4000/android-0x01</id>
-      <content type="html" xml:base="http://localhost:4000/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
+      <id>/android-0x01</id>
+      <content type="html" xml:base="/android-0x01">&lt;h1 id=&quot;android-정적-분석&quot;&gt;Android 정적 분석&lt;/h1&gt;
 
 &lt;p&gt;안녕하세요 chaem 입니다.&lt;/p&gt;
 
