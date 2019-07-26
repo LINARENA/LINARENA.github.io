@@ -8,6 +8,21 @@
     
       
       <item>
+        <title>linux_0x07 UAF(Use After Free) - 1부</title>
+        
+          <description>&lt;h1 id=&quot;uafuse-after-free---1부&quot;&gt;UAF(Use After Free) - 1부&lt;/h1&gt;
+
+</description>
+        
+        <pubDate>Sat, 27 Jul 2019 06:10:00 +0900</pubDate>
+        <link>
+        /linux_0x07</link>
+        <guid isPermaLink="true">/linux_0x07</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>CVE-2012-4782</title>
         
           <description>&lt;h1 id=&quot;0x0e-ie8-exploit&quot;&gt;0x0e IE8 Exploit&lt;/h1&gt;

