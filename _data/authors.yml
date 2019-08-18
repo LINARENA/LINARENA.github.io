@@ -1,0 +1,54 @@
+ghost:
+  username: ghost
+  name: Ghost
+  url_full: http://jekyller.github.io/jasper2/
+  url: jekyller.github.io/jasper2
+  bio: The professional publishing platform
+  picture: assets/images/ghost.png
+  facebook: ghost
+  twitter: tryghost
+  cover: False
+Joel:
+  username: Joel
+  name: Joel Park
+  location: Seoul, Republic of Korea
+  url_full: 
+  url: 
+  bio: psh@linarena.com
+  picture: assets/images/CI_Logo.jpg
+  facebook: False
+  twitter: False
+  cover: assets/images/lin_logo.png
+Sulla:
+  username: Sulla
+  name: Sulla
+  location: Seoul, Republic of Korea
+  url_full: 
+  url: 
+  bio: ksh@linarena.com
+  picture: assets/images/CI_Logo.jpg
+  facebook: False
+  twitter: False
+  cover: assets/images/lin_logo.pngs
+Hackyu:
+  username: Hackyu
+  name: Hackyu
+  location: Seoul, Republic of Korea
+  url_full: 
+  url: 
+  bio: ldk@linarena.com
+  picture: assets/images/CI_Logo.jpg
+  facebook: False
+  twitter: False
+  cover: assets/images/lin_logo.png
+Chaem:
+  username: Chaem
+  name: Chaem
+  location: Seoul, Republic of Korea
+  url_full: 
+  url: 
+  bio: lcm@linarena.com
+  picture: assets/images/CI_Logo.jpg
+  facebook: False
+  twitter: False
+  cover: assets/images/lin_logo.png
