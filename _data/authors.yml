@@ -52,7 +52,6 @@ Chaem:
   facebook: False
   twitter: False
   cover: assets/images/lin_logo.png
-  
 Ppeuni:
   username: Ppeuni
   name: Ppeuni
@@ -60,6 +59,17 @@ Ppeuni:
   url_full: 
   url: 
   bio: cdy@linarena.com
+  picture: assets/images/CI_Logo.jpg
+  facebook: False
+  twitter: False
+  cover: assets/images/lin_logo.png
+Choonsik:
+  username: Choonsik
+  name: Choonsik
+  location: Seoul, Republic of Korea
+  url_full: 
+  url: 
+  bio: ssw@linarena.com
   picture: assets/images/CI_Logo.jpg
   facebook: False
   twitter: False
